@@ -3,7 +3,29 @@
 Semua perubahan yang signifikan pada proyek HomeHub ini akan dicatat di file ini.
 Format penulisan berdasarkan [Keep a Changelog](https://keepachangelog.com/id/1.0.0/).
 
+## [v1.0.8] - 2026-07-01
+
+### Security
+- **AI Agent generic auth error**: Mengembalikan pesan error generik "Unauthorized" untuk semua kegagalan autentikasi AI agent (tidak lagi mengungkap apakah token dikonfigurasi atau invalid).
+- **File path traversal validation**: Menambahkan validasi `_safe_basename()` pada semua rute serve media dan PDF untuk mencegah path traversal.
+
+### Changed
+- **SQLite WAL mode + connection pooling**: Mengaktifkan Write-Ahead Logging (WAL) untuk performa konkurensi lebih baik. Konfigurasi pool: timeout 15s, pool_size 5, max_overflow 10, pool_pre_ping untuk deteksi koneksi stale.
+- **python-dateutil untuk date arithmetic**: Recurring chores sekarang menggunakan `python-dateutil` (relativedelta) untuk perhitungan tanggal yang akurat, dengan fallback ke logika manual jika library tidak tersedia.
+
+### Fixed
+- **Infinite loop protection (recurring expense)**: Menambahkan safety check pada `_generate_recurring_entries_until` untuk mencegah infinite loop jika `next_date()` tidak memajukan tanggal. Error dicatat di log.
+- **Expense month/year validation**: Menambahkan validasi parameter y/m pada route expenses untuk mencegah crash dengan nilai ekstrem (y harus 1900-2100, m harus 1-12).
+- **Expense settings logging**: Logging ditambahkan pada kegagalan muat pengaturan expense (sebelumnya silent fail).
+
 ## [v1.0.7] - 2026-07-01
+
+### Fixed
+- **Media/PDF preview not found saat file hilang**: Media downloader dan PDF viewer sekarang mengecek keberadaan file di disk sebelum menyajikan tautan Preview/Download. Jika file sudah dihapus atau folder media dipindah, backend mengembalikan 404 dengan rapi, API status mengembalikan flag `file_exists`, dan antarmuka menampilkan "Not available (deleted)" alih-alih tautan rusak. Tombol Delete tetap tersedia agar pengguna bisa membersihkan entri *database*.
+- **Preview link tetap buka new tab 404 meski sudah ditandai "Not available"**: Memperbaiki *async race condition* di click handler frontend — `preventDefault()` kini dipanggil secara sinkron sebelum `await fetch(HEAD)`, sehingga navigasi ke 404 benar-benar dicegah. Jika file valid, `window.open()` dipanggil manual di kode.
+- **Raw HTML "Not available" muncul sebagai teks**: Memperbaiki penggunaan `replaceWith()` yang membuat TextNode — kini menggunakan `outerHTML()` agar elemen HTML dirender dengan benar.
+- **Add Redownload button untuk media hilang**: Menambahkan tombol "Redownload" yang muncul ketika media tidak ditemukan di disk. Klik tombol mengisi form URL download dengan URL asli video dan scroll ke form untuk memudahkan re-download.
+- **Initial page load validation**: Media yang sudah selesai di-download (filepath di DB ada) tetapi file di disk hilang kini otomatis terdeteksi saat halaman dimuat, bukan hanya setelah polling.
 
 ### Fixed
 - **Media/PDF preview not found saat file hilang**: Media downloader dan PDF viewer sekarang mengecek keberadaan file di disk sebelum menyajikan tautan Preview/Download. Jika file sudah dihapus atau folder media dipindah, backend mengembalikan 404 dengan rapi, API status mengembalikan flag `file_exists`, dan antarmuka menampilkan "Not available (deleted)" alih-alih tautan rusak. Tombol Delete tetap tersedia agar pengguna bisa membersihkan entri *database*.
