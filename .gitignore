@@ -27,3 +27,7 @@ package-lock.json
 static/output.css
 static/custom.css
 tests/__pycache__/
+
+# Other
+CLAUDE.md
+migrate_quicklinks.py
