@@ -11,3 +11,4 @@ bleach
 pytest
 requests
 ruamel.yaml
+python-dateutil

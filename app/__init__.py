@@ -32,6 +32,14 @@ def create_app(test_config: dict | None = None):
     db_path = os.path.join(base_dir, 'data', 'app.db')
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_path
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    # SQLite connection pooling & concurrency tuning
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+        'connect_args': {'timeout': 15, 'check_same_thread': False},
+        'pool_size': 5,
+        'max_overflow': 10,
+        'pool_pre_ping': True,
+        'pool_recycle': 3600,
+    }
     # Generate a strong SECRET_KEY if not provided via env
     secret = os.environ.get('SECRET_KEY')
     if not secret:
@@ -49,6 +57,14 @@ def create_app(test_config: dict | None = None):
         app.config.update(test_config)
 
     db.init_app(app)
+
+    # Enable SQLite WAL mode for better concurrency
+    with app.app_context():
+        try:
+            db.session.execute(db.text('PRAGMA journal_mode=WAL'))
+            db.session.commit()
+        except Exception:
+            pass  # WAL may not be supported in all scenarios (e.g., network FS)
 
     # Ensure models are imported before creating tables
     with app.app_context():

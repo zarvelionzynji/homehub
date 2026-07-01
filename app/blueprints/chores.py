@@ -4,6 +4,10 @@ from ..models import db, Chore, RecurringChore
 from ..blueprints import main_bp
 from ..security import sanitize_text
 import json
+try:
+    from dateutil.relativedelta import relativedelta
+except ImportError:
+    relativedelta = None
 
 
 def _parse_date(value):
@@ -16,6 +20,9 @@ def _parse_date(value):
 
 
 def _add_months(dt: date, months: int) -> date:
+    if relativedelta is not None:
+        return dt + relativedelta(months=months)
+    # Fallback for environments without python-dateutil
     y = dt.year + (dt.month - 1 + months) // 12
     m = (dt.month - 1 + months) % 12 + 1
     last = (date(y + (1 if m == 12 else 0), 1 if m == 12 else m + 1, 1) - timedelta(days=1)).day
@@ -24,6 +31,8 @@ def _add_months(dt: date, months: int) -> date:
 
 
 def _add_years(dt: date, years: int) -> date:
+    if relativedelta is not None:
+        return dt + relativedelta(years=years)
     try:
         return date(dt.year + years, dt.month, dt.day)
     except Exception:

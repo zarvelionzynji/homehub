@@ -11,18 +11,15 @@ def require_ai_token(f):
     def decorated_function(*args, **kwargs):
         config = current_app.config.get('HOMEHUB_CONFIG', {})
         token = config.get('ai_agent_token')
-        
-        if not token:
-            return jsonify({'error': 'AI agent token not configured in config.yml'}), 501
-            
+
         auth_header = request.headers.get('Authorization')
         if not auth_header or not auth_header.startswith('Bearer '):
-            return jsonify({'error': 'Missing or invalid Authorization header'}), 401
-            
+            return jsonify({'error': 'Unauthorized'}), 401
+
         provided_token = auth_header.split(' ', 1)[1]
-        if provided_token != str(token):
-            return jsonify({'error': 'Invalid token'}), 403
-            
+        if (not token) or (provided_token != str(token)):
+            return jsonify({'error': 'Unauthorized'}), 401
+
         return f(*args, **kwargs)
     return decorated_function
 

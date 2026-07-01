@@ -84,7 +84,12 @@ def _generate_recurring_entries_until(today: date | None = None) -> None:
                     recurring_id=r.id
                 ))
             r.last_generated_date = d
+            prev_d = d
             d = next_date(d)
+            # Safety check: prevent infinite loop if date doesn't advance
+            if d == prev_d:
+                current_app.logger.error(f'Recurring expense date increment failed for rule {r.id}: date={d} not advancing')
+                break
     db.session.commit()
 
 
@@ -177,6 +182,12 @@ def expenses():
         m = int(request.args.get('m') or today.month)
     except Exception:
         y, m = today.year, today.month
+
+    # Validate year and month to prevent date calculation crashes
+    if not (1900 <= y <= 2100):
+        y = today.year
+    if not (1 <= m <= 12):
+        m = today.month
         
     # Ensure recurring entries are generated up to the end of the viewed month
     import calendar

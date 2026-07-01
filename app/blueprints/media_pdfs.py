@@ -21,6 +21,13 @@ def _file_exists(filepath: str) -> bool:
         return False
 
 
+def _safe_basename(filename: str) -> str:
+    """Validate filename is a safe basename (no path traversal)"""
+    if not filename or '/' in filename or '\\' in filename or filename.startswith('.'):
+        return ''
+    return filename
+
+
 @main_bp.route('/media/share', methods=['GET'])
 @main_bp.route('/media', methods=['GET', 'POST'])
 def media():
@@ -104,7 +111,8 @@ def media():
                     m.progress = None
                     db.session.commit()
 
-        Thread(target=worker, args=(app_obj, media_obj.id, base, cmd), daemon=True).start()
+        t = Thread(target=worker, args=(app_obj, media_obj.id, base, cmd), daemon=True)
+        t.start()
         return redirect(url_for('main.media'))
     media_list = Media.query.order_by(Media.download_time.desc()).all()
     config = current_app.config['HOMEHUB_CONFIG']
@@ -120,6 +128,8 @@ def media_status(media_id):
 
 @main_bp.route('/media/<filename>')
 def serve_media(filename):
+    if not _safe_basename(filename):
+        abort(400)
     full_path = os.path.join(MEDIA_FOLDER, filename)
     if not _file_exists(full_path):
         abort(404)
@@ -129,6 +139,8 @@ def serve_media(filename):
 @main_bp.route('/media/preview/<filename>')
 def preview_media(filename):
     """Serve media file for preview (inline) with security headers"""
+    if not _safe_basename(filename):
+        abort(400)
     full_path = os.path.join(MEDIA_FOLDER, filename)
     if not _file_exists(full_path):
         abort(404)
@@ -201,6 +213,8 @@ def pdfs():
 
 @main_bp.route('/pdfs/<filename>')
 def serve_pdf(filename):
+    if not _safe_basename(filename):
+        abort(400)
     full_path = os.path.join(PDF_FOLDER, filename)
     if not _file_exists(full_path):
         abort(404)
@@ -210,6 +224,8 @@ def serve_pdf(filename):
 @main_bp.route('/pdfs/preview/<filename>')
 def preview_pdf(filename):
     """Serve PDF file for preview (inline) with security headers"""
+    if not _safe_basename(filename):
+        abort(400)
     full_path = os.path.join(PDF_FOLDER, filename)
     if not _file_exists(full_path):
         abort(404)
