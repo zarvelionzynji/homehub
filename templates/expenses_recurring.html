@@ -96,13 +96,13 @@
         {% if rules %}
         <div class="rules-container">
           {% for r in rules %}
-          <div class="border border-gray-200 dark:border-gray-700 border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800">
+          <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800">
             <details>
               <summary class="cursor-pointer font-semibold p-2 select-none hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 rounded">
                 <div class="flex items-center justify-between gap-4">
                   <div class="min-w-0">
                     <div class="font-medium">{{ r.title }} — {{ r.frequency }}{% if r.frequency=='monthly' %} ({{ r.monthly_mode or 'day_of_month' }}){% endif %}</div>
-                    <div class="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-1">
+                    <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">
                       {{ r.default_quantity }} × {{ ('%.' ~ expense_precision ~ 'f')|format(r.unit_price or 0) }} 
                       • {{ r.start_date }}{% if r.end_date %} → {{ r.end_date }}{% endif %} 
                       • by {{ r.creator }}
@@ -124,24 +124,24 @@
                 </div>
                 <div>
                   <label class="text-sm text-gray-600 dark:text-gray-300">Title</label>
-                  <input type="text" name="title" class="w-full border border-gray-200 dark:border-gray-700 rounded p-2" value="{{ r.title }}">
+                  <input type="text" name="title" class="w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded p-2 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" value="{{ r.title }}">
                 </div>
                 <div>
                   <label class="text-sm text-gray-600 dark:text-gray-300">Category</label>
-                  <input type="text" name="category" class="w-full border border-gray-200 dark:border-gray-700 rounded p-2" value="{{ r.category or '' }}">
+                  <input type="text" name="category" class="w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded p-2 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" value="{{ r.category or '' }}">
                   <div class="edit-category-chips mt-2 flex flex-wrap gap-2"></div>
                 </div>
                 <div>
                   <label class="text-sm text-gray-600 dark:text-gray-300">Unit Price</label>
-                  <input type="number" step="0.01" name="unit_price" class="w-full border border-gray-200 dark:border-gray-700 rounded p-2" value="{{ ('%.' ~ expense_precision ~ 'f')|format(r.unit_price or 0) }}">
+                  <input type="number" step="0.01" name="unit_price" class="w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded p-2 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" value="{{ ('%.' ~ expense_precision ~ 'f')|format(r.unit_price or 0) }}">
                 </div>
                 <div>
                   <label class="text-sm text-gray-600 dark:text-gray-300">Default Qty</label>
-                  <input type="number" step="0.01" name="default_quantity" class="w-full border border-gray-200 dark:border-gray-700 rounded p-2" value="{{ r.default_quantity }}">
+                  <input type="number" step="0.01" name="default_quantity" class="w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded p-2 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" value="{{ r.default_quantity }}">
                 </div>
                 <div>
                   <label class="text-sm text-gray-600 dark:text-gray-300">Frequency</label>
-                  <select name="frequency" class="w-full border border-gray-200 dark:border-gray-700 rounded p-2">
+                  <select name="frequency" class="w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded p-2 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">
                     <option value="daily" {% if r.frequency=='daily' %}selected{% endif %}>Daily</option>
                     <option value="weekly" {% if r.frequency=='weekly' %}selected{% endif %}>Weekly</option>
                     <option value="monthly" {% if r.frequency=='monthly' %}selected{% endif %}>Monthly</option>
@@ -149,22 +149,22 @@
                 </div>
                 <div>
                   <label class="text-sm text-gray-600 dark:text-gray-300">Monthly Mode</label>
-                  <select name="monthly_mode" class="w-full border border-gray-200 dark:border-gray-700 rounded p-2">
+                  <select name="monthly_mode" class="w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded p-2 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">
                     <option value="day_of_month" {% if (r.monthly_mode or 'day_of_month')=='day_of_month' %}selected{% endif %}>Same day-of-month</option>
                     <option value="calendar" {% if (r.monthly_mode or 'day_of_month')=='calendar' %}selected{% endif %}>Calendar month</option>
                   </select>
                 </div>
                 <div>
                   <label class="text-sm text-gray-600 dark:text-gray-300">Start Date</label>
-                  <input type="date" name="start_date" class="w-full border border-gray-200 dark:border-gray-700 rounded p-2" value="{{ r.start_date }}">
+                  <input type="date" name="start_date" class="w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded p-2 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" value="{{ r.start_date }}">
                 </div>
                 <div>
                   <label class="text-sm text-gray-600 dark:text-gray-300">End Date</label>
-                  <input type="date" name="end_date" class="w-full border border-gray-200 dark:border-gray-700 rounded p-2" value="{{ r.end_date or '' }}">
+                  <input type="date" name="end_date" class="w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded p-2 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" value="{{ r.end_date or '' }}">
                 </div>
                 <div>
                   <label class="text-sm text-gray-600 dark:text-gray-300">Edit Strategy</label>
-                  <select name="edit_strategy" class="w-full border border-gray-200 dark:border-gray-700 rounded p-2">
+                  <select name="edit_strategy" class="w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded p-2 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">
                     <option value="apply_from" selected>Keep history, apply changes from effective date</option>
                     <option value="split_rule">Create new rule from effective date (split)</option>
                     <option value="rewrite_all">Rewrite entire rule history (destructive)</option>
@@ -172,12 +172,12 @@
                 </div>
                 <div>
                   <label class="text-sm text-gray-600 dark:text-gray-300">Update Attachment (opt)</label>
-                  <input type="file" name="attachment" accept="image/*" class="w-full text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-50 dark:bg-slate-800 dark:border-slate-700 file:text-blue-700 hover:file:bg-blue-100">
+                  <input type="file" name="attachment" accept="image/*" class="w-full text-sm text-gray-500 dark:text-gray-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-50 dark:bg-slate-800 dark:border-slate-700 file:text-blue-700 hover:file:bg-blue-100 focus-visible:outline-none">
                 </div>
                 <div class="effective-from-group">
                   <label class="text-sm text-gray-600 dark:text-gray-300">Effective From</label>
-                  <input type="date" name="effective_from" class="w-full border border-gray-200 dark:border-gray-700 rounded p-2" value="{{ (r.start_date or '') }}">
-                  <p class="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-1">Used by apply/split strategies.</p>
+                  <input type="date" name="effective_from" class="w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded p-2 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" value="{{ (r.start_date or '') }}">
+                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Used by apply/split strategies.</p>
                 </div>
                 <div class="md:col-span-3 flex justify-end gap-2">
                   <button type="button" class="btn btn-secondary cancel-edit" onclick="this.closest('details').open=false">Cancel</button>
@@ -200,7 +200,7 @@
         </div>
         {% else %}
         <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded border">
-          <p class="text-gray-500 dark:text-gray-400 dark:text-gray-500">No recurring rules yet. Add one below.</p>
+          <p class="text-gray-500 dark:text-gray-400">No recurring rules yet. Add one below.</p>
         </div>
         {% endif %}
 
@@ -209,26 +209,26 @@
           <h3 class="text-lg font-semibold mb-4">Add New Rule</h3>
           <form id="recurring-form" method="POST" action="/expenses" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
             <input type="hidden" name="form_type" value="recurring">
-            <input type="text" name="title" class="md:col-span-4 p-2 border border-gray-200 dark:border-gray-700 rounded" placeholder="Title (e.g., Milk)" required>
+            <input type="text" name="title" class="md:col-span-4 p-2 border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="Title (e.g., Milk)" required>
             <div class="md:col-span-4">
               <div id="recurring-category-chips" class="mb-2 flex flex-wrap gap-2"></div>
-              <input type="text" name="category" class="w-full p-2 border border-gray-200 dark:border-gray-700 rounded" placeholder="Category (opt)">
+              <input type="text" name="category" class="w-full p-2 border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="Category (opt)">
             </div>
-            <input type="number" step="0.01" name="unit_price" class="md:col-span-4 p-2 border border-gray-200 dark:border-gray-700 rounded" placeholder="Unit price" required>
-            <input type="number" step="0.01" name="default_quantity" class="md:col-span-4 p-2 border border-gray-200 dark:border-gray-700 rounded" placeholder="Default qty" required>
-            <select name="frequency" class="md:col-span-4 p-2 border border-gray-200 dark:border-gray-700 rounded">
+            <input type="number" step="0.01" name="unit_price" class="md:col-span-4 p-2 border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="Unit price" required>
+            <input type="number" step="0.01" name="default_quantity" class="md:col-span-4 p-2 border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="Default qty" required>
+            <select name="frequency" class="md:col-span-4 p-2 border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">
               <option value="daily">Daily</option>
               <option value="weekly">Weekly</option>
               <option value="monthly">Monthly</option>
             </select>
-            <select name="monthly_mode" class="md:col-span-4 p-2 border border-gray-200 dark:border-gray-700 rounded">
+            <select name="monthly_mode" class="md:col-span-4 p-2 border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">
               <option value="day_of_month">Monthly mode: Same day-of-month</option>
               <option value="calendar">Monthly mode: Calendar boundary</option>
             </select>
-            <input type="date" name="start_date" class="md:col-span-4 p-2 border border-gray-200 dark:border-gray-700 rounded" placeholder="Start">
-            <input type="date" name="end_date" class="md:col-span-4 p-2 border border-gray-200 dark:border-gray-700 rounded" placeholder="End (optional)">
+            <input type="date" name="start_date" class="md:col-span-4 p-2 border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="Start">
+            <input type="date" name="end_date" class="md:col-span-4 p-2 border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="End (optional)">
             <div class="md:col-span-4">
-              <input type="file" name="attachment" accept="image/*" class="w-full text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-50 dark:bg-slate-800 dark:border-slate-700 file:text-blue-700 hover:file:bg-blue-100" title="Proof of subscription/contract">
+              <input type="file" name="attachment" accept="image/*" class="w-full text-sm text-gray-500 dark:text-gray-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-50 dark:bg-slate-800 dark:border-slate-700 file:text-blue-700 hover:file:bg-blue-100 focus-visible:outline-none" title="Proof of subscription/contract">
             </div>
             <input type="hidden" name="creator" id="recCreator">
             <div class="md:col-span-12 flex justify-end">
@@ -249,18 +249,18 @@
           
           <div>
             <label class="text-sm text-gray-600 dark:text-gray-300 font-semibold">Currency symbol</label>
-            <input type="text" name="currency" id="currency-input" class="w-full border border-gray-200 dark:border-gray-700 rounded p-2 mt-1" placeholder="Rp">
+            <input type="text" name="currency" id="currency-input" class="w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded p-2 mt-1 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="Rp">
           </div>
           
           <div>
             <label class="text-sm text-gray-600 dark:text-gray-300 font-semibold">Fraction factor</label>
-            <input type="number" min="1" step="1" name="fraction_factor" id="fraction-factor-input" class="w-full border border-gray-200 dark:border-gray-700 rounded p-2 mt-1" value="{{ expense_settings.fraction_factor if expense_settings is defined and expense_settings.fraction_factor is defined else 1 }}" placeholder="1">
-            <p class="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-2">How many lower currency units make one main unit, like $1 contains 100 cents. Common values: 1 (IDR, JPY), 100 (USD, EUR).</p>
+            <input type="number" min="1" step="1" name="fraction_factor" id="fraction-factor-input" class="w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded p-2 mt-1 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" value="{{ expense_settings.fraction_factor if expense_settings is defined and expense_settings.fraction_factor is defined else 1 }}" placeholder="1">
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">How many lower currency units make one main unit, like $1 contains 100 cents. Common values: 1 (IDR, JPY), 100 (USD, EUR).</p>
           </div>
           
           <div>
             <label class="text-sm text-gray-600 dark:text-gray-300 font-semibold">Categories (comma separated)</label>
-            <input type="text" name="categories" id="categories-input" class="w-full border border-gray-200 dark:border-gray-700 rounded p-2 mt-1" placeholder="Groceries, Utilities, Housing">
+            <input type="text" name="categories" id="categories-input" class="w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded p-2 mt-1 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="Groceries, Utilities, Housing">
             <div id="category-chips" class="mt-3 flex flex-wrap gap-2"></div>
           </div>
           

@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="mx-auto">
-    <h2 class="text-xl font-bold mb-4">Media Downloader</h2>
+    <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Media Downloader</h2>
     <form method="POST" action="/media" class="mb-4 grid gap-2 md:grid-cols-12 grid-cols-1 items-end">
-        <input type="url" name="url" class="w-full p-2 border rounded md:col-span-6" placeholder="Paste media URL..." value="{{ shared_url }}" required>
-        <select name="format" class="p-2 border rounded md:col-span-2">
+        <input type="url" name="url" class="w-full p-2 rounded-lg bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none border md:col-span-6" placeholder="Paste media URL..." value="{{ shared_url }}" required>
+        <select name="format" class="p-2 rounded-lg bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none border md:col-span-2">
             <option value="mp4">MP4 (video)</option>
             <option value="mp3">MP3 (audio)</option>
         </select>
-        <select name="quality" class="p-2 border rounded md:col-span-2">
+        <select name="quality" class="p-2 rounded-lg bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none border md:col-span-2">
             <option value="best">Best Available</option>
             <option value="bestvideo[height<=1080]+bestaudio/best[height<=1080]">Up to 1080p</option>
             <option value="bestvideo[height<=720]+bestaudio/best[height<=720]">Up to 720p</option>
@@ -18,11 +18,11 @@
     </form>
         <ul>
         {% for media in media_list %}
-    <li class="card p-4 mb-2 flex flex-wrap gap-2 items-center" data-id="{{ media.id }}" data-filepath="{{ media.filepath }}">
-            <span class="flex-1 truncate">{{ media.title }}</span>
+    <li class="card p-4 mb-2 flex flex-wrap gap-2 items-center border border-gray-200 dark:border-gray-700 rounded-xl" data-id="{{ media.id }}" data-filepath="{{ media.filepath }}">
+            <span class="flex-1 truncate text-gray-800 dark:text-gray-100">{{ media.title }}</span>
             {% if media.status == 'pending' %}
         <span class="px-2 py-1 rounded bg-yellow-100 text-yellow-800 status-chip">Starting…</span>
-        <span class="text-xs text-gray-500 progress-line">{{ media.progress or 'Will take a while…' }}</span>
+        <span class="text-xs text-gray-500 dark:text-gray-400 progress-line">{{ media.progress or 'Will take a while…' }}</span>
                         {% elif media.filepath %}
                 <a href="/media/preview/{{ media.filepath }}" target="_blank" rel="noopener noreferrer" class="btn btn-success media-preview-link" data-filename="{{ media.filepath }}" aria-label="Preview {{ media.filepath }} in new tab">
                     <i class="fa-solid fa-eye" aria-hidden="true"></i> Preview
@@ -33,7 +33,7 @@
                         {% else %}
                 <a href="#" class="px-2 py-1 rounded bg-red-100 text-red-800 media-not-found" data-url="{{ media.title }}">Not available</a>
                         {% endif %}
-                        <div class="text-xs text-gray-500">By {{ media.creator }} at {{ media.download_time.strftime('%Y-%m-%d %H:%M') }}</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">By {{ media.creator }} at {{ media.download_time.strftime('%Y-%m-%d %H:%M') }}</div>
             <form method="POST" action="/media/delete/{{ media.id }}" class="delete-form" data-creator="{{ media.creator }}">
                 <input type="hidden" name="user">
                 <button type="submit" class="btn btn-danger action-delete">Delete</button>
