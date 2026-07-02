@@ -563,10 +563,13 @@ def edit_expense_entry(entry_id):
         if new_path:
             entry.attachment_path = new_path
 
-    # Sync amount back to linked maintenance record (if this expense is from vehicles)
+    # Sync amount + attachment back to linked maintenance record (if this expense is from vehicles)
     maintenance = MaintenanceRecord.query.filter_by(expense_id=entry.id).first()
-    if maintenance and maintenance.cost != entry.amount:
-        maintenance.cost = entry.amount
+    if maintenance:
+        if maintenance.cost != entry.amount:
+            maintenance.cost = entry.amount
+        if maintenance.attachment_path != entry.attachment_path:
+            maintenance.attachment_path = entry.attachment_path
 
     db.session.commit()
     flash('Expense updated.', 'success')
