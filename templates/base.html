@@ -108,6 +108,13 @@
                 </div>
             </div>
             <nav class="flex-1 p-4 space-y-1 overflow-y-auto" id="sidebarNav">
+                <button id="customizeNavBtn" class="flex items-center gap-3 py-2 px-4 rounded text-white/70 hover:text-white hover:bg-white/10 w-full text-sm mb-1 transition-colors" title="Customize navbar order">
+                    <i class="fa-solid fa-grip w-5 text-center"></i><span class="nav-label">Reorder</span>
+                </button>
+                <button id="saveNavOrderBtn" class="flex items-center gap-3 py-2 px-4 rounded text-green-300 hover:text-green-200 hover:bg-white/10 w-full text-sm mb-1 hidden transition-colors" title="Save order">
+                    <i class="fa-solid fa-check w-5 text-center"></i><span class="nav-label">Done</span>
+                </button>
+                <hr class="border-white/10 mb-1" id="navSep">
                 {% set navbar_items = [
                     {'id': 'welcome', 'url': '/', 'icon': 'fa-house', 'label': 'Welcome', 'toggle': None, 'icon_color': ''},
                     {'id': 'quick_links', 'url': '/quick-links', 'icon': 'fa-link', 'label': 'Quick Links', 'toggle': 'quick_links', 'icon_color': 'text-blue-400', 'default': True},
@@ -124,7 +131,6 @@
                     {'id': 'expense_tracker', 'url': '/expenses', 'icon': 'fa-wallet', 'label': 'Expense Tracker', 'toggle': 'expense_tracker', 'icon_color': '', 'default': True},
                     {'id': 'vehicles', 'url': '/vehicles', 'icon': 'fa-car', 'label': 'Vehicles', 'toggle': 'vehicles', 'icon_color': ''},
                 ] %}
-                {% set ns = namespace(has_customize=false) %}
                 {% for item in navbar_items %}
                     {% set show = false %}
                     {% if item.toggle is none %}
@@ -136,17 +142,8 @@
                     {% endif %}
                     {% if show %}
                 <a href="{{ item.url }}" class="flex items-center gap-3 py-2 px-4 rounded sidebar-link" title="{{ item.label }}" data-nav-id="{{ item.id }}"><i class="fa-solid {{ item.icon }} w-5 text-center {{ item.icon_color }}"></i><span class="nav-label">{{ item.label }}</span></a>
-                    {% set ns.has_customize = true %}
                     {% endif %}
                 {% endfor %}
-                {% if ns.has_customize %}
-                <button id="customizeNavBtn" class="flex items-center gap-3 py-2 px-4 rounded text-white/70 hover:text-white hover:bg-white/10 w-full text-sm mt-2 transition-colors" title="Customize navbar order">
-                    <i class="fa-solid fa-grip w-5 text-center"></i><span class="nav-label">Customize</span>
-                </button>
-                <button id="saveNavOrderBtn" class="flex items-center gap-3 py-2 px-4 rounded text-green-300 hover:text-green-200 hover:bg-white/10 w-full text-sm hidden transition-colors" title="Save order">
-                    <i class="fa-solid fa-check w-5 text-center"></i><span class="nav-label">Done</span>
-                </button>
-                {% endif %}
             </nav>
             <script>
             // Highlight active sidebar link
@@ -181,14 +178,38 @@
                     const key = 'navbar_order_' + user;
                     try {
                         const saved = JSON.parse(localStorage.getItem(key) || '[]');
-                        if (!saved.length) return;
+                        // Get all reorderable nav items
                         const links = nav.querySelectorAll('.sidebar-link[data-nav-id]');
                         const linkMap = {};
-                        links.forEach(el => { linkMap[el.getAttribute('data-nav-id')] = el; });
-                        // Reorder: append in saved order
+                        const allIds = [];
+                        links.forEach(el => {
+                            const id = el.getAttribute('data-nav-id');
+                            linkMap[id] = el;
+                            allIds.push(id);
+                        });
+                        if (!saved.length || saved.every(id => !linkMap[id])) {
+                            // No saved order - restore default (append everything to reset)
+                            allIds.forEach(id => {
+                                const el = linkMap[id];
+                                if (el && el.parentNode === nav) nav.appendChild(el);
+                            });
+                            return;
+                        }
+                        // Order: saved items first, then unknown items appended
+                        const moved = new Set();
                         saved.forEach(id => {
                             const el = linkMap[id];
-                            if (el && el.parentNode === nav) nav.appendChild(el);
+                            if (el && el.parentNode === nav) {
+                                nav.appendChild(el);
+                                moved.add(id);
+                            }
+                        });
+                        // Append any items not in saved order
+                        allIds.forEach(id => {
+                            if (!moved.has(id)) {
+                                const el = linkMap[id];
+                                if (el && el.parentNode === nav) nav.appendChild(el);
+                            }
                         });
                     } catch(e) {}
                 }
