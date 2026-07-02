@@ -3,21 +3,21 @@
 <div class="mx-auto">
     <h2 class="text-xl font-bold mb-4"><i class="fa-solid fa-file-pdf text-red-600 mr-2"></i>PDF Compressor</h2>
     <form method="POST" enctype="multipart/form-data" class="mb-4 grid gap-2 md:grid-cols-12 items-end">
-        <input type="file" name="pdf" accept="application/pdf" required class="md:col-span-10">
+        <input type="file" name="pdf" accept="application/pdf" required class="md:col-span-10 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900/50 dark:file:text-blue-200">
         <input type="hidden" name="creator" id="creator">
         <button type="submit" class="btn btn-primary md:col-span-2"><i class="fa-solid fa-compress mr-1"></i>Compress PDF</button>
     </form>
     <ul>
         {% for pdf in pdfs %}
-        <li class="card p-4 mb-2 flex flex-wrap gap-2 items-center">
-            <span class="flex-1"><i class="fa-solid fa-file text-gray-500 mr-2"></i>{{ pdf.filename }}</span>
+        <li class="card p-4 mb-2 flex flex-wrap gap-2 items-center border border-gray-200 dark:border-gray-700 rounded-xl">
+            <span class="flex-1 text-gray-800 dark:text-gray-200"><i class="fa-solid fa-file text-gray-500 mr-2"></i>{{ pdf.filename }}</span>
             <a href="/pdfs/preview/{{ pdf.compressed_path }}" target="_blank" rel="noopener noreferrer" class="btn btn-success" aria-label="Preview {{ pdf.filename }} in new tab">
                 <i class="fa-solid fa-eye" aria-hidden="true"></i> Preview
             </a>
             <a href="/pdfs/{{ pdf.compressed_path }}" class="btn btn-primary">
                 <i class="fa-solid fa-download" aria-hidden="true"></i> Download
             </a>
-            <div class="text-xs text-gray-500">By {{ pdf.creator }} at {{ pdf.upload_time.strftime('%Y-%m-%d %H:%M') }}</div>
+            <div class="text-xs text-gray-500 dark:text-gray-400">By {{ pdf.creator }} at {{ pdf.upload_time.strftime('%Y-%m-%d %H:%M') }}</div>
             <form method="POST" action="/pdfs/delete/{{ pdf.id }}" class="delete-form" data-creator="{{ pdf.creator }}">
                 <input type="hidden" name="user">
                 <button type="submit" class="btn btn-danger">Delete</button>

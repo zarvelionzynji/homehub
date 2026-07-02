@@ -1,18 +1,18 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="mx-auto">
-    <h2 class="text-xl font-bold mb-4">URL Shortener</h2>
+    <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100"><i class="fa-solid fa-link text-blue-600 mr-2"></i>URL Shortener</h2>
     <form method="POST" class="mb-4 grid grid-cols-1 md:grid-cols-12 gap-2 items-end">
-        <input type="url" name="original_url" class="md:col-span-9 w-full p-2 border rounded" placeholder="Paste long URL here..." required>
+        <input type="url" name="original_url" class="md:col-span-9 w-full p-2 border rounded-lg bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="Paste long URL here..." required>
         <input type="hidden" name="creator" id="creator">
         <button type="submit" class="md:col-span-3 btn btn-primary">Shorten</button>
     </form>
     <ul>
         {% for url in urls %}
-        <li class="card p-4 mb-2 flex flex-wrap gap-2 items-center">
-            <span class="flex-1">{{ url.original_url }}</span>
-            <a href="/s/{{ url.short_code }}" class="text-blue-600 underline">{{ (request.host_url ~ 's/' ~ url.short_code) }}</a>
-            <div class="text-xs text-gray-500">By {{ url.creator }} at {{ url.timestamp.strftime('%Y-%m-%d %H:%M') }}</div>
+        <li class="card p-4 mb-2 flex flex-wrap gap-2 items-center border border-gray-200 dark:border-gray-700 rounded-xl">
+            <span class="flex-1 text-gray-800 dark:text-gray-200 truncate">{{ url.original_url }}</span>
+            <a href="/s/{{ url.short_code }}" class="text-blue-600 dark:text-blue-400 underline text-sm">{{ (request.host_url ~ 's/' ~ url.short_code) }}</a>
+            <div class="text-xs text-gray-500 dark:text-gray-400">By {{ url.creator }} at {{ url.timestamp.strftime('%Y-%m-%d %H:%M') }}</div>
             <form method="POST" action="/shorten/delete/{{ url.id }}" class="delete-form" data-creator="{{ url.creator }}">
                 <input type="hidden" name="user">
                 <button type="submit" class="btn btn-danger">Delete</button>
@@ -24,7 +24,6 @@
 <script>
 document.getElementById('creator').value = localStorage.getItem('username');
 document.querySelectorAll('input[name="user"]').forEach(i=> i.value = localStorage.getItem('username'));
-// Hide delete for non-owners
 (function(){
     const adminName='{{ config.admin_name }}';
     const current=localStorage.getItem('username');

@@ -123,16 +123,16 @@
 </div>
 
 <!-- Add/Edit Expense Modal -->
-<div id="expense-modal" class="modal fixed inset-0 z-50 bg-black bg-opacity-50 items-center justify-center p-4 hidden">
-  <div class="modal-content card w-full max-w-md p-6 transform scale-95">
+<div id="expense-modal" class="modal fixed inset-0 z-50 bg-black/40 backdrop-blur-sm items-center justify-center p-4 hidden">
+  <div class="modal-content card w-full max-w-md p-6">
     <h2 class="text-2xl font-bold mb-4" id="modal-title">Add Expense</h2>
     <form id="expense-form" method="POST" action="/expenses" enctype="multipart/form-data">
       <input type="hidden" name="form_type" value="single">
       <input type="hidden" name="user" id="expense-user">
       <div class="space-y-3">
         <div>
-          <label class="text-sm text-gray-600">Date</label>
-          <input type="date" id="expense-date" name="date" class="mt-1 block w-full border rounded p-2" required>
+          <label class="text-sm text-gray-600 dark:text-gray-300">Date</label>
+          <input type="date" id="expense-date" name="date" class="mt-1 block w-full border border-gray-300 dark:border-gray-700 bg-[var(--input-bg)] text-[var(--input-text)] rounded p-2 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" required>
         </div>
         <div>
           <label class="text-sm text-gray-600">Title</label>
@@ -209,8 +209,8 @@ document.addEventListener('DOMContentLoaded', function(){
   // Modal helpers
   const expenseModal = document.getElementById('expense-modal');
   const attachmentModal = document.getElementById('attachment-modal');
-  function openModal(m){ m.classList.remove('hidden'); m.classList.add('flex'); setTimeout(()=> m.querySelector('.modal-content').classList.add('scale-100'), 10); }
-  function closeModal(m){ const c=m.querySelector('.modal-content'); c.classList.remove('scale-100'); setTimeout(()=>{ m.classList.add('hidden'); m.classList.remove('flex'); }, 200); }
+  function openModal(m){ m.classList.remove('hidden'); m.classList.add('flex'); }
+  function closeModal(m){ m.classList.add('hidden'); m.classList.remove('flex'); }
 
   // State
   let payload = {};
