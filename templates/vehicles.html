@@ -1,42 +1,369 @@
 {% extends "base.html" %}
-
 {% block content %}
-<div class="p-4">
-  <h1 class="text-2xl font-bold mb-4">Vehicles</h1>
+<style>
+  .modal { transition: opacity 0.2s ease; }
+  .modal-content { transition: transform 0.2s ease; max-height: 80vh; overflow-y: auto; }
+  .vehicle-tab {
+    border-bottom: 2px solid transparent;
+    color: #6b7280;
+    border-radius: 0.5rem 0.5rem 0 0;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .vehicle-tab:hover,
+  .vehicle-tab:focus-visible {
+    color: #1f2937;
+    background: #f3f4f6;
+    border-color: #d1d5db;
+    outline: none;
+  }
+  .vehicle-tab.active {
+    background: #e5e7eb;
+    color: #111827;
+    border-color: var(--primary-color);
+    font-weight: 600;
+  }
+  [data-theme="dark"] .vehicle-tab {
+    color: #94a3b8;
+  }
+  [data-theme="dark"] .vehicle-tab:hover,
+  [data-theme="dark"] .vehicle-tab:focus-visible {
+    color: #f1f5f9;
+    background: #1e293b;
+    border-color: #475569;
+  }
+  [data-theme="dark"] .vehicle-tab.active {
+    background: #334155;
+    color: #f8fafc;
+    border-color: var(--primary-color);
+  }
+</style>
 
-  <div class="mb-6">
-    <h2 class="text-xl font-semibold mb-2">Add Vehicle</h2>
-    <form method="post" action="{{ url_for('main.add_vehicle') }}">
-      <input type="text" name="name" placeholder="Vehicle Name" required />
-      <input type="text" name="vehicle_type" placeholder="Type (car/motorcycle)" />
-      <input type="text" name="plate" placeholder="License Plate" />
-      <input type="text" name="creator" placeholder="Creator" />
-      <button type="submit">Add</button>
-    </form>
+<div class="max-w-screen-2xl mx-auto space-y-6">
+  <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">Vehicle Maintenance</h1>
+
+  <!-- Tabs -->
+  <div class="flex gap-1 border-b border-gray-200 dark:border-gray-700 flex-wrap">
+    <button class="vehicle-tab active px-4 py-2" data-tab="vehicles">
+      <i class="fas fa-car mr-2"></i>Vehicles
+    </button>
+    <button class="vehicle-tab px-4 py-2" data-tab="service-types">
+      <i class="fas fa-tools mr-2"></i>Service Types
+    </button>
+    <button class="vehicle-tab px-4 py-2" data-tab="history">
+      <i class="fas fa-history mr-2"></i>History
+    </button>
   </div>
 
-  <div>
-    <h2 class="text-xl font-semibold mb-2">Vehicles</h2>
-    {% if vehicle_data %}
-      <ul>
+  <!-- Tab: Vehicles -->
+  <div id="tab-vehicles" class="vehicle-tab-content block">
+    <div class="space-y-4">
+      <!-- Add Vehicle Button -->
+      <button id="add-vehicle-btn" class="btn btn-primary">
+        <i class="fas fa-plus mr-2"></i>Add Vehicle
+      </button>
+
+      <!-- Vehicles List -->
+      <div id="vehicles-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {% for item in vehicle_data %}
-          <li class="mb-4 p-4 border rounded">
-            <a href="{{ url_for('main.vehicle_detail', vid=item.vehicle.id) }}">
-              <strong>{{ item.vehicle.name }}</strong> ({{ item.vehicle.vehicle_type }})
-            </a>
-            {% if item.alerts %}
-              <div class="text-red-600">
-                {% for alert in item.alerts %}
-                  <div>{{ alert.service_type }}: {{ alert.status }} - {{ alert.alert }}</div>
+          {% set v = item.vehicle %}
+          {% set alerts = item.alerts %}
+          <div class="card p-4">
+            <div class="flex items-start justify-between mb-3">
+              <div class="flex-1">
+                <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100">{{ v.name }}</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {% if v.vehicle_type == 'car' %}
+                    <i class="fas fa-car mr-1"></i>Car
+                  {% elif v.vehicle_type == 'motorcycle' %}
+                    <i class="fas fa-motorcycle mr-1"></i>Motorcycle
+                  {% else %}
+                    <i class="fas fa-car mr-1"></i>{{ v.vehicle_type }}
+                  {% endif %}
+                </p>
+              </div>
+            </div>
+            {% if v.plate %}
+              <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                <strong>Plate:</strong> {{ v.plate }}
+              </p>
+            {% endif %}
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
+              <strong>Mileage:</strong> {{ "{:,.0f}".format(v.current_mileage) }} km
+            </p>
+
+            <!-- Service Alerts -->
+            {% if alerts %}
+              <div class="mb-4 space-y-1">
+                {% for alert in alerts %}
+                  <div class="flex items-center text-sm">
+                    {% if alert.status == 'overdue' %}
+                      <i class="fas fa-circle text-red-600 mr-2"></i>
+                      <span class="text-red-600 dark:text-red-400">
+                        <strong>{{ alert.service_type }}:</strong> {{ alert.alert }}
+                      </span>
+                    {% elif alert.status == 'warning' %}
+                      <i class="fas fa-circle text-yellow-500 mr-2"></i>
+                      <span class="text-yellow-600 dark:text-yellow-400">
+                        <strong>{{ alert.service_type }}:</strong> {{ alert.alert }}
+                      </span>
+                    {% endif %}
+                  </div>
                 {% endfor %}
               </div>
+            {% else %}
+              <div class="mb-4 flex items-center text-sm text-green-600 dark:text-green-400">
+                <i class="fas fa-check-circle mr-2"></i>
+                All services up to date
+              </div>
             {% endif %}
-          </li>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-2 flex-wrap">
+              <a href="{{ url_for('main.vehicle_detail', vid=v.id) }}" class="flex-1 btn btn-secondary text-center text-sm min-w-fit">
+                <i class="fas fa-eye mr-1"></i>View
+              </a>
+              <button class="edit-vehicle-btn btn btn-secondary text-sm" data-id="{{ v.id }}" data-name="{{ v.name }}" data-type="{{ v.vehicle_type }}" data-plate="{{ v.plate or '' }}" data-edit-url="{{ url_for('main.edit_vehicle', vid=v.id) }}">
+                <i class="fas fa-edit mr-1"></i>Edit
+              </button>
+              <form method="POST" action="{{ url_for('main.delete_vehicle', vid=v.id) }}" class="inline delete-form" data-creator="{{ v.creator }}">
+                <button type="submit" class="btn btn-danger text-sm" onclick="return confirm('Delete {{ v.name }}?')">
+                  <i class="fas fa-trash mr-1"></i>Delete
+                </button>
+              </form>
+            </div>
+          </div>
         {% endfor %}
-      </ul>
-    {% else %}
-      <p>No vehicles yet.</p>
-    {% endif %}
+      </div>
+
+      {% if not vehicle_data %}
+        <div class="card p-8 text-center">
+          <div class="text-gray-500 dark:text-gray-400">
+            <i class="fas fa-car text-4xl mb-3 block"></i>
+            <p class="text-lg">No vehicles yet. Add one to get started.</p>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Tab: Service Types -->
+  <div id="tab-service-types" class="vehicle-tab-content hidden">
+    <div class="space-y-4">
+      <!-- Add Service Type Form -->
+      <div class="card p-4">
+        <h3 class="text-lg font-bold mb-3">Add Service Type</h3>
+        <form method="POST" action="{{ url_for('main.add_service_type') }}" class="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
+            <input type="text" name="name" placeholder="e.g., Oil Change" class="w-full border rounded p-2 text-sm" required>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Interval (km)</label>
+            <input type="number" name="interval_km" placeholder="5000" step="100" class="w-full border rounded p-2 text-sm">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Interval (months)</label>
+            <input type="number" name="interval_months" placeholder="6" step="1" class="w-full border rounded p-2 text-sm">
+          </div>
+          <div class="flex items-end">
+            <button type="submit" class="w-full btn btn-primary text-sm">Add</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Service Types Table -->
+      <div class="card p-4 overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="border-b border-gray-200 dark:border-gray-700">
+            <tr>
+              <th class="text-left py-2 px-2 font-semibold text-gray-700 dark:text-gray-300">Name</th>
+              <th class="text-left py-2 px-2 font-semibold text-gray-700 dark:text-gray-300">Interval (km)</th>
+              <th class="text-left py-2 px-2 font-semibold text-gray-700 dark:text-gray-300">Interval (months)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for st in service_types %}
+              <tr class="border-b border-gray-100 dark:border-gray-700">
+                <td class="py-2 px-2">{{ st.name }}</td>
+                <td class="py-2 px-2">{{ st.interval_km if st.interval_km > 0 else '-' }}</td>
+                <td class="py-2 px-2">{{ st.interval_months if st.interval_months > 0 else '-' }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% if not service_types %}
+          <div class="text-center py-4 text-gray-500 dark:text-gray-400">
+            No service types defined yet.
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab: History -->
+  <div id="tab-history" class="vehicle-tab-content hidden">
+    <div class="space-y-4">
+      <!-- Filters -->
+      <div class="card p-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Vehicle</label>
+            <select id="history-vehicle-filter" class="w-full border rounded p-2 text-sm">
+              <option value="">All Vehicles</option>
+              {% for item in vehicle_data %}
+                <option value="{{ item.vehicle.id }}">{{ item.vehicle.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Service Type</label>
+            <select id="history-type-filter" class="w-full border rounded p-2 text-sm">
+              <option value="">All Types</option>
+              {% for st in service_types %}
+                <option value="{{ st.id }}">{{ st.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">From Date</label>
+            <input type="date" id="history-date-from" class="w-full border rounded p-2 text-sm">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">To Date</label>
+            <input type="date" id="history-date-to" class="w-full border rounded p-2 text-sm">
+          </div>
+        </div>
+      </div>
+
+      <!-- History Table -->
+      <div class="card p-4 overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="border-b border-gray-200 dark:border-gray-700">
+            <tr>
+              <th class="text-left py-2 px-2 font-semibold text-gray-700 dark:text-gray-300">Date</th>
+              <th class="text-left py-2 px-2 font-semibold text-gray-700 dark:text-gray-300">Vehicle</th>
+              <th class="text-left py-2 px-2 font-semibold text-gray-700 dark:text-gray-300">Service Type</th>
+              <th class="text-left py-2 px-2 font-semibold text-gray-700 dark:text-gray-300">Mileage</th>
+              <th class="text-left py-2 px-2 font-semibold text-gray-700 dark:text-gray-300">Cost</th>
+              <th class="text-left py-2 px-2 font-semibold text-gray-700 dark:text-gray-300">Provider</th>
+            </tr>
+          </thead>
+          <tbody id="history-table-body">
+            <tr>
+              <td colspan="6" class="py-4 text-center text-gray-500 dark:text-gray-400">
+                No maintenance records found.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </div>
+
+<!-- Add/Edit Vehicle Modal -->
+<div id="vehicle-modal" class="modal fixed inset-0 z-50 bg-black bg-opacity-50 items-center justify-center p-4 hidden">
+  <div class="modal-content card w-full max-w-md p-6 transform scale-95">
+    <h2 class="text-2xl font-bold mb-4" id="vehicle-modal-title">Add Vehicle</h2>
+    <form id="vehicle-form" method="POST" action="{{ url_for('main.add_vehicle') }}">
+      <input type="hidden" name="creator" id="vehicle-creator">
+      <div class="space-y-3">
+        <div>
+          <label class="text-sm text-gray-600 dark:text-gray-400">Vehicle Name</label>
+          <input type="text" id="vehicle-name" name="name" class="mt-1 block w-full border rounded p-2" placeholder="e.g., Honda Civic" required>
+        </div>
+        <div>
+          <label class="text-sm text-gray-600 dark:text-gray-400">Type</label>
+          <select id="vehicle-type" name="vehicle_type" class="mt-1 block w-full border rounded p-2" required>
+            <option value="car">Car</option>
+            <option value="motorcycle">Motorcycle</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-sm text-gray-600 dark:text-gray-400">License Plate</label>
+          <input type="text" id="vehicle-plate" name="plate" class="mt-1 block w-full border rounded p-2" placeholder="e.g., ABC-1234">
+        </div>
+      </div>
+      <div class="mt-5 flex justify-end gap-2">
+        <button type="button" id="cancel-vehicle" class="btn btn-secondary">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Vehicle</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  const adminName = '{{ config.admin_name }}';
+  const currentUser = () => localStorage.getItem('username') || '';
+
+  // Tab switching
+  document.querySelectorAll('.vehicle-tab').forEach(tab => {
+    tab.addEventListener('click', function(){
+      const tabName = this.getAttribute('data-tab');
+      document.querySelectorAll('.vehicle-tab-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+      document.querySelectorAll('.vehicle-tab').forEach(el => el.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  // Modal helpers
+  const vehicleModal = document.getElementById('vehicle-modal');
+  function openModal(m){
+    m.classList.remove('hidden');
+    m.classList.add('flex');
+    setTimeout(()=> m.querySelector('.modal-content').classList.add('scale-100'), 10);
+  }
+  function closeModal(m){
+    const c = m.querySelector('.modal-content');
+    c.classList.remove('scale-100');
+    setTimeout(()=>{ m.classList.add('hidden'); m.classList.remove('flex'); }, 200);
+  }
+
+  // Add vehicle button
+  document.getElementById('add-vehicle-btn').addEventListener('click', function(){
+    document.getElementById('vehicle-modal-title').textContent = 'Add Vehicle';
+    document.getElementById('vehicle-form').action = '{{ url_for("main.add_vehicle") }}';
+    document.getElementById('vehicle-name').value = '';
+    document.getElementById('vehicle-type').value = 'car';
+    document.getElementById('vehicle-plate').value = '';
+    document.getElementById('vehicle-creator').value = currentUser();
+    openModal(vehicleModal);
+  });
+
+  // Edit vehicle button
+  document.querySelectorAll('.edit-vehicle-btn').forEach(btn => {
+    btn.addEventListener('click', function(){
+      const name = this.getAttribute('data-name');
+      const type = this.getAttribute('data-type');
+      const plate = this.getAttribute('data-plate');
+      const editUrl = this.getAttribute('data-edit-url');
+
+      document.getElementById('vehicle-modal-title').textContent = 'Edit Vehicle';
+      document.getElementById('vehicle-form').action = editUrl;
+      document.getElementById('vehicle-name').value = name;
+      document.getElementById('vehicle-type').value = type;
+      document.getElementById('vehicle-plate').value = plate;
+      document.getElementById('vehicle-creator').value = currentUser();
+      openModal(vehicleModal);
+    });
+  });
+
+  // Modal close handlers
+  document.getElementById('cancel-vehicle').addEventListener('click', ()=> closeModal(vehicleModal));
+  vehicleModal.addEventListener('click', (e)=>{ if (e.target===vehicleModal) closeModal(vehicleModal); });
+
+  // Apply user visibility to delete forms
+  function applyUserVisibility(){
+    document.querySelectorAll('.delete-form').forEach(f => {
+      const creator = f.getAttribute('data-creator');
+      const isAllowed = (currentUser() === creator || currentUser() === adminName || currentUser() === 'Administrator' || currentUser() === 'admin');
+      f.style.display = isAllowed ? '' : 'none';
+    });
+  }
+  document.addEventListener('user-switched', applyUserVisibility);
+  applyUserVisibility();
+});
+</script>
 {% endblock %}
