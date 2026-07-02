@@ -553,7 +553,7 @@ def edit_expense_entry(entry_id):
     entry.quantity = float(q) if q not in (None, '') else entry.quantity
     entry.amount = float(amt) if amt not in (None, '') else entry.amount
     entry.is_paid = request.form.get('is_paid') == 'on'
-    
+
     # Handle attachment update
     attachment = request.files.get('attachment')
     if attachment and attachment.filename:
@@ -562,7 +562,13 @@ def edit_expense_entry(entry_id):
         new_path = handle_expense_attachment(attachment, upload_dir)
         if new_path:
             entry.attachment_path = new_path
-            
+
+    # Sync amount back to linked maintenance record (if this expense is from vehicles)
+    from ..models import MaintenanceRecord
+    maintenance = MaintenanceRecord.query.filter_by(expense_id=entry.id).first()
+    if maintenance and maintenance.cost != entry.amount:
+        maintenance.cost = entry.amount
+
     db.session.commit()
     flash('Expense updated.', 'success')
     # Preserve view
