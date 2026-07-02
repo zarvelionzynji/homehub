@@ -202,6 +202,41 @@ class QuickLink(db.Model):
     creator = db.Column(db.String(64))
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
+class Vehicle(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(128), nullable=False)
+    vehicle_type = db.Column(db.String(16), nullable=False)  # 'car' | 'motorcycle'
+    plate = db.Column(db.String(32))
+    current_mileage = db.Column(db.Float, default=0)
+    creator = db.Column(db.String(64))
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+class ServiceType(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(128), nullable=False)
+    interval_km = db.Column(db.Float, default=0)
+    interval_months = db.Column(db.Integer, default=0)
+    is_active = db.Column(db.Boolean, default=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+class MaintenanceRecord(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    vehicle_id = db.Column(db.Integer, db.ForeignKey('vehicle.id'), nullable=False)
+    service_type_id = db.Column(db.Integer, db.ForeignKey('service_type.id'), nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    mileage = db.Column(db.Float, nullable=False)
+    cost = db.Column(db.Float, default=0)
+    provider = db.Column(db.String(256))
+    notes = db.Column(db.Text)
+    attachment_path = db.Column(db.String(512))
+    expense_id = db.Column(db.Integer, db.ForeignKey('expense_entry.id'))
+    creator = db.Column(db.String(64))
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    vehicle = db.relationship('Vehicle', backref='maintenance_records')
+    service_type = db.relationship('ServiceType')
+    expense = db.relationship('ExpenseEntry')
+
 # Event listeners for strict file CRUD
 
 def delete_attachment_file(attachment_path):
