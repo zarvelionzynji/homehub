@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="p-4">
+  <a href="{{ url_for('main.vehicles') }}">&larr; Back to Vehicles</a>
+
+  <h1 class="text-2xl font-bold mb-2">{{ vehicle.name }}</h1>
+  <p>Type: {{ vehicle.vehicle_type }} | Plate: {{ vehicle.plate }} | Mileage: {{ vehicle.current_mileage }}</p>
+
+  <div class="mt-6">
+    <h2 class="text-xl font-semibold mb-2">Add Service Record</h2>
+    <form method="post" action="{{ url_for('main.add_maintenance_record', vid=vehicle.id) }}" enctype="multipart/form-data">
+      <select name="service_type_id" required>
+        {% for st in service_types %}
+          <option value="{{ st.id }}">{{ st.name }}</option>
+        {% endfor %}
+      </select>
+      <input type="date" name="date" required />
+      <input type="number" name="mileage" placeholder="Mileage" step="0.1" required />
+      <input type="number" name="cost" placeholder="Cost" step="0.01" />
+      <input type="text" name="provider" placeholder="Provider" />
+      <textarea name="notes" placeholder="Notes"></textarea>
+      <input type="file" name="attachment" />
+      <input type="text" name="creator" placeholder="Creator" />
+      <button type="submit">Log Service</button>
+    </form>
+  </div>
+
+  <div class="mt-6">
+    <h2 class="text-xl font-semibold mb-2">Service History</h2>
+    {% if records %}
+      <ul>
+        {% for rec in records %}
+          <li class="mb-2 p-2 border rounded">
+            <strong>{{ rec.service_type.name }}</strong> - {{ rec.date }}
+            <br />Mileage: {{ rec.mileage }} | Cost: {{ rec.cost }} | Provider: {{ rec.provider }}
+            <br />{{ rec.notes }}
+            <form method="post" action="{{ url_for('main.delete_maintenance_record', rid=rec.id) }}" style="display:inline">
+              <button type="submit">Delete</button>
+            </form>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No service records yet.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

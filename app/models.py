@@ -233,7 +233,7 @@ class MaintenanceRecord(db.Model):
     creator = db.Column(db.String(64))
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
-    vehicle = db.relationship('Vehicle', backref='maintenance_records')
+    vehicle = db.relationship('Vehicle', backref=db.backref('maintenance_records', cascade='all, delete-orphan'))
     service_type = db.relationship('ServiceType')
     expense = db.relationship('ExpenseEntry')
 

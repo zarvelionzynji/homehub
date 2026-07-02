@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="p-4">
+  <h1 class="text-2xl font-bold mb-4">Vehicles</h1>
+
+  <div class="mb-6">
+    <h2 class="text-xl font-semibold mb-2">Add Vehicle</h2>
+    <form method="post" action="{{ url_for('main.add_vehicle') }}">
+      <input type="text" name="name" placeholder="Vehicle Name" required />
+      <input type="text" name="vehicle_type" placeholder="Type (car/motorcycle)" />
+      <input type="text" name="plate" placeholder="License Plate" />
+      <input type="text" name="creator" placeholder="Creator" />
+      <button type="submit">Add</button>
+    </form>
+  </div>
+
+  <div>
+    <h2 class="text-xl font-semibold mb-2">Vehicles</h2>
+    {% if vehicle_data %}
+      <ul>
+        {% for item in vehicle_data %}
+          <li class="mb-4 p-4 border rounded">
+            <a href="{{ url_for('main.vehicle_detail', vid=item.vehicle.id) }}">
+              <strong>{{ item.vehicle.name }}</strong> ({{ item.vehicle.vehicle_type }})
+            </a>
+            {% if item.alerts %}
+              <div class="text-red-600">
+                {% for alert in item.alerts %}
+                  <div>{{ alert.service_type }}: {{ alert.status }} - {{ alert.alert }}</div>
+                {% endfor %}
+              </div>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No vehicles yet.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
