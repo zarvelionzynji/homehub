@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, flash, current_app
+from flask import render_template, request, redirect, url_for, flash, current_app, send_from_directory
 from datetime import datetime, date
 import calendar
 import os
@@ -281,3 +281,11 @@ def add_service_type():
     db.session.commit()
     flash(f'Service type "{name}" added.', 'success')
     return redirect(url_for('main.vehicles', _anchor='tab-service-types'))
+
+
+@main_bp.route('/vehicle-attachment/<path:filename>')
+def vehicle_attachment(filename):
+    """Serve attachment files for vehicle maintenance records from uploads/."""
+    base_dir = os.path.abspath(os.path.join(current_app.root_path, '..'))
+    upload_dir = os.path.join(base_dir, 'uploads')
+    return send_from_directory(upload_dir, filename)
