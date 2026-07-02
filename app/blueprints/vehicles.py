@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, flash, current_app, send_from_directory
+from flask import render_template, request, redirect, url_for, flash, current_app, send_from_directory, send_file, abort
 from datetime import datetime, date
 import calendar
 import os
@@ -287,5 +287,7 @@ def add_service_type():
 def vehicle_attachment(filename):
     """Serve attachment files for vehicle maintenance records from uploads/."""
     base_dir = os.path.abspath(os.path.join(current_app.root_path, '..'))
-    upload_dir = os.path.join(base_dir, 'uploads')
-    return send_from_directory(upload_dir, filename)
+    file_path = os.path.join(base_dir, 'uploads', filename)
+    if not os.path.exists(file_path):
+        abort(404)
+    return send_file(file_path)
