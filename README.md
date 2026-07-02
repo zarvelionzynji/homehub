@@ -14,6 +14,7 @@ HomeHub adalah aplikasi web ringan yang berjalan di server lokal (self-hosted) u
 * **🛒 Daftar Belanja & Tugas (Chores)**: Daftar kolaboratif untuk melacak belanjaan dan tugas rumah tangga.
 * **🗓️ Kalender & Pengingat**: Kalender bersama untuk mengingat tanggal penting.
 * **💰 Pencatat Pengeluaran**: Lacak pengeluaran keluarga dan tagihan bulanan (mendukung status lunas/belum bayar).
+* **🚗 Vehicle Maintenance Log**: Catat riwayat servis kendaraan (mobil & motor) dengan odometer, biaya, dan lampiran. Dilengkapi pengingat servis otomatis dan sinkronisasi biaya dua arah dengan Expense Tracker.
 * **👋 Siapa di Rumah?**: Cek dengan cepat siapa anggota keluarga yang sedang berada di rumah.
 * **🎬 Pengunduh Media**: Simpan video atau musik langsung ke server Anda.
 * **🤖 AI Agent API (RESTful)**: Hubungkan HomeHub dengan asisten AI favorit Anda (seperti OpenClaw atau GPT). AI dapat mengontrol status rumah, membaca catatan, menyelesaikan tugas, hingga mengubah `config.yml` secara programatis via API terenkripsi.

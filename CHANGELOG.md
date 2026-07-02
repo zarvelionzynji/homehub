@@ -3,6 +3,18 @@
 Semua perubahan yang signifikan pada proyek HomeHub ini akan dicatat di file ini.
 Format penulisan berdasarkan [Keep a Changelog](https://keepachangelog.com/id/1.0.0/).
 
+## [v1.0.9] - 2026-07-02
+
+### Added
+- **Vehicle Maintenance Log**: Fitur baru untuk mencatat riwayat perawatan kendaraan (mobil & motor). Mendukung multi-kendaraan, tipe servis dengan interval ganda (km + waktu), pencatatan biaya perawatan dengan integrasi otomatis ke Expense Tracker, dan lampiran bukti/foto.
+- **Service Status Alerts**: Tampilan status servis per kendaraan langsung di halaman daftar kendaraan dengan indikator warna (🔴 overdue, 🟡 warning, 🟢 ok) berdasarkan interval km dan waktu.
+- **Service Types**: Daftar tipe servis yang dapat dikonfigurasi (Oil Change, Pajak Tahunan, STNK, dll) dengan interval km dan bulan.
+
+### Fixed
+- **Dual Sync (Vehicle ↔ Expense)**: Sinkronisasi dua arah untuk biaya dan lampiran antara Maintenance Record dan Expense Entry. Edit biaya atau lampiran di salah satu tempat otomatis tersinkronisasi.
+- **Attachment path 404**: Memperbaiki serve file attachment dari subfolder `uploads/expenses/` dengan mengubah ke `send_file()`. Ditambahkan route `/vehicle-attachment/<path>` khusus.
+- **Config toggle vehicles**: Menambahkan `vehicles: true` ke `config-example.yml` di bawah `feature_toggles` dan menambahkan navbar link.
+
 ## [v1.0.8] - 2026-07-01
 
 ### Security
