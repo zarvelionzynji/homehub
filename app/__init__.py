@@ -187,6 +187,47 @@ def create_app(test_config: dict | None = None):
                     cur.execute("UPDATE recurring_reminder SET unit='month' WHERE (unit IS NULL OR unit='') AND frequency='monthly'")
                 except Exception:
                     pass
+                # Ensure vehicle, service_type, maintenance_record tables exist
+                cur.execute("""
+                CREATE TABLE IF NOT EXISTS vehicle (
+                    id INTEGER PRIMARY KEY,
+                    name TEXT NOT NULL,
+                    vehicle_type TEXT NOT NULL,
+                    plate TEXT,
+                    current_mileage REAL DEFAULT 0,
+                    creator TEXT,
+                    timestamp TIMESTAMP
+                )
+                """)
+                cur.execute("""
+                CREATE TABLE IF NOT EXISTS service_type (
+                    id INTEGER PRIMARY KEY,
+                    name TEXT NOT NULL,
+                    interval_km REAL DEFAULT 0,
+                    interval_months INTEGER DEFAULT 0,
+                    is_active BOOLEAN DEFAULT 1,
+                    timestamp TIMESTAMP
+                )
+                """)
+                cur.execute("""
+                CREATE TABLE IF NOT EXISTS maintenance_record (
+                    id INTEGER PRIMARY KEY,
+                    vehicle_id INTEGER NOT NULL,
+                    service_type_id INTEGER NOT NULL,
+                    date DATE NOT NULL,
+                    mileage REAL NOT NULL,
+                    cost REAL DEFAULT 0,
+                    provider TEXT,
+                    notes TEXT,
+                    attachment_path TEXT,
+                    expense_id INTEGER,
+                    creator TEXT,
+                    timestamp TIMESTAMP,
+                    FOREIGN KEY (vehicle_id) REFERENCES vehicle(id),
+                    FOREIGN KEY (service_type_id) REFERENCES service_type(id),
+                    FOREIGN KEY (expense_id) REFERENCES expense_entry(id)
+                )
+                """)
                 conn.commit()
                 conn.close()
             except Exception:
@@ -208,6 +249,7 @@ def create_app(test_config: dict | None = None):
     from .blueprints import chores  # noqa: F401
     from .blueprints import qr  # noqa: F401
     from .blueprints import weather  # noqa: F401
+    from .blueprints import vehicles  # noqa: F401
     app.register_blueprint(main_bp)
     
     from .blueprints.ai_agent import ai_agent_bp
