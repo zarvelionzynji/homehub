@@ -36,10 +36,46 @@
     color: #f8fafc;
     border-color: var(--primary-color);
   }
+  .vehicle-card-hover {
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+  }
+  .vehicle-card-hover:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+  }
+  [data-theme="dark"] .vehicle-card-hover:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.125rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .badge-overdue { background: #fef2f2; color: #dc2626; }
+  .badge-warning { background: #fefce8; color: #ca8a04; }
+  .badge-ok { background: #f0fdf4; color: #16a34a; }
+  [data-theme="dark"] .badge-overdue { background: #450a0a; color: #fca5a5; }
+  [data-theme="dark"] .badge-warning { background: #422006; color: #fde047; }
+  [data-theme="dark"] .badge-ok { background: #052e16; color: #86efac; }
+  .row-action-btn {
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    transition: background-color 0.15s ease;
+  }
 </style>
 
 <div class="max-w-screen-2xl mx-auto space-y-6">
-  <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">Vehicle Maintenance</h1>
+  <div class="flex items-center justify-between flex-wrap gap-4">
+    <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">
+      <i class="fas fa-car mr-2 text-blue-500"></i>Vehicle Maintenance
+    </h1>
+  </div>
 
   <!-- Tabs -->
   <div class="flex gap-1 border-b border-gray-200 dark:border-gray-700 flex-wrap">
@@ -57,69 +93,61 @@
   <!-- Tab: Vehicles -->
   <div id="tab-vehicles" class="vehicle-tab-content block">
     <div class="space-y-4">
-      <!-- Add Vehicle Button -->
-      <button id="add-vehicle-btn" class="btn btn-primary">
-        <i class="fas fa-plus mr-2"></i>Add Vehicle
-      </button>
+      <div class="flex items-center justify-between">
+        <p class="text-sm text-gray-500 dark:text-gray-400">{{ vehicle_data|length }} vehicle(s)</p>
+        <button id="add-vehicle-btn" class="btn btn-primary">
+          <i class="fas fa-plus mr-2"></i>Add Vehicle
+        </button>
+      </div>
 
-      <!-- Vehicles List -->
-      <div id="vehicles-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {% if vehicle_data %}
+      <div id="vehicles-list" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
         {% for item in vehicle_data %}
           {% set v = item.vehicle %}
           {% set alerts = item.alerts %}
-          <div class="card p-4">
-            <div class="flex items-start justify-between mb-3">
-              <div class="flex-1">
-                <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100">{{ v.name }}</h3>
-                <p class="text-sm text-gray-600 dark:text-gray-400">
-                  {% if v.vehicle_type == 'car' %}
-                    <i class="fas fa-car mr-1"></i>Car
-                  {% elif v.vehicle_type == 'motorcycle' %}
-                    <i class="fas fa-motorcycle mr-1"></i>Motorcycle
-                  {% else %}
-                    <i class="fas fa-car mr-1"></i>{{ v.vehicle_type }}
-                  {% endif %}
-                </p>
+          <div class="card p-4 vehicle-card-hover rounded-xl border border-gray-200 dark:border-gray-700">
+            <div class="flex items-start gap-3 mb-3">
+              <div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-lg">
+                {% if v.vehicle_type == 'car' %}
+                  <i class="fas fa-car text-blue-600 dark:text-blue-400"></i>
+                {% elif v.vehicle_type == 'motorcycle' %}
+                  <i class="fas fa-motorcycle text-blue-600 dark:text-blue-400"></i>
+                {% endif %}
+              </div>
+              <div class="flex-1 min-w-0">
+                <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 truncate">{{ v.name }}</h3>
+                {% if v.plate %}
+                  <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ v.plate }}</p>
+                {% endif %}
               </div>
             </div>
-            {% if v.plate %}
-              <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                <strong>Plate:</strong> {{ v.plate }}
-              </p>
-            {% endif %}
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
-              <strong>Mileage:</strong> {{ "{:,.0f}".format(v.current_mileage) }} km
-            </p>
+
+            <div class="flex items-center gap-2 mb-3 text-sm text-gray-600 dark:text-gray-400">
+              <i class="fas fa-tachometer-alt text-gray-400"></i>
+              <span><strong>{{ "{:,.0f}".format(v.current_mileage) }}</strong> km</span>
+            </div>
 
             <!-- Service Alerts -->
             {% if alerts %}
-              <div class="mb-4 space-y-1">
+              <div class="mb-3 space-y-1.5">
                 {% for alert in alerts %}
-                  <div class="flex items-center text-sm">
-                    {% if alert.status == 'overdue' %}
-                      <i class="fas fa-circle text-red-600 mr-2"></i>
-                      <span class="text-red-600 dark:text-red-400">
-                        <strong>{{ alert.service_type }}:</strong> {{ alert.alert }}
-                      </span>
-                    {% elif alert.status == 'warning' %}
-                      <i class="fas fa-circle text-yellow-500 mr-2"></i>
-                      <span class="text-yellow-600 dark:text-yellow-400">
-                        <strong>{{ alert.service_type }}:</strong> {{ alert.alert }}
-                      </span>
-                    {% endif %}
-                  </div>
+                  <span class="badge {% if alert.status == 'overdue' %}badge-overdue{% else %}badge-warning{% endif %}">
+                    <i class="fas fa-{% if alert.status == 'overdue' %}exclamation-circle{% else %}exclamation-triangle{% endif %}"></i>
+                    {{ alert.service_type }}: {{ alert.alert }}
+                  </span>
                 {% endfor %}
               </div>
             {% else %}
-              <div class="mb-4 flex items-center text-sm text-green-600 dark:text-green-400">
-                <i class="fas fa-check-circle mr-2"></i>
-                All services up to date
+              <div class="mb-3">
+                <span class="badge badge-ok">
+                  <i class="fas fa-check-circle"></i>All services up to date
+                </span>
               </div>
             {% endif %}
 
             <!-- Action Buttons -->
-            <div class="flex gap-2 flex-wrap">
-              <a href="{{ url_for('main.vehicle_detail', vid=v.id) }}" class="flex-1 btn btn-secondary text-center text-sm min-w-fit">
+            <div class="flex gap-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+              <a href="{{ url_for('main.vehicle_detail', vid=v.id) }}" class="flex-1 btn btn-secondary text-center text-sm">
                 <i class="fas fa-eye mr-1"></i>View
               </a>
               <button class="edit-vehicle-btn btn btn-secondary text-sm" data-id="{{ v.id }}" data-name="{{ v.name }}" data-type="{{ v.vehicle_type }}" data-plate="{{ v.plate or '' }}" data-edit-url="{{ url_for('main.edit_vehicle', vid=v.id) }}">
@@ -127,21 +155,24 @@
               </button>
               <form method="POST" action="{{ url_for('main.delete_vehicle', vid=v.id) }}" class="inline delete-form" data-creator="{{ v.creator }}">
                 <button type="submit" class="btn btn-danger text-sm" onclick="return confirm('Delete {{ v.name }}?')">
-                  <i class="fas fa-trash mr-1"></i>Delete
+                  <i class="fas fa-trash"></i>
                 </button>
               </form>
             </div>
           </div>
         {% endfor %}
       </div>
-
-      {% if not vehicle_data %}
-        <div class="card p-8 text-center">
-          <div class="text-gray-500 dark:text-gray-400">
-            <i class="fas fa-car text-4xl mb-3 block"></i>
-            <p class="text-lg">No vehicles yet. Add one to get started.</p>
-          </div>
+      {% else %}
+      <div class="card p-12 text-center">
+        <div class="text-gray-400 dark:text-gray-500">
+          <i class="fas fa-car text-5xl mb-4 block"></i>
+          <p class="text-xl font-semibold text-gray-600 dark:text-gray-400 mb-1">No vehicles yet</p>
+          <p class="text-sm">Add your first vehicle to start tracking maintenance.</p>
+          <button id="add-vehicle-btn-empty" class="btn btn-primary mt-4">
+            <i class="fas fa-plus mr-2"></i>Add Vehicle
+          </button>
         </div>
+      </div>
       {% endif %}
     </div>
   </div>
@@ -149,53 +180,53 @@
   <!-- Tab: Service Types -->
   <div id="tab-service-types" class="vehicle-tab-content hidden">
     <div class="space-y-4">
-      <!-- Add Service Type Form -->
       <div class="card p-4">
-        <h3 class="text-lg font-bold mb-3">Add Service Type</h3>
-        <form method="POST" action="{{ url_for('main.add_service_type') }}" class="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <h3 class="text-lg font-bold mb-3"><i class="fas fa-plus-circle mr-2 text-green-500"></i>Add Service Type</h3>
+        <form method="POST" action="{{ url_for('main.add_service_type') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
-            <input type="text" name="name" placeholder="e.g., Oil Change" class="w-full border rounded p-2 text-sm" required>
+            <input type="text" name="name" placeholder="e.g., Oil Change" class="w-full border rounded-lg p-2 text-sm bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" required>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Interval (km)</label>
-            <input type="number" name="interval_km" placeholder="5000" step="100" class="w-full border rounded p-2 text-sm">
+            <input type="number" name="interval_km" placeholder="5000" step="100" class="w-full border rounded-lg p-2 text-sm bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Interval (months)</label>
-            <input type="number" name="interval_months" placeholder="6" step="1" class="w-full border rounded p-2 text-sm">
+            <input type="number" name="interval_months" placeholder="6" step="1" class="w-full border rounded-lg p-2 text-sm bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">
           </div>
           <div class="flex items-end">
-            <button type="submit" class="w-full btn btn-primary text-sm">Add</button>
+            <button type="submit" class="w-full btn btn-primary text-sm"><i class="fas fa-plus mr-1"></i>Add</button>
           </div>
         </form>
       </div>
 
-      <!-- Service Types Table -->
       <div class="card p-4 overflow-x-auto">
         <table class="w-full text-sm">
           <thead class="border-b border-gray-200 dark:border-gray-700">
             <tr>
-              <th class="text-left py-2 px-2 font-semibold text-gray-700 dark:text-gray-300">Name</th>
-              <th class="text-left py-2 px-2 font-semibold text-gray-700 dark:text-gray-300">Interval (km)</th>
-              <th class="text-left py-2 px-2 font-semibold text-gray-700 dark:text-gray-300">Interval (months)</th>
+              <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">Name</th>
+              <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">Interval (km)</th>
+              <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">Interval (months)</th>
             </tr>
           </thead>
           <tbody>
             {% for st in service_types %}
-              <tr class="border-b border-gray-100 dark:border-gray-700">
-                <td class="py-2 px-2">{{ st.name }}</td>
-                <td class="py-2 px-2">{{ st.interval_km if st.interval_km > 0 else '-' }}</td>
-                <td class="py-2 px-2">{{ st.interval_months if st.interval_months > 0 else '-' }}</td>
+              <tr class="border-b border-gray-100 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                <td class="py-2.5 px-3 font-medium">{{ st.name }}</td>
+                <td class="py-2.5 px-3 text-gray-600 dark:text-gray-400">{{ st.interval_km|int if st.interval_km > 0 else '—' }}</td>
+                <td class="py-2.5 px-3 text-gray-600 dark:text-gray-400">{{ st.interval_months if st.interval_months > 0 else '—' }}</td>
+              </tr>
+            {% else %}
+              <tr>
+                <td colspan="3" class="py-8 text-center text-gray-500 dark:text-gray-400">
+                  <i class="fas fa-tools text-3xl mb-2 block text-gray-300 dark:text-gray-600"></i>
+                  No service types defined yet.
+                </td>
               </tr>
             {% endfor %}
           </tbody>
         </table>
-        {% if not service_types %}
-          <div class="text-center py-4 text-gray-500 dark:text-gray-400">
-            No service types defined yet.
-          </div>
-        {% endif %}
       </div>
     </div>
   </div>
@@ -203,12 +234,11 @@
   <!-- Tab: History -->
   <div id="tab-history" class="vehicle-tab-content hidden">
     <div class="space-y-4">
-      <!-- Filters -->
       <div class="card p-4">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Vehicle</label>
-            <select id="history-vehicle-filter" class="w-full border rounded p-2 text-sm">
+            <select id="history-vehicle-filter" class="w-full border rounded-lg p-2 text-sm bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">
               <option value="">All Vehicles</option>
               {% for item in vehicle_data %}
                 <option value="{{ item.vehicle.id }}">{{ item.vehicle.name }}</option>
@@ -217,7 +247,7 @@
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Service Type</label>
-            <select id="history-type-filter" class="w-full border rounded p-2 text-sm">
+            <select id="history-type-filter" class="w-full border rounded-lg p-2 text-sm bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">
               <option value="">All Types</option>
               {% for st in service_types %}
                 <option value="{{ st.id }}">{{ st.name }}</option>
@@ -226,31 +256,31 @@
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">From Date</label>
-            <input type="date" id="history-date-from" class="w-full border rounded p-2 text-sm">
+            <input type="date" id="history-date-from" class="w-full border rounded-lg p-2 text-sm bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">To Date</label>
-            <input type="date" id="history-date-to" class="w-full border rounded p-2 text-sm">
+            <input type="date" id="history-date-to" class="w-full border rounded-lg p-2 text-sm bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">
           </div>
         </div>
       </div>
 
-      <!-- History Table -->
       <div class="card p-4 overflow-x-auto">
         <table class="w-full text-sm">
           <thead class="border-b border-gray-200 dark:border-gray-700">
             <tr>
-              <th class="text-left py-2 px-2 font-semibold text-gray-700 dark:text-gray-300">Date</th>
-              <th class="text-left py-2 px-2 font-semibold text-gray-700 dark:text-gray-300">Vehicle</th>
-              <th class="text-left py-2 px-2 font-semibold text-gray-700 dark:text-gray-300">Service Type</th>
-              <th class="text-left py-2 px-2 font-semibold text-gray-700 dark:text-gray-300">Mileage</th>
-              <th class="text-left py-2 px-2 font-semibold text-gray-700 dark:text-gray-300">Cost</th>
-              <th class="text-left py-2 px-2 font-semibold text-gray-700 dark:text-gray-300">Provider</th>
+              <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">Date</th>
+              <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">Vehicle</th>
+              <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">Service Type</th>
+              <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">Mileage</th>
+              <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">Cost</th>
+              <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">Provider</th>
             </tr>
           </thead>
           <tbody id="history-table-body">
             <tr>
-              <td colspan="6" class="py-4 text-center text-gray-500 dark:text-gray-400">
+              <td colspan="6" class="py-8 text-center text-gray-500 dark:text-gray-400">
+                <i class="fas fa-history text-3xl mb-2 block text-gray-300 dark:text-gray-600"></i>
                 No maintenance records found.
               </td>
             </tr>
@@ -262,26 +292,26 @@
 </div>
 
 <!-- Add/Edit Vehicle Modal -->
-<div id="vehicle-modal" class="modal fixed inset-0 z-50 bg-black bg-opacity-50 items-center justify-center p-4 hidden">
-  <div class="modal-content card w-full max-w-md p-6 transform scale-95">
+<div id="vehicle-modal" class="modal fixed inset-0 z-50 bg-black/40 backdrop-blur-sm items-center justify-center p-4 hidden">
+  <div class="modal-content card w-full max-w-md p-6">
     <h2 class="text-2xl font-bold mb-4" id="vehicle-modal-title">Add Vehicle</h2>
     <form id="vehicle-form" method="POST" action="{{ url_for('main.add_vehicle') }}">
       <input type="hidden" name="creator" id="vehicle-creator">
       <div class="space-y-3">
         <div>
-          <label class="text-sm text-gray-600 dark:text-gray-400">Vehicle Name</label>
-          <input type="text" id="vehicle-name" name="name" class="mt-1 block w-full border rounded p-2" placeholder="e.g., Honda Civic" required>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Vehicle Name</label>
+          <input type="text" id="vehicle-name" name="name" class="w-full border rounded-lg p-2 bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="e.g., Honda Civic" required>
         </div>
         <div>
-          <label class="text-sm text-gray-600 dark:text-gray-400">Type</label>
-          <select id="vehicle-type" name="vehicle_type" class="mt-1 block w-full border rounded p-2" required>
-            <option value="car">Car</option>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Type</label>
+          <select id="vehicle-type" name="vehicle_type" class="w-full border rounded-lg p-2 bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" required>
+            <option value="car"><i class="fas fa-car"></i> Car</option>
             <option value="motorcycle">Motorcycle</option>
           </select>
         </div>
         <div>
-          <label class="text-sm text-gray-600 dark:text-gray-400">License Plate</label>
-          <input type="text" id="vehicle-plate" name="plate" class="mt-1 block w-full border rounded p-2" placeholder="e.g., ABC-1234">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">License Plate</label>
+          <input type="text" id="vehicle-plate" name="plate" class="w-full border rounded-lg p-2 bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="e.g., ABC-1234">
         </div>
       </div>
       <div class="mt-5 flex justify-end gap-2">
@@ -298,41 +328,61 @@ document.addEventListener('DOMContentLoaded', function(){
   const currentUser = () => localStorage.getItem('username') || '';
 
   // Tab switching
-  document.querySelectorAll('.vehicle-tab').forEach(tab => {
+  const tabs = document.querySelectorAll('.vehicle-tab');
+  const tabContents = {
+    vehicles: document.getElementById('tab-vehicles'),
+    'service-types': document.getElementById('tab-service-types'),
+    history: document.getElementById('tab-history'),
+  };
+
+  tabs.forEach(tab => {
     tab.addEventListener('click', function(){
       const tabName = this.getAttribute('data-tab');
-      document.querySelectorAll('.vehicle-tab-content').forEach(el => el.classList.add('hidden'));
-      document.getElementById(`tab-${tabName}`).classList.remove('hidden');
-      document.querySelectorAll('.vehicle-tab').forEach(el => el.classList.remove('active'));
+      Object.values(tabContents).forEach(el => el?.classList.add('hidden'));
+      tabContents[tabName]?.classList.remove('hidden');
+      tabs.forEach(el => el.classList.remove('active'));
       this.classList.add('active');
+      // Store active tab
+      try { sessionStorage.setItem('vehicle-active-tab', tabName); } catch(e) {}
     });
   });
 
-  // Modal helpers
+  // Restore active tab from session
+  try {
+    const savedTab = sessionStorage.getItem('vehicle-active-tab');
+    if (savedTab && tabContents[savedTab]) {
+      document.querySelector(`.vehicle-tab[data-tab="${savedTab}"]`)?.click();
+    }
+  } catch(e) {}
+
+  // Modal helpers (simple show/hide, no scale animation)
   const vehicleModal = document.getElementById('vehicle-modal');
   function openModal(m){
     m.classList.remove('hidden');
     m.classList.add('flex');
-    setTimeout(()=> m.querySelector('.modal-content').classList.add('scale-100'), 10);
   }
   function closeModal(m){
-    const c = m.querySelector('.modal-content');
-    c.classList.remove('scale-100');
-    setTimeout(()=>{ m.classList.add('hidden'); m.classList.remove('flex'); }, 200);
+    m.classList.add('hidden');
+    m.classList.remove('flex');
   }
 
-  // Add vehicle button
-  document.getElementById('add-vehicle-btn').addEventListener('click', function(){
-    document.getElementById('vehicle-modal-title').textContent = 'Add Vehicle';
-    document.getElementById('vehicle-form').action = '{{ url_for("main.add_vehicle") }}';
-    document.getElementById('vehicle-name').value = '';
-    document.getElementById('vehicle-type').value = 'car';
-    document.getElementById('vehicle-plate').value = '';
-    document.getElementById('vehicle-creator').value = currentUser();
-    openModal(vehicleModal);
-  });
+  // Add vehicle buttons
+  function setupAddVehicle(btn) {
+    if (!btn) return;
+    btn.addEventListener('click', function(){
+      document.getElementById('vehicle-modal-title').textContent = 'Add Vehicle';
+      document.getElementById('vehicle-form').action = '{{ url_for("main.add_vehicle") }}';
+      document.getElementById('vehicle-name').value = '';
+      document.getElementById('vehicle-type').value = 'car';
+      document.getElementById('vehicle-plate').value = '';
+      document.getElementById('vehicle-creator').value = currentUser();
+      openModal(vehicleModal);
+    });
+  }
+  setupAddVehicle(document.getElementById('add-vehicle-btn'));
+  setupAddVehicle(document.getElementById('add-vehicle-btn-empty'));
 
-  // Edit vehicle button
+  // Edit vehicle buttons
   document.querySelectorAll('.edit-vehicle-btn').forEach(btn => {
     btn.addEventListener('click', function(){
       const name = this.getAttribute('data-name');
