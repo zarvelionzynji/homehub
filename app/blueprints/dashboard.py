@@ -4,8 +4,6 @@ from ..models import db, HomeStatus, MemberStatus, Notice, Reminder, RecurringRe
 from ..blueprints import main_bp
 from ..security import sanitize_html, sanitize_text
 import json
-
-
 def _parse_date_param(value, default=None):
     if not value:
         return default
@@ -788,3 +786,23 @@ def member_status_delete():
         member_statuses = {ms.name: ms.text for ms in MemberStatus.query.all() if ms.name in family and (ms.text or '').strip()}
         return jsonify({'ok': True, 'who_statuses': who_statuses, 'member_statuses': member_statuses, 'result': 'removed' if removed else 'none'})
     return redirect(url_for('main.index'))
+
+
+@main_bp.route('/settings/navbar-order', methods=['POST'])
+def save_navbar_order():
+    """Save navbar item order for current user."""
+    import json
+    user = sanitize_text(request.form.get('user', ''))
+    order_json = request.form.get('order', '[]')
+    try:
+        order = json.loads(order_json)
+        if not isinstance(order, list):
+            raise ValueError
+        db.session.execute(
+            db.text("INSERT INTO app_setting(key,value) VALUES(:k,:v) ON CONFLICT(key) DO UPDATE SET value=excluded.value"),
+            {"k": f"navbar_order_{user}", "v": json.dumps(order)}
+        )
+        db.session.commit()
+        return jsonify({'ok': True})
+    except Exception:
+        return jsonify({'ok': False, 'error': 'Invalid order data'}), 400
