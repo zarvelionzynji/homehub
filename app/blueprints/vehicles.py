@@ -280,4 +280,4 @@ def add_service_type():
     db.session.add(st)
     db.session.commit()
     flash(f'Service type "{name}" added.', 'success')
-    return redirect(url_for('main.vehicles'))
+    return redirect(url_for('main.vehicles', _anchor='tab-service-types'))

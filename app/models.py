@@ -261,7 +261,7 @@ def receive_after_delete(mapper, connection, target):
 def receive_before_update(mapper, connection, target):
     from sqlalchemy.orm import object_session
     session = object_session(target)
-    
+
     # Check if this object is modified and attachment_path changed
     state = db.inspect(target)
     history = state.get_history('attachment_path', True)
@@ -270,4 +270,21 @@ def receive_before_update(mapper, connection, target):
         if history.deleted and history.deleted[0]:
             # delete the old file
             delete_attachment_file(history.deleted[0])
+
+@event.listens_for(ExpenseEntry, 'before_update')
+def sync_maintenance_cost_on_expense_update(mapper, connection, target):
+    """Sync expense amount changes back to linked maintenance record cost."""
+    from sqlalchemy.orm import object_session
+    session = object_session(target)
+    if not session:
+        return
+
+    state = db.inspect(target)
+    history = state.get_history('amount', True)
+    if history.has_changes():
+        new_amount = target.amount
+        maintenance = session.query(MaintenanceRecord).filter_by(expense_id=target.id).first()
+        if maintenance and new_amount != maintenance.cost:
+            maintenance.cost = new_amount
+            session.flush()
 
