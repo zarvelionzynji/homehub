@@ -1,49 +1,309 @@
 {% extends "base.html" %}
-
 {% block content %}
-<div class="p-4">
-  <a href="{{ url_for('main.vehicles') }}">&larr; Back to Vehicles</a>
+<style>
+  .modal { transition: opacity 0.2s ease; }
+  .modal-content { transition: transform 0.2s ease; max-height: 80vh; overflow-y: auto; }
+  .expandable-notes {
+    max-height: 2.5em;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    cursor: pointer;
+    position: relative;
+  }
+  .expandable-notes.expanded {
+    max-height: none;
+  }
+  .expandable-notes::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1.5em;
+    background: linear-gradient(to bottom, transparent, var(--card-background-color));
+    pointer-events: none;
+  }
+  .expandable-notes.expanded::after {
+    display: none;
+  }
+</style>
 
-  <h1 class="text-2xl font-bold mb-2">{{ vehicle.name }}</h1>
-  <p>Type: {{ vehicle.vehicle_type }} | Plate: {{ vehicle.plate }} | Mileage: {{ vehicle.current_mileage }}</p>
-
-  <div class="mt-6">
-    <h2 class="text-xl font-semibold mb-2">Add Service Record</h2>
-    <form method="post" action="{{ url_for('main.add_maintenance_record', vid=vehicle.id) }}" enctype="multipart/form-data">
-      <select name="service_type_id" required>
-        {% for st in service_types %}
-          <option value="{{ st.id }}">{{ st.name }}</option>
-        {% endfor %}
-      </select>
-      <input type="date" name="date" required />
-      <input type="number" name="mileage" placeholder="Mileage" step="0.1" required />
-      <input type="number" name="cost" placeholder="Cost" step="0.01" />
-      <input type="text" name="provider" placeholder="Provider" />
-      <textarea name="notes" placeholder="Notes"></textarea>
-      <input type="file" name="attachment" />
-      <input type="text" name="creator" placeholder="Creator" />
-      <button type="submit">Log Service</button>
-    </form>
+<div class="max-w-screen-2xl mx-auto space-y-6">
+  <!-- Header -->
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-3 mb-2">
+        <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">{{ vehicle.name }}</h1>
+        {% if vehicle.vehicle_type == 'car' %}
+          <i class="fas fa-car text-2xl text-gray-600 dark:text-gray-400"></i>
+        {% elif vehicle.vehicle_type == 'motorcycle' %}
+          <i class="fas fa-motorcycle text-2xl text-gray-600 dark:text-gray-400"></i>
+        {% else %}
+          <i class="fas fa-car text-2xl text-gray-600 dark:text-gray-400"></i>
+        {% endif %}
+      </div>
+      <div class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+        {% if vehicle.plate %}
+          <p><strong>License Plate:</strong> {{ vehicle.plate }}</p>
+        {% endif %}
+        <p><strong>Current Mileage:</strong> {{ "{:,.0f}".format(vehicle.current_mileage) }} km</p>
+      </div>
+    </div>
+    <div class="flex gap-2 flex-wrap">
+      <button id="edit-vehicle-btn" class="btn btn-secondary">
+        <i class="fas fa-edit mr-1"></i>Edit Vehicle
+      </button>
+      <form method="POST" action="{{ url_for('main.delete_vehicle', vid=vehicle.id) }}" class="inline delete-form" data-creator="{{ vehicle.creator }}">
+        <button type="submit" class="btn btn-danger" onclick="return confirm('Delete {{ vehicle.name }}?')">
+          <i class="fas fa-trash mr-1"></i>Delete Vehicle
+        </button>
+      </form>
+      <a href="{{ url_for('main.vehicles') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left mr-1"></i>Back to Vehicles
+      </a>
+    </div>
   </div>
 
-  <div class="mt-6">
-    <h2 class="text-xl font-semibold mb-2">Service History</h2>
+  <!-- Service History Table -->
+  <div class="card p-4">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">Service History</h2>
+      <button id="add-service-btn" class="btn btn-primary">
+        <i class="fas fa-plus mr-1"></i>Add Service Record
+      </button>
+    </div>
+
     {% if records %}
-      <ul>
-        {% for rec in records %}
-          <li class="mb-2 p-2 border rounded">
-            <strong>{{ rec.service_type.name }}</strong> - {{ rec.date }}
-            <br />Mileage: {{ rec.mileage }} | Cost: {{ rec.cost }} | Provider: {{ rec.provider }}
-            <br />{{ rec.notes }}
-            <form method="post" action="{{ url_for('main.delete_maintenance_record', rid=rec.id) }}" style="display:inline">
-              <button type="submit">Delete</button>
-            </form>
-          </li>
-        {% endfor %}
-      </ul>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="border-b border-gray-200 dark:border-gray-700">
+            <tr>
+              <th class="text-left py-2 px-2 font-semibold text-gray-700 dark:text-gray-300">Date</th>
+              <th class="text-left py-2 px-2 font-semibold text-gray-700 dark:text-gray-300">Service Type</th>
+              <th class="text-left py-2 px-2 font-semibold text-gray-700 dark:text-gray-300">Mileage</th>
+              <th class="text-left py-2 px-2 font-semibold text-gray-700 dark:text-gray-300">Cost</th>
+              <th class="text-left py-2 px-2 font-semibold text-gray-700 dark:text-gray-300">Provider</th>
+              <th class="text-left py-2 px-2 font-semibold text-gray-700 dark:text-gray-300">Notes</th>
+              <th class="text-left py-2 px-2 font-semibold text-gray-700 dark:text-gray-300">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for rec in records %}
+              <tr class="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-slate-700/50">
+                <td class="py-2 px-2">{{ rec.date.strftime('%Y-%m-%d') }}</td>
+                <td class="py-2 px-2">{{ rec.service_type.name }}</td>
+                <td class="py-2 px-2">{{ "{:,.0f}".format(rec.mileage) }} km</td>
+                <td class="py-2 px-2">{{ config.currency_symbol or 'Rp' }}{{ "{:,.0f}".format(rec.cost) if rec.cost else '-' }}</td>
+                <td class="py-2 px-2">{{ rec.provider or '-' }}</td>
+                <td class="py-2 px-2">
+                  {% if rec.notes %}
+                    <span class="text-xs text-gray-500 truncate max-w-xs inline-block align-middle" title="{{ rec.notes }}">{{ rec.notes[:50] }}{% if rec.notes|length > 50 %}...{% endif %}</span>
+                    {% if rec.attachment_path %}
+                      <a href="/{{ rec.attachment_path }}" class="ml-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300" title="View attachment">
+                        <i class="fas fa-paperclip text-xs"></i>
+                      </a>
+                    {% endif %}
+                  {% elif rec.attachment_path %}
+                    <a href="/{{ rec.attachment_path }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300" title="View attachment">
+                      <i class="fas fa-paperclip"></i> View
+                    </a>
+                  {% else %}
+                    <span class="text-gray-400">-</span>
+                  {% endif %}
+                </td>
+                <td class="py-2 px-2 space-x-2">
+                  <button class="edit-service-btn text-blue-600 hover:underline text-xs" data-id="{{ rec.id }}" data-service-type="{{ rec.service_type_id }}" data-date="{{ rec.date.strftime('%Y-%m-%d') }}" data-mileage="{{ rec.mileage }}" data-cost="{{ rec.cost }}" data-provider="{{ rec.provider or '' }}" data-notes="{{ rec.notes or '' }}">
+                    <i class="fas fa-edit"></i> Edit
+                  </button>
+                  <form method="POST" action="{{ url_for('main.delete_maintenance_record', rid=rec.id) }}" class="inline delete-form" data-creator="{{ rec.creator }}">
+                    <button type="submit" class="text-red-600 hover:underline text-xs" onclick="return confirm('Delete this service record?')">
+                      <i class="fas fa-trash"></i> Delete
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     {% else %}
-      <p>No service records yet.</p>
+      <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+        <i class="fas fa-tools text-3xl mb-2 block text-gray-400 dark:text-gray-500"></i>
+        <p class="text-lg">No service records yet.</p>
+        <p class="text-sm mt-1">Add the first service record to get started.</p>
+      </div>
     {% endif %}
   </div>
 </div>
+
+<!-- Edit Vehicle Modal -->
+<div id="vehicle-modal" class="modal fixed inset-0 z-50 bg-black bg-opacity-50 items-center justify-center p-4 hidden">
+  <div class="modal-content card w-full max-w-md p-6 transform scale-95">
+    <h2 class="text-2xl font-bold mb-4">Edit Vehicle</h2>
+    <form id="vehicle-form" method="POST" action="{{ url_for('main.edit_vehicle', vid=vehicle.id) }}">
+      <div class="space-y-3">
+        <div>
+          <label class="text-sm text-gray-600 dark:text-gray-400">Vehicle Name</label>
+          <input type="text" id="vehicle-name" name="name" class="mt-1 block w-full border rounded p-2 bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" value="{{ vehicle.name }}" required>
+        </div>
+        <div>
+          <label class="text-sm text-gray-600 dark:text-gray-400">Type</label>
+          <select id="vehicle-type" name="vehicle_type" class="mt-1 block w-full border rounded p-2 bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" required>
+            <option value="car" {% if vehicle.vehicle_type == 'car' %}selected{% endif %}>Car</option>
+            <option value="motorcycle" {% if vehicle.vehicle_type == 'motorcycle' %}selected{% endif %}>Motorcycle</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-sm text-gray-600 dark:text-gray-400">License Plate</label>
+          <input type="text" id="vehicle-plate" name="plate" class="mt-1 block w-full border rounded p-2 bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" value="{{ vehicle.plate or '' }}" placeholder="e.g., ABC-1234">
+        </div>
+      </div>
+      <div class="mt-5 flex justify-end gap-2">
+        <button type="button" id="cancel-vehicle" class="btn btn-secondary">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Add/Edit Service Record Modal -->
+<div id="service-modal" class="modal fixed inset-0 z-50 bg-black bg-opacity-50 items-center justify-center p-4 hidden">
+  <div class="modal-content card w-full max-w-md p-6 transform scale-95">
+    <h2 class="text-2xl font-bold mb-4" id="service-modal-title">Add Service Record</h2>
+    <form id="service-form" method="POST" action="{{ url_for('main.add_maintenance_record', vid=vehicle.id) }}" enctype="multipart/form-data">
+      <input type="hidden" name="creator" id="service-creator">
+      <div class="space-y-3">
+        <div>
+          <label class="text-sm text-gray-600 dark:text-gray-400">Service Type</label>
+          <select id="service-type" name="service_type_id" class="mt-1 block w-full border rounded p-2 bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" required>
+            <option value="">-- Select Service Type --</option>
+            {% for st in service_types %}
+              <option value="{{ st.id }}">{{ st.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label class="text-sm text-gray-600 dark:text-gray-400">Date</label>
+          <input type="date" id="service-date" name="date" class="mt-1 block w-full border rounded p-2 bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" required>
+        </div>
+        <div>
+          <label class="text-sm text-gray-600 dark:text-gray-400">Mileage (km)</label>
+          <input type="number" id="service-mileage" name="mileage" class="mt-1 block w-full border rounded p-2 bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" step="0.1" placeholder="45000" required>
+        </div>
+        <div>
+          <label class="text-sm text-gray-600 dark:text-gray-400">Cost ({{ config.currency_symbol or 'Rp' }})</label>
+          <input type="number" id="service-cost" name="cost" class="mt-1 block w-full border rounded p-2 bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" step="0.01" placeholder="0" min="0">
+        </div>
+        <div>
+          <label class="text-sm text-gray-600 dark:text-gray-400">Provider</label>
+          <input type="text" id="service-provider" name="provider" class="mt-1 block w-full border rounded p-2 bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="e.g., ABC Auto Shop">
+        </div>
+        <div>
+          <label class="text-sm text-gray-600 dark:text-gray-400">Notes</label>
+          <textarea id="service-notes" name="notes" class="mt-1 block w-full border rounded p-2 bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" rows="3" placeholder="e.g., Replaced air filter, rotated tires"></textarea>
+        </div>
+        <div>
+          <label class="text-sm text-gray-600 dark:text-gray-400">Attachment (Receipt/Proof)</label>
+          <input type="file" id="service-attachment" name="attachment" accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:text-gray-400 dark:file:bg-blue-900 dark:file:text-blue-200">
+        </div>
+      </div>
+      <div class="mt-5 flex justify-end gap-2">
+        <button type="button" id="cancel-service" class="btn btn-secondary">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Record</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  const adminName = '{{ config.admin_name }}';
+  const currentUser = () => localStorage.getItem('username') || '';
+
+  // Modal helpers
+  const vehicleModal = document.getElementById('vehicle-modal');
+  const serviceModal = document.getElementById('service-modal');
+
+  function openModal(m){
+    m.classList.remove('hidden');
+    m.classList.add('flex');
+    setTimeout(()=> m.querySelector('.modal-content').classList.add('scale-100'), 10);
+  }
+
+  function closeModal(m){
+    const c = m.querySelector('.modal-content');
+    c.classList.remove('scale-100');
+    setTimeout(()=>{ m.classList.add('hidden'); m.classList.remove('flex'); }, 200);
+  }
+
+  // Edit vehicle button
+  document.getElementById('edit-vehicle-btn').addEventListener('click', function(){
+    document.getElementById('vehicle-name').value = '{{ vehicle.name }}';
+    document.getElementById('vehicle-type').value = '{{ vehicle.vehicle_type }}';
+    document.getElementById('vehicle-plate').value = '{{ vehicle.plate or '' }}';
+    openModal(vehicleModal);
+  });
+
+  // Cancel vehicle modal
+  document.getElementById('cancel-vehicle').addEventListener('click', ()=> closeModal(vehicleModal));
+  vehicleModal.addEventListener('click', (e)=>{ if (e.target === vehicleModal) closeModal(vehicleModal); });
+
+  // Add service button
+  document.getElementById('add-service-btn').addEventListener('click', function(){
+    document.getElementById('service-modal-title').textContent = 'Add Service Record';
+    document.getElementById('service-form').action = '{{ url_for("main.add_maintenance_record", vid=vehicle.id) }}';
+    document.getElementById('service-form').method = 'POST';
+    document.getElementById('service-type').value = '';
+    document.getElementById('service-date').value = new Date().toISOString().split('T')[0];
+    document.getElementById('service-mileage').value = '';
+    document.getElementById('service-cost').value = '';
+    document.getElementById('service-provider').value = '';
+    document.getElementById('service-notes').value = '';
+    document.getElementById('service-attachment').value = '';
+    document.getElementById('service-creator').value = currentUser();
+    openModal(serviceModal);
+  });
+
+  // Edit service buttons
+  document.querySelectorAll('.edit-service-btn').forEach(btn => {
+    btn.addEventListener('click', function(){
+      const id = this.getAttribute('data-id');
+      const serviceTypeId = this.getAttribute('data-service-type');
+      const date = this.getAttribute('data-date');
+      const mileage = this.getAttribute('data-mileage');
+      const cost = this.getAttribute('data-cost');
+      const provider = this.getAttribute('data-provider');
+      const notes = this.getAttribute('data-notes');
+
+      document.getElementById('service-modal-title').textContent = 'Edit Service Record';
+      document.getElementById('service-form').action = '{{ url_for("main.edit_maintenance_record", rid=999) }}'.replace('999', id);
+      document.getElementById('service-form').method = 'POST';
+      document.getElementById('service-type').value = serviceTypeId;
+      document.getElementById('service-date').value = date;
+      document.getElementById('service-mileage').value = mileage;
+      document.getElementById('service-cost').value = cost;
+      document.getElementById('service-provider').value = provider;
+      document.getElementById('service-notes').value = notes;
+      document.getElementById('service-attachment').value = '';
+      document.getElementById('service-creator').value = currentUser();
+      openModal(serviceModal);
+    });
+  });
+
+  // Cancel service modal
+  document.getElementById('cancel-service').addEventListener('click', ()=> closeModal(serviceModal));
+  serviceModal.addEventListener('click', (e)=>{ if (e.target === serviceModal) closeModal(serviceModal); });
+
+  // Apply user visibility to delete forms
+  function applyUserVisibility(){
+    document.querySelectorAll('.delete-form').forEach(f => {
+      const creator = f.getAttribute('data-creator');
+      const isAllowed = (currentUser() === creator || currentUser() === adminName || currentUser() === 'Administrator' || currentUser() === 'admin');
+      f.style.display = isAllowed ? '' : 'none';
+    });
+  }
+  document.addEventListener('user-switched', applyUserVisibility);
+  applyUserVisibility();
+});
+</script>
 {% endblock %}
