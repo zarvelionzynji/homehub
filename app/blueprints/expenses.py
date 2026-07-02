@@ -3,7 +3,7 @@ from datetime import datetime, date, timedelta
 import calendar as _calendar
 import json
 import os
-from ..models import db, RecurringExpense, ExpenseEntry
+from ..models import db, RecurringExpense, ExpenseEntry, MaintenanceRecord
 from ..security import sanitize_text
 from ..blueprints import main_bp
 from ..utils import handle_expense_attachment
@@ -564,7 +564,6 @@ def edit_expense_entry(entry_id):
             entry.attachment_path = new_path
 
     # Sync amount back to linked maintenance record (if this expense is from vehicles)
-    from ..models import MaintenanceRecord
     maintenance = MaintenanceRecord.query.filter_by(expense_id=entry.id).first()
     if maintenance and maintenance.cost != entry.amount:
         maintenance.cost = entry.amount
