@@ -161,9 +161,6 @@ body {
     font-weight: 600;
     box-shadow: inset 3px 0 0 rgba(255,255,255,0.7);
 }
-    font-weight: 600;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-}
 
 .sidebar a.sidebar-link:hover {
     background-color: var(--primary-color);
