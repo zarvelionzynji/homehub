@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="mx-auto">
+<div class="mx-auto max-w-4xl">
     <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Media Downloader</h2>
-    <form method="POST" action="/media" class="mb-4 grid gap-2 md:grid-cols-12 grid-cols-1 items-end">
+    <form method="POST" action="/media" class="mb-6 grid gap-2 md:grid-cols-12 grid-cols-1 items-end">
         <input type="url" name="url" class="w-full p-2 rounded-lg bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none border md:col-span-6" placeholder="Paste media URL..." value="{{ shared_url }}" required>
         <select name="format" class="p-2 rounded-lg bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none border md:col-span-2">
             <option value="mp4">MP4 (video)</option>
@@ -16,31 +16,51 @@
     <input type="hidden" name="creator" id="creator">
     <button type="submit" class="btn btn-primary md:col-span-2">Download</button>
     </form>
-        <ul>
+        <ul class="space-y-3">
         {% for media in media_list %}
-    <li class="card p-4 mb-2 flex flex-wrap gap-2 items-center border border-gray-200 dark:border-gray-700 rounded-xl" data-id="{{ media.id }}" data-filepath="{{ media.filepath }}" data-format="{{ media.download_format or 'mp4' }}" data-quality="{{ media.download_quality or 'best' }}">
-            <span class="flex-1 truncate text-gray-800 dark:text-gray-100">{{ media.title }}</span>
-            {% if media.status == 'pending' %}
-        <span class="px-2 py-1 rounded bg-yellow-100 text-yellow-800 status-chip">Starting…</span>
-        <span class="text-xs text-gray-500 dark:text-gray-400 progress-line">{{ media.progress or 'Will take a while…' }}</span>
-                        {% elif media.filepath %}
-                <a href="/media/preview/{{ media.filepath }}" target="_blank" rel="noopener noreferrer" class="btn btn-success media-preview-link" data-filename="{{ media.filepath }}" aria-label="Preview {{ media.filepath }} in new tab">
-                    <i class="fa-solid fa-eye" aria-hidden="true"></i> Preview
-                </a>
-                <a href="/media/{{ media.filepath }}" class="btn btn-primary media-download-link" data-filename="{{ media.filepath }}">
-                    <i class="fa-solid fa-download" aria-hidden="true"></i> Download
-                </a>
-                <button class="btn btn-warning media-redownload-btn" data-id="{{ media.id }}">
-                    <i class="fa-solid fa-rotate"></i> Redownload
-                </button>
-                        {% else %}
-                <a href="#" class="px-2 py-1 rounded bg-red-100 text-red-800 media-not-found" data-url="{{ media.title }}">Not available</a>
-                        {% endif %}
-                        <div class="text-xs text-gray-500 dark:text-gray-400">By {{ media.creator }} at {{ media.download_time.strftime('%Y-%m-%d %H:%M') }}</div>
-            <form method="POST" action="/media/delete/{{ media.id }}" class="delete-form" data-creator="{{ media.creator }}">
-                <input type="hidden" name="user">
-                <button type="submit" class="btn btn-danger action-delete">Delete</button>
-            </form>
+    <li class="card p-3 md:p-4 border border-gray-200 dark:border-gray-700 rounded-xl" data-id="{{ media.id }}" data-filepath="{{ media.filepath }}" data-format="{{ media.download_format or 'mp4' }}" data-quality="{{ media.download_quality or 'best' }}">
+        <!-- Title row -->
+        <div class="flex items-start gap-2 mb-2">
+            <span class="flex-1 min-w-0 truncate text-sm md:text-base font-medium text-gray-800 dark:text-gray-100">{{ media.title }}</span>
+            {% if media.download_format %}
+            <span class="shrink-0 self-start mt-0.5 text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-md {% if media.download_format == 'mp3' %}bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300{% else %}bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300{% endif %}">{{ media.download_format }}</span>
+            {% endif %}
+        </div>
+
+        <!-- Actions row -->
+        {% if media.status == 'pending' %}
+        <div class="flex flex-wrap items-center gap-2 mb-2">
+            <span class="px-2 py-1 rounded text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300 status-chip">Starting…</span>
+            <span class="text-xs text-gray-500 dark:text-gray-400 progress-line">{{ media.progress or 'Will take a while…' }}</span>
+        </div>
+                    {% elif media.filepath %}
+        <div class="flex flex-wrap items-center gap-1.5 mb-2">
+            <a href="/media/preview/{{ media.filepath }}" target="_blank" rel="noopener noreferrer" class="btn btn-success media-preview-link !py-1.5 !px-2.5 md:!px-3 text-xs" data-filename="{{ media.filepath }}" aria-label="Preview {{ media.filepath }} in new tab">
+                <i class="fa-solid fa-eye" aria-hidden="true"></i> <span class="hidden sm:inline">Preview</span>
+            </a>
+            <a href="/media/{{ media.filepath }}" class="btn btn-primary media-download-link !py-1.5 !px-2.5 md:!px-3 text-xs" data-filename="{{ media.filepath }}">
+                <i class="fa-solid fa-download" aria-hidden="true"></i> <span class="hidden sm:inline">Download</span>
+            </a>
+            <button class="btn btn-warning media-redownload-btn !py-1.5 !px-2.5 md:!px-3 text-xs" data-id="{{ media.id }}">
+                <i class="fa-solid fa-rotate"></i> <span class="hidden sm:inline">Redownload</span>
+            </button>
+        </div>
+                    {% else %}
+        <div class="flex flex-wrap items-center gap-2 mb-2">
+            <a href="#" class="text-xs px-2 py-1 rounded font-medium bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 media-not-found" data-url="{{ media.title }}">Not available</a>
+        </div>
+                    {% endif %}
+
+        <!-- Meta + Delete row -->
+        <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+            <span>By {{ media.creator }} &middot; {{ media.download_time.strftime('%Y-%m-%d %H:%M') }}</span>
+        <form method="POST" action="/media/delete/{{ media.id }}" class="delete-form inline" data-creator="{{ media.creator }}">
+            <input type="hidden" name="user">
+            <button type="submit" class="hover:text-red-600 dark:hover:text-red-400 transition-colors action-delete" title="Delete">
+                <i class="fa-solid fa-trash-can"></i>
+            </button>
+        </form>
+        </div>
                 </li>
                 {% endfor %}
         </ul>
@@ -84,19 +104,19 @@ var pollMedia; // hoisted for redownload handler access
                 const p = item.querySelector('.progress-line');
                 if (d.file_exists === false) {
                     const url = item.querySelector('.flex-1')?.textContent?.trim() || '';
-                    if (chip) chip.outerHTML = '<a href="#" class="px-2 py-1 rounded bg-red-100 text-red-800 media-not-found" data-url="' + url.replace(/"/g, '&quot;') + '">Not available (deleted)</a>';
+                    if (chip) chip.outerHTML = '<a href="#" class="text-xs px-2 py-1 rounded font-medium bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 media-not-found" data-url="' + url.replace(/"/g, '&quot;') + '">Not available (deleted)</a>';
                     if (p) p.textContent = 'File not found on disk';
                 } else {
                     if (chip){
                         chip.outerHTML = `
-                            <a href="/media/preview/${d.filepath}" target="_blank" rel="noopener noreferrer" class="btn btn-success media-preview-link" data-filename="${d.filepath}" aria-label="Preview ${d.filepath} in new tab">
-                                <i class="fa-solid fa-eye" aria-hidden="true"></i> Preview
+                            <a href="/media/preview/${d.filepath}" target="_blank" rel="noopener noreferrer" class="btn btn-success media-preview-link !py-1.5 !px-2.5 text-xs" data-filename="${d.filepath}" aria-label="Preview ${d.filepath} in new tab">
+                                <i class="fa-solid fa-eye" aria-hidden="true"></i> <span class="hidden sm:inline">Preview</span>
                             </a>
-                            <a href="/media/${d.filepath}" class="btn btn-primary media-download-link" data-filename="${d.filepath}">
-                                <i class="fa-solid fa-download" aria-hidden="true"></i> Download
+                            <a href="/media/${d.filepath}" class="btn btn-primary media-download-link !py-1.5 !px-2.5 text-xs" data-filename="${d.filepath}">
+                                <i class="fa-solid fa-download" aria-hidden="true"></i> <span class="hidden sm:inline">Download</span>
                             </a>
-                            <button class="btn btn-warning media-redownload-btn" data-id="${item.getAttribute('data-id')}">
-                                <i class="fa-solid fa-rotate"></i> Redownload
+                            <button class="btn btn-warning media-redownload-btn !py-1.5 !px-2.5 text-xs" data-id="${item.getAttribute('data-id')}">
+                                <i class="fa-solid fa-rotate"></i> <span class="hidden sm:inline">Redownload</span>
                             </button>
                         `;
                     }
@@ -105,14 +125,16 @@ var pollMedia; // hoisted for redownload handler access
             } else if (d.status === 'error'){
                 const chip = item.querySelector('.status-chip');
                 const p = item.querySelector('.progress-line');
-                if (chip){
-                    chip.outerHTML = `
-                        <span class="px-2 py-1 rounded bg-red-100 text-red-800 status-chip">Error</span>
-                        <button class="btn btn-warning media-redownload-btn" data-id="${item.getAttribute('data-id')}">
-                            <i class="fa-solid fa-rotate"></i> Redownload
-                        </button>
-                    `;
-                }
+                    if (chip){
+                        chip.outerHTML = `
+                            <div class="flex flex-wrap items-center gap-2 mb-2">
+                            <span class="px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300 status-chip">Error</span>
+                            <button class="btn btn-warning media-redownload-btn !py-1.5 !px-2.5 text-xs" data-id="${item.getAttribute('data-id')}">
+                                <i class="fa-solid fa-rotate"></i> <span class="hidden sm:inline">Redownload</span>
+                            </button>
+                            </div>
+                        `;
+                    }
                 if (p) p.textContent = '';
             }
         }).catch(()=> setTimeout(()=>pollMedia(item), 2000));
@@ -142,26 +164,19 @@ document.addEventListener('click', (e) => {
         const id = btn.getAttribute('data-id');
         const item = btn.closest('li[data-id]');
         if (!id || !item) return;
-        // Remove old status/progress elements (handles retry after error)
-        item.querySelectorAll('.status-chip, .progress-line').forEach(el => el.remove());
-        // Create fresh status elements
-        const chip = document.createElement('span');
-        chip.className = 'px-2 py-1 rounded bg-yellow-100 text-yellow-800 status-chip';
-        chip.textContent = 'Re-downloading…';
-        const prog = document.createElement('span');
-        prog.className = 'text-xs text-gray-500 dark:text-gray-400 progress-line';
-        prog.textContent = 'Starting…';
-        // Insert before the delete form (last form in item)
-        const delForm = item.querySelector('.delete-form');
-        if (delForm) {
-            item.insertBefore(prog, delForm);
-            item.insertBefore(chip, delForm);
+        // Find the actions div and replace its content with status
+        let actionsDiv = item.querySelector('.flex-wrap.items-center.gap-1\\.5');
+        if (!actionsDiv) actionsDiv = item.querySelector('.flex-wrap.items-center.gap-2');
+        if (actionsDiv) {
+            actionsDiv.innerHTML = `
+                <span class="px-2 py-1 rounded text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300 status-chip">Re-downloading…</span>
+                <span class="text-xs text-gray-500 dark:text-gray-400 progress-line">Starting…</span>
+            `;
         } else {
-            item.appendChild(chip);
-            item.appendChild(prog);
+            // fallback: remove old status, append new
+            item.querySelectorAll('.status-chip, .progress-line').forEach(el => el.remove());
+            item.insertAdjacentHTML('beforeend', '<span class="px-2 py-1 rounded text-xs font-medium bg-yellow-100 text-yellow-800 status-chip">Re-downloading…</span><span class="text-xs text-gray-500 dark:text-gray-400 progress-line">Starting…</span>');
         }
-        // Hide existing action buttons
-        item.querySelectorAll('.media-preview-link, .media-download-link, .media-redownload-btn').forEach(el => el.style.display = 'none');
         fetch(`/media/redownload/${id}`, { method: 'POST' })
             .then(r => r.json())
             .then(d => {
