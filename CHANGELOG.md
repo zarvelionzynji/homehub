@@ -3,7 +3,7 @@
 Semua perubahan yang signifikan pada proyek HomeHub ini akan dicatat di file ini.
 Format penulisan berdasarkan [Keep a Changelog](https://keepachangelog.com/id/1.0.0/).
 
-## [v1.0.9] - 2026-07-06
+## [v1.1.0] - 2026-07-06
 
 ### Added
 - **Re-download Media**: Tombol "Redownload" pada setiap item media yang sudah selesai di-download. Menggunakan URL, format (MP4/MP3), dan kualitas yang tersimpan dari download sebelumnya. File lama otomatis dihapus setelah download baru berhasil.

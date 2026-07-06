@@ -1,1 +1,0 @@
-- [Vehicle Maintenance Design](specs/2026-07-02-vehicle-maintenance-design.md) — Standalone feature for tracking car/motorcycle maintenance with mileage + cost integration
