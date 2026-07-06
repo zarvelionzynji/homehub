@@ -34,6 +34,9 @@ tests/__pycache__/
 # Design system artifacts (generated)
 design-system/
 
+# Internal docs (Claude Superpowers, not for public)
+docs/
+
 # Other
 CLAUDE.md
 migrate_quicklinks.py
