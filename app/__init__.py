@@ -101,6 +101,11 @@ def create_app(test_config: dict | None = None):
                 # Add 'progress' to media
                 if not has_column('media', 'progress'):
                     cur.execute("ALTER TABLE media ADD COLUMN progress TEXT")
+                # Add 'download_format' and 'download_quality' to media (for re-download feature)
+                if not has_column('media', 'download_format'):
+                    cur.execute("ALTER TABLE media ADD COLUMN download_format TEXT DEFAULT 'mp4'")
+                if not has_column('media', 'download_quality'):
+                    cur.execute("ALTER TABLE media ADD COLUMN download_quality TEXT DEFAULT 'best'")
                 # Reminder new columns (category, color, updated_at)
                 if not has_column('reminder', 'category'):
                     cur.execute("ALTER TABLE reminder ADD COLUMN category TEXT")

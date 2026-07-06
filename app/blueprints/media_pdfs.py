@@ -57,7 +57,7 @@ def media():
         quality = sanitize_text(request.form.get('quality', 'best'))
         base = f"media_{int(datetime.utcnow().timestamp())}"
         output_tmpl = os.path.join(MEDIA_FOLDER, base + ".%(ext)s")
-        media_obj = Media(title=url, url=url, creator=creator, filepath='', status='pending')
+        media_obj = Media(title=url, url=url, creator=creator, filepath='', status='pending', download_format=fmt, download_quality=quality)
         db.session.add(media_obj)
         db.session.commit()
         flash('Download queued. You can switch tabs; refresh to check status.', 'info')
@@ -75,7 +75,7 @@ def media():
 
         app_obj = current_app._get_current_object()
 
-        def worker(app, mid: int, base_prefix: str, command: list):
+        def worker(app, mid: int, base_prefix: str, command: list, old_filepath: str = None):
             with app.app_context():
                 m = Media.query.get(mid)
                 try:
@@ -103,6 +103,14 @@ def media():
                         if fname.startswith(base_prefix):
                             saved = fname
                             break
+                    # Remove old file on re-download (if different from new file)
+                    if old_filepath and saved and saved != old_filepath:
+                        old_path = os.path.join(MEDIA_FOLDER, old_filepath)
+                        try:
+                            if os.path.isfile(old_path):
+                                os.remove(old_path)
+                        except Exception:
+                            pass
                     m.filepath = saved or ''
                     m.status = 'done'
                 except Exception:
@@ -124,6 +132,41 @@ def media_status(media_id):
     m = Media.query.get_or_404(media_id)
     file_exists = _file_exists(os.path.join(MEDIA_FOLDER, m.filepath)) if m.filepath else False
     return jsonify({'status': m.status, 'progress': m.progress, 'filepath': m.filepath, 'file_exists': file_exists})
+
+
+@main_bp.route('/media/redownload/<int:media_id>', methods=['POST'])
+def redownload_media(media_id):
+    """Re-download media using stored URL and options (format/quality)"""
+    m = Media.query.get_or_404(media_id)
+    old_filepath = m.filepath
+    url = m.url
+    fmt = m.download_format or 'mp4'
+    quality = m.download_quality or 'best'
+
+    base = f"media_{int(datetime.utcnow().timestamp())}"
+    output_tmpl = os.path.join(MEDIA_FOLDER, base + ".%(ext)s")
+
+    m.status = 'pending'
+    m.progress = None
+    db.session.commit()
+
+    cmd = ["yt-dlp", "-o", output_tmpl]
+    if fmt == 'mp3':
+        cmd += ["-x", "--audio-format", "mp3"]
+    else:
+        selected = quality or 'best'
+        if selected == 'best':
+            fmt_string = "bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio/best"
+        else:
+            fmt_string = f"{selected}/bestvideo[ext=mp4]+bestaudio[ext=m4a]/best"
+        cmd += ["-f", fmt_string, "--merge-output-format", "mp4"]
+    cmd += [url]
+
+    app_obj = current_app._get_current_object()
+    t = Thread(target=worker, args=(app_obj, m.id, base, cmd, old_filepath), daemon=True)
+    t.start()
+
+    return jsonify({'status': 'started'})
 
 
 @main_bp.route('/media/<filename>')
