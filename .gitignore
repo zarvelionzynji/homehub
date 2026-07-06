@@ -28,6 +28,12 @@ static/output.css
 static/custom.css
 tests/__pycache__/
 
+# Playwright MCP artifacts
+.playwright-mcp/
+
+# Design system artifacts (generated)
+design-system/
+
 # Other
 CLAUDE.md
 migrate_quicklinks.py
