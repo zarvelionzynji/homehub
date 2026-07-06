@@ -28,6 +28,70 @@ def _safe_basename(filename: str) -> str:
     return filename
 
 
+def _build_ytdlp_cmd(url: str, fmt: str, quality: str, output_tmpl: str) -> list:
+    """Build yt-dlp command list from format/quality options"""
+    cmd = ["yt-dlp", "-o", output_tmpl]
+    if fmt == 'mp3':
+        cmd += ["-x", "--audio-format", "mp3"]
+    else:
+        selected = quality or 'best'
+        if selected == 'best':
+            fmt_string = "bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio/best"
+        else:
+            fmt_string = f"{selected}/bestvideo[ext=mp4]+bestaudio[ext=m4a]/best"
+        cmd += ["-f", fmt_string, "--merge-output-format", "mp4"]
+    cmd += [url]
+    return cmd
+
+
+def _download_worker(app, mid: int, base_prefix: str, command: list, old_filepath: str = None):
+    """Run yt-dlp in background thread, update DB progress/status"""
+    with app.app_context():
+        m = Media.query.get(mid)
+        if not m:
+            return
+        try:
+            proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
+            last_percent = -1
+            for line in proc.stdout:
+                try:
+                    m = Media.query.get(mid)
+                    if not m:
+                        continue
+                    match = re.search(r"\[download\]\s+(\d+(?:\.\d+)?)%", line)
+                    if match:
+                        p = int(float(match.group(1)))
+                        if p != last_percent and p % 5 == 0:
+                            m.progress = f"{p}%"
+                            db.session.commit()
+                            last_percent = p
+                except Exception:
+                    pass
+            ret = proc.wait()
+            if ret != 0:
+                raise RuntimeError(f"yt-dlp exited with {ret}")
+            saved = None
+            for fname in os.listdir(MEDIA_FOLDER):
+                if fname.startswith(base_prefix):
+                    saved = fname
+                    break
+            # Remove old file on re-download (if different from new file)
+            if old_filepath and saved and saved != old_filepath:
+                old_path = os.path.join(MEDIA_FOLDER, old_filepath)
+                try:
+                    if os.path.isfile(old_path):
+                        os.remove(old_path)
+                except Exception:
+                    pass
+            m.filepath = saved or ''
+            m.status = 'done'
+        except Exception:
+            m.status = 'error'
+        finally:
+            m.progress = None
+            db.session.commit()
+
+
 @main_bp.route('/media/share', methods=['GET'])
 @main_bp.route('/media', methods=['GET', 'POST'])
 def media():
@@ -61,65 +125,10 @@ def media():
         db.session.add(media_obj)
         db.session.commit()
         flash('Download queued. You can switch tabs; refresh to check status.', 'info')
-        cmd = ["yt-dlp", "-o", output_tmpl]
-        if fmt == 'mp3':
-            cmd += ["-x", "--audio-format", "mp3"]
-        else:
-            selected = quality or 'best'
-            if selected == 'best':
-                fmt_string = "bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio/best"
-            else:
-                fmt_string = f"{selected}/bestvideo[ext=mp4]+bestaudio[ext=m4a]/best"
-            cmd += ["-f", fmt_string, "--merge-output-format", "mp4"]
-        cmd += [url]
+        cmd = _build_ytdlp_cmd(url, fmt, quality, output_tmpl)
 
         app_obj = current_app._get_current_object()
-
-        def worker(app, mid: int, base_prefix: str, command: list, old_filepath: str = None):
-            with app.app_context():
-                m = Media.query.get(mid)
-                try:
-                    proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
-                    last_percent = -1
-                    for line in proc.stdout:
-                        try:
-                            m = Media.query.get(mid)
-                            if not m:
-                                continue
-                            match = re.search(r"\[download\]\s+(\d+(?:\.\d+)?)%", line)
-                            if match:
-                                p = int(float(match.group(1)))
-                                if p != last_percent and p % 5 == 0:
-                                    m.progress = f"{p}%"
-                                    db.session.commit()
-                                    last_percent = p
-                        except Exception:
-                            pass
-                    ret = proc.wait()
-                    if ret != 0:
-                        raise RuntimeError(f"yt-dlp exited with {ret}")
-                    saved = None
-                    for fname in os.listdir(MEDIA_FOLDER):
-                        if fname.startswith(base_prefix):
-                            saved = fname
-                            break
-                    # Remove old file on re-download (if different from new file)
-                    if old_filepath and saved and saved != old_filepath:
-                        old_path = os.path.join(MEDIA_FOLDER, old_filepath)
-                        try:
-                            if os.path.isfile(old_path):
-                                os.remove(old_path)
-                        except Exception:
-                            pass
-                    m.filepath = saved or ''
-                    m.status = 'done'
-                except Exception:
-                    m.status = 'error'
-                finally:
-                    m.progress = None
-                    db.session.commit()
-
-        t = Thread(target=worker, args=(app_obj, media_obj.id, base, cmd), daemon=True)
+        t = Thread(target=_download_worker, args=(app_obj, media_obj.id, base, cmd), daemon=True)
         t.start()
         return redirect(url_for('main.media'))
     media_list = Media.query.order_by(Media.download_time.desc()).all()
@@ -150,20 +159,10 @@ def redownload_media(media_id):
     m.progress = None
     db.session.commit()
 
-    cmd = ["yt-dlp", "-o", output_tmpl]
-    if fmt == 'mp3':
-        cmd += ["-x", "--audio-format", "mp3"]
-    else:
-        selected = quality or 'best'
-        if selected == 'best':
-            fmt_string = "bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio/best"
-        else:
-            fmt_string = f"{selected}/bestvideo[ext=mp4]+bestaudio[ext=m4a]/best"
-        cmd += ["-f", fmt_string, "--merge-output-format", "mp4"]
-    cmd += [url]
+    cmd = _build_ytdlp_cmd(url, fmt, quality, output_tmpl)
 
     app_obj = current_app._get_current_object()
-    t = Thread(target=worker, args=(app_obj, m.id, base, cmd, old_filepath), daemon=True)
+    t = Thread(target=_download_worker, args=(app_obj, m.id, base, cmd, old_filepath), daemon=True)
     t.start()
 
     return jsonify({'status': 'started'})
