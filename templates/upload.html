@@ -1,21 +1,21 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="mx-auto">
-    <h2 class="text-xl font-bold mb-4">Shared Cloud</h2>
-    <form method="POST" enctype="multipart/form-data" class="mb-4 card p-4">
-        <input type="file" name="files" multiple required class="mb-2">
+    <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100"><i class="fa-solid fa-cloud text-blue-600 mr-2"></i>Shared Cloud</h2>
+    <form method="POST" enctype="multipart/form-data" class="mb-4 card p-4 border border-gray-200 dark:border-gray-700 rounded-xl">
+        <input type="file" name="files" multiple required class="mb-2 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900/50 dark:file:text-blue-200">
         <input type="hidden" name="creator" id="creator">
-        <button type="submit" class="btn btn-primary">Upload</button>
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-upload mr-1"></i>Upload</button>
     </form>
     <ul>
         {% for file in files %}
-        <li class="card p-4 mb-2 flex justify-between items-center">
-            <div class="flex-1">
-                <a href="/uploads/{{ file.filename }}" class="font-semibold text-blue-700">{{ file.filename }}</a>
-                <div class="text-xs text-gray-500">By {{ file.creator }} at {{ file.upload_time.strftime('%Y-%m-%d %H:%M') }}</div>
+        <li class="card p-4 mb-2 flex justify-between items-center border border-gray-200 dark:border-gray-700 rounded-xl">
+            <div class="flex-1 min-w-0">
+                <a href="/uploads/{{ file.filename }}" class="font-semibold text-blue-600 dark:text-blue-400 hover:underline truncate block">{{ file.filename }}</a>
+                <div class="text-xs text-gray-500 dark:text-gray-400">By {{ file.creator }} at {{ file.upload_time.strftime('%Y-%m-%d %H:%M') }}</div>
             </div>
-            <div class="flex gap-2">
-                <a href="/uploads/preview/{{ file.filename }}" target="_blank" rel="noopener noreferrer" class="btn btn-success" aria-label="Preview {{ file.filename }} in new tab">
+            <div class="flex gap-2 flex-shrink-0">
+                <a href="/uploads/preview/{{ file.filename }}" target="_blank" rel="noopener noreferrer" class="btn btn-success" aria-label="Preview {{ file.filename }}">
                     <i class="fa-solid fa-eye" aria-hidden="true"></i> Preview
                 </a>
                 <a href="/uploads/{{ file.filename }}" class="btn btn-primary">
@@ -33,7 +33,6 @@
 <script>
 document.getElementById('creator').value = localStorage.getItem('username');
 document.querySelectorAll('input[name="user"]').forEach(i=> i.value = localStorage.getItem('username'));
-// Hide delete for non-owners
 (function(){
     const adminName='{{ config.admin_name }}';
     const current=localStorage.getItem('username');

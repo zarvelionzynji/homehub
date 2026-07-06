@@ -3,17 +3,16 @@
 Semua perubahan yang signifikan pada proyek HomeHub ini akan dicatat di file ini.
 Format penulisan berdasarkan [Keep a Changelog](https://keepachangelog.com/id/1.0.0/).
 
-## [v1.0.9] - 2026-07-02
+## [v1.0.9] - 2026-07-06
 
 ### Added
-- **Vehicle Maintenance Log**: Fitur baru untuk mencatat riwayat perawatan kendaraan (mobil & motor). Mendukung multi-kendaraan, tipe servis dengan interval ganda (km + waktu), pencatatan biaya perawatan dengan integrasi otomatis ke Expense Tracker, dan lampiran bukti/foto.
-- **Service Status Alerts**: Tampilan status servis per kendaraan langsung di halaman daftar kendaraan dengan indikator warna (🔴 overdue, 🟡 warning, 🟢 ok) berdasarkan interval km dan waktu.
-- **Service Types**: Daftar tipe servis yang dapat dikonfigurasi (Oil Change, Pajak Tahunan, STNK, dll) dengan interval km dan bulan.
+- **Re-download Media**: Tombol "Redownload" pada setiap item media yang sudah selesai di-download. Menggunakan URL, format (MP4/MP3), dan kualitas yang tersimpan dari download sebelumnya. File lama otomatis dihapus setelah download baru berhasil.
+- **Format preservation**: Kolom `download_format` dan `download_quality` pada model Media untuk menyimpan opsi download agar re-download menggunakan pengaturan yang sama.
+- **Mobile-optimized media card**: Layout card yang lebih rapi dengan format badge (MP4/MP3), tombol icon-only di mobile, dan tombol delete berupa icon sampah yang lebih subtle.
 
 ### Fixed
-- **Dual Sync (Vehicle ↔ Expense)**: Sinkronisasi dua arah untuk biaya dan lampiran antara Maintenance Record dan Expense Entry. Edit biaya atau lampiran di salah satu tempat otomatis tersinkronisasi.
-- **Attachment path 404**: Memperbaiki serve file attachment dari subfolder `uploads/expenses/` dengan mengubah ke `send_file()`. Ditambahkan route `/vehicle-attachment/<path>` khusus.
-- **Config toggle vehicles**: Menambahkan `vehicles: true` ke `config-example.yml` di bawah `feature_toggles` dan menambahkan navbar link.
+- **NameError on re-download**: Nested `worker()` function tidak bisa diakses dari route `redownload_media()`. Diekstrak ke module level sebagai `_download_worker()`.
+- **Redownload stuck on retry**: Setelah error, status chip lama tidak dihapus sehingga klik Redownload ulang tidak mengirim fetch request.
 
 ## [v1.0.8] - 2026-07-01
 

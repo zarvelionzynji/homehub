@@ -24,6 +24,8 @@ class Media(db.Model):
     filepath = db.Column(db.String(512))
     status = db.Column(db.String(32), default='done')  # pending, done, error
     progress = db.Column(db.Text)  # latest progress line or JSON
+    download_format = db.Column(db.String(16), default='mp4')  # mp4 or mp3
+    download_quality = db.Column(db.String(64), default='best')  # quality string for yt-dlp
 
 class PDF(db.Model):
     id = db.Column(db.Integer, primary_key=True)
