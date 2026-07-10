@@ -58,6 +58,10 @@ def create_app(test_config: dict | None = None):
 
     db.init_app(app)
 
+    # Register i18n (before_request, context_processor, Jinja2 globals)
+    from .i18n import register_i18n
+    register_i18n(app)
+
     # Enable SQLite WAL mode for better concurrency
     with app.app_context():
         try:
@@ -266,7 +270,7 @@ def create_app(test_config: dict | None = None):
     @app.context_processor
     def inject_auth_state():
         return {
-            'is_authed': bool(session.get('authed'))
+            'is_authed': bool(session.get('authed')),
         }
     
     # Add Jinja2 filter for JSON parsing

@@ -1,4 +1,7 @@
-from flask import current_app, request, session, redirect, url_for, render_template, flash
+from flask import current_app, request, session, redirect, url_for, render_template, flash, g
+from ..i18n import LANGUAGES, _
+
+
 from ..blueprints import main_bp
 from ..config import load_config
 import hashlib
@@ -30,7 +33,7 @@ def login():
         supplied = bleach.clean(request.form.get('password', ''))
         if hashlib.sha256(supplied.encode()).hexdigest() == config.get('password_hash'):
             session['authed'] = True
-            flash('Logged in successfully.', 'success')
+            flash(_('Logged in successfully!'), 'success')
             return redirect(url_for('main.index'))
         flash('Invalid password', 'error')
     return render_template('login.html', config=config, hide_user_ui=True)
@@ -39,5 +42,16 @@ def login():
 @main_bp.route('/logout')
 def logout():
     session.pop('authed', None)
-    flash('Logged out.', 'info')
+    flash(_('Logged out!'), 'info')
     return redirect(url_for('main.login'))
+
+
+@main_bp.route('/lang/<lang>')
+def set_lang(lang):
+    if lang in LANGUAGES:
+        session['lang'] = lang
+    # Preserve user-specified Accept-Language for next request
+    ref = request.referrer or url_for('main.index')
+    resp = redirect(ref)
+    resp.set_cookie('lang', lang, max_age=365*24*3600)
+    return resp

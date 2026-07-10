@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="mx-auto">
-    <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100"><i class="fa-solid fa-hourglass-half text-amber-600 mr-2"></i>Expiry Tracker</h2>
+    <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100"><i class="fa-solid fa-hourglass-half text-amber-600 mr-2"></i>{{ _('Expiry Tracker') }}</h2>
     <form method="POST" class="mb-4 grid grid-cols-1 md:grid-cols-12 gap-2 items-end">
-        <input type="text" name="name" class="md:col-span-5 w-full p-2 border rounded-lg bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="Item name..." required>
+        <input type="text" name="name" class="md:col-span-5 w-full p-2 border rounded-lg bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="{{ _('Item name...') }}" required>
         <input type="date" name="expiry_date" class="md:col-span-4 w-full p-2 border rounded-lg bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" required>
         <input type="hidden" name="creator" id="creator">
-        <button type="submit" class="md:col-span-3 btn btn-primary">Add Item</button>
+        <button type="submit" class="md:col-span-3 btn btn-primary">{{ _('Add Item') }}</button>
     </form>
     <ul>
         {% for item, days_left in items %}
@@ -24,16 +24,16 @@
                     {% set badge = 'bg-green-100 text-green-700 border-green-300' %}
                 {% endif %}
             {% endif %}
-            <span class="inline-flex items-center px-2 py-1 rounded border {{ badge }}" title="{{ days_left if days_left is not none else '' }} days left">
+            <span class="inline-flex items-center px-2 py-1 rounded border {{ badge }}" title="{{ _('%(count)s days left', count=days_left) if days_left is not none else '' }}">
                 {{ item.expiry_date.strftime('%Y-%m-%d') }}
                 {% if days_left is not none %}
-                    <span class="ml-2 text-xs">({{ 'Expired' if days_left < 0 else days_left ~ ' days left' }})</span>
+                    <span class="ml-2 text-xs">({{ _('Expired') if days_left < 0 else _('%(count)s days left', count=days_left) }})</span>
                 {% endif %}
             </span>
-            <div class="text-xs text-gray-500">By {{ item.creator }} at {{ item.timestamp.strftime('%Y-%m-%d %H:%M') }}</div>
+            <div class="text-xs text-gray-500">{{ _('By') }} {{ item.creator }} {{ _('at') }} {{ item.timestamp.strftime('%Y-%m-%d %H:%M') }}</div>
             <form method="POST" action="/expiry/delete/{{ item.id }}" class="delete-form" data-creator="{{ item.creator }}">
                 <input type="hidden" name="user">
-                <button type="submit" class="btn btn-danger">Delete</button>
+                <button type="submit" class="btn btn-danger">{{ _('Delete') }}</button>
             </form>
         </li>
         {% endfor %}

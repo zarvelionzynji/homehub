@@ -1,45 +1,45 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="mx-auto">
-    <h2 class="text-xl font-bold mb-4"><i class="fa-solid fa-qrcode text-purple-600 mr-2"></i>QR Code Generator</h2>
+    <h2 class="text-xl font-bold mb-4"><i class="fa-solid fa-qrcode text-purple-600 mr-2"></i>{{ _('QR Code Generator') }}</h2>
     <div class="mb-4 p-4 card bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl">
-        <h3 class="font-semibold mb-2 text-gray-800 dark:text-gray-200">WiFi QR Code Instructions</h3>
-        <p class="text-sm text-gray-600 dark:text-gray-400">To generate a QR code for your wireless network, enter your details in the following format:</p>
+        <h3 class="font-semibold mb-2 text-gray-800 dark:text-gray-200">{{ _('WiFi QR Code Instructions') }}</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400">{{ _('To generate a QR code for your wireless network, enter your details in the following format:') }}</p>
         <pre class="bg-gray-100 dark:bg-gray-900 p-2 rounded text-sm overflow-x-auto mt-2"><code>ssid:mywifiname pass:123456789 type:wpa hidden:false</code></pre>
         <ul class="list-disc ml-6 text-sm text-gray-600 dark:text-gray-400 mt-2">
-            <li><b>ssid</b>: your WiFi network name</li>
-            <li><b>pass</b>: your WiFi password</li>
-            <li><b>type</b>: encryption type (<code>wpa</code>, <code>wep</code>, or <code>nopass</code>), default is <code>wpa</code></li>
-            <li><b>hidden</b>: <code>true</code> if the network is hidden, <code>false</code> otherwise</li>
+            <li><b>ssid</b>: {{ _('your WiFi network name') }}</li>
+            <li><b>pass</b>: {{ _('your WiFi password') }}</li>
+            <li><b>type</b>: {{ _('encryption type') }} (<code>wpa</code>, <code>wep</code>, {{ _('or') }} <code>nopass</code>), {{ _('default is') }} <code>wpa</code></li>
+            <li><b>hidden</b>: <code>true</code> {{ _('if the network is hidden') }}, <code>false</code> {{ _('otherwise') }}</li>
         </ul>
-        <p class="mt-2 text-xs text-gray-500 dark:text-gray-500">Format: <code>ssid:your_network_name pass:your_wifi_password</code></p>
+        <p class="mt-2 text-xs text-gray-500 dark:text-gray-500">{{ _('Format:') }} <code>ssid:your_network_name pass:your_wifi_password</code></p>
     </div>
     <form method="POST" class="mb-4 grid grid-cols-1 md:grid-cols-12 gap-2 items-end">
-        <input type="text" name="qrtext" class="md:col-span-9 w-full p-2 border rounded-lg bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="Text to encode..." required>
+        <input type="text" name="qrtext" class="md:col-span-9 w-full p-2 border rounded-lg bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="{{ _('Text to encode...') }}" required>
         <input type="hidden" name="creator" id="creator">
-        <button type="submit" class="md:col-span-3 btn btn-primary">Generate QR</button>
+        <button type="submit" class="md:col-span-3 btn btn-primary">{{ _('Generate QR') }}</button>
     </form>
     {% if qr_img %}
     <div class="mt-4 card p-4 border border-gray-200 dark:border-gray-700 rounded-xl">
-        <img src="data:image/png;base64,{{ qr_img }}" alt="QR Code" class="mx-auto">
+        <img src="data:image/png;base64,{{ qr_img }}" alt="{{ _('QR Code') }}" class="mx-auto">
     </div>
     {% endif %}
-    <h3 class="text-lg font-bold mt-6 mb-2 text-gray-800 dark:text-gray-200">History</h3>
+    <h3 class="text-lg font-bold mt-6 mb-2 text-gray-800 dark:text-gray-200">{{ _('History') }}</h3>
     <ul>
         {% for q in history %}
         <li class="card p-4 mb-2 flex flex-wrap gap-2 items-center border border-gray-200 dark:border-gray-700 rounded-xl">
             <span class="flex-1 truncate text-gray-800 dark:text-gray-200">
                 {{ q.original_input or q.text }}
                 {% if q.original_input and q.original_input != q.text %}
-                <details class="text-xs text-gray-500 dark:text-gray-400"><summary class="cursor-pointer inline text-gray-500">Generated</summary><span class="break-all">{{ q.text }}</span></details>
+                <details class="text-xs text-gray-500 dark:text-gray-400"><summary class="cursor-pointer inline text-gray-500">{{ _('Generated') }}</summary><span class="break-all">{{ q.text }}</span></details>
                 {% endif %}
             </span>
-            <a class="btn btn-primary" href="/static/{{ q.filename }}" target="_blank">View</a>
-            <a class="btn btn-success" href="/static/{{ q.filename }}" download>Download</a>
-            <span class="text-xs text-gray-500 dark:text-gray-400">By {{ q.creator }} at {{ q.timestamp.strftime('%Y-%m-%d %H:%M') }}</span>
+            <a class="btn btn-primary" href="/static/{{ q.filename }}" target="_blank">{{ _('View') }}</a>
+            <a class="btn btn-success" href="/static/{{ q.filename }}" download>{{ _('Download') }}</a>
+            <span class="text-xs text-gray-500 dark:text-gray-400">{{ _('By') }} {{ q.creator }} {{ _('at') }} {{ q.timestamp.strftime('%Y-%m-%d %H:%M') }}</span>
             <form method="POST" action="/qr/delete/{{ q.id }}" class="delete-form" data-creator="{{ q.creator }}">
                 <input type="hidden" name="user">
-                <button type="submit" class="btn btn-danger">Delete</button>
+                <button type="submit" class="btn btn-danger">{{ _('Delete') }}</button>
             </form>
         </li>
         {% endfor %}

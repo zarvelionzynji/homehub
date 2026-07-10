@@ -74,20 +74,20 @@
 <div class="max-w-screen-2xl mx-auto space-y-6">
   <div class="flex items-center justify-between flex-wrap gap-4">
     <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">
-      <i class="fas fa-car mr-2 text-blue-500"></i>Vehicle Maintenance
+      <i class="fas fa-car mr-2 text-blue-500"></i>{{ _('Vehicle Maintenance') }}
     </h1>
   </div>
 
   <!-- Tabs -->
   <div class="flex gap-1 border-b border-gray-200 dark:border-gray-700 flex-wrap">
     <button class="vehicle-tab active px-4 py-2" data-tab="vehicles">
-      <i class="fas fa-car mr-2"></i>Vehicles
+      <i class="fas fa-car mr-2"></i>{{ _('Vehicles') }}
     </button>
     <button class="vehicle-tab px-4 py-2" data-tab="service-types">
-      <i class="fas fa-tools mr-2"></i>Service Types
+      <i class="fas fa-tools mr-2"></i>{{ _('Service Types') }}
     </button>
     <button class="vehicle-tab px-4 py-2" data-tab="history">
-      <i class="fas fa-history mr-2"></i>History
+      <i class="fas fa-history mr-2"></i>{{ _('History') }}
     </button>
   </div>
 
@@ -95,9 +95,9 @@
   <div id="tab-vehicles" class="vehicle-tab-content block">
     <div class="space-y-4">
       <div class="flex items-center justify-between">
-        <p class="text-sm text-gray-500 dark:text-gray-400">{{ vehicle_data|length }} vehicle(s)</p>
+        <p class="text-sm text-gray-500 dark:text-gray-400">{{ _('%(count)s vehicle(s)', count=vehicle_data|length) }}</p>
         <button id="add-vehicle-btn" class="btn btn-primary">
-          <i class="fas fa-plus mr-2"></i>Add Vehicle
+          <i class="fas fa-plus mr-2"></i>{{ _('Add Vehicle') }}
         </button>
       </div>
 
@@ -141,7 +141,7 @@
             {% else %}
               <div class="mb-3">
                 <span class="badge badge-ok">
-                  <i class="fas fa-check-circle"></i>All services up to date
+                  <i class="fas fa-check-circle"></i>{{ _('All services up to date') }}
                 </span>
               </div>
             {% endif %}
@@ -149,13 +149,13 @@
             <!-- Action Buttons -->
             <div class="flex gap-2 pt-2 border-t border-gray-100 dark:border-gray-700">
               <a href="{{ url_for('main.vehicle_detail', vid=v.id) }}" class="flex-1 btn btn-secondary text-center text-sm">
-                <i class="fas fa-eye mr-1"></i>View
+                <i class="fas fa-eye mr-1"></i>{{ _('View') }}
               </a>
               <button class="edit-vehicle-btn btn btn-secondary text-sm" data-id="{{ v.id }}" data-name="{{ v.name }}" data-type="{{ v.vehicle_type }}" data-plate="{{ v.plate or '' }}" data-edit-url="{{ url_for('main.edit_vehicle', vid=v.id) }}">
-                <i class="fas fa-edit mr-1"></i>Edit
+                <i class="fas fa-edit mr-1"></i>{{ _('Edit') }}
               </button>
               <form method="POST" action="{{ url_for('main.delete_vehicle', vid=v.id) }}" class="inline delete-form" data-creator="{{ v.creator }}">
-                <button type="submit" class="btn btn-danger text-sm" onclick="return confirm('Delete {{ v.name }}?')">
+                <button type="submit" class="btn btn-danger text-sm" onclick="return confirm('{{ _('Delete %(name)s?', name=v.name) }}')">
                   <i class="fas fa-trash"></i>
                 </button>
               </form>
@@ -167,10 +167,10 @@
       <div class="card p-12 text-center">
         <div class="text-gray-400 dark:text-gray-500">
           <i class="fas fa-car text-5xl mb-4 block"></i>
-          <p class="text-xl font-semibold text-gray-600 dark:text-gray-400 mb-1">No vehicles yet</p>
-          <p class="text-sm">Add your first vehicle to start tracking maintenance.</p>
+          <p class="text-xl font-semibold text-gray-600 dark:text-gray-400 mb-1">{{ _('No vehicles yet') }}</p>
+          <p class="text-sm">{{ _('Add your first vehicle to start tracking maintenance.') }}</p>
           <button id="add-vehicle-btn-empty" class="btn btn-primary mt-4">
-            <i class="fas fa-plus mr-2"></i>Add Vehicle
+            <i class="fas fa-plus mr-2"></i>{{ _('Add Vehicle') }}
           </button>
         </div>
       </div>
@@ -182,22 +182,22 @@
   <div id="tab-service-types" class="vehicle-tab-content hidden">
     <div class="space-y-4">
       <div class="card p-4">
-        <h3 class="text-lg font-bold mb-3"><i class="fas fa-plus-circle mr-2 text-green-500"></i>Add Service Type</h3>
+        <h3 class="text-lg font-bold mb-3"><i class="fas fa-plus-circle mr-2 text-green-500"></i>{{ _('Add Service Type') }}</h3>
         <form method="POST" action="{{ url_for('main.add_service_type') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
-            <input type="text" name="name" placeholder="e.g., Oil Change" class="w-full border rounded-lg p-2 text-sm bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" required>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ _('Name') }}</label>
+            <input type="text" name="name" placeholder="{{ _('e.g., Oil Change') }}" class="w-full border rounded-lg p-2 text-sm bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" required>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Interval (km)</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ _('Interval (km)') }}</label>
             <input type="number" name="interval_km" placeholder="5000" step="100" class="w-full border rounded-lg p-2 text-sm bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Interval (months)</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ _('Interval (months)') }}</label>
             <input type="number" name="interval_months" placeholder="6" step="1" class="w-full border rounded-lg p-2 text-sm bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">
           </div>
           <div class="flex items-end">
-            <button type="submit" class="w-full btn btn-primary text-sm"><i class="fas fa-plus mr-1"></i>Add</button>
+            <button type="submit" class="w-full btn btn-primary text-sm"><i class="fas fa-plus mr-1"></i>{{ _('Add') }}</button>
           </div>
         </form>
       </div>
@@ -206,9 +206,9 @@
         <table class="w-full text-sm">
           <thead class="border-b border-gray-200 dark:border-gray-700">
             <tr>
-              <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">Name</th>
-              <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">Interval (km)</th>
-              <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">Interval (months)</th>
+              <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">{{ _('Name') }}</th>
+              <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">{{ _('Interval (km)') }}</th>
+              <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">{{ _('Interval (months)') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -222,7 +222,7 @@
               <tr>
                 <td colspan="3" class="py-8 text-center text-gray-500 dark:text-gray-400">
                   <i class="fas fa-tools text-3xl mb-2 block text-gray-300 dark:text-gray-600"></i>
-                  No service types defined yet.
+                  {{ _('No service types defined yet.') }}
                 </td>
               </tr>
             {% endfor %}
@@ -238,29 +238,29 @@
       <div class="card p-4">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Vehicle</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ _('Vehicle') }}</label>
             <select id="history-vehicle-filter" class="w-full border rounded-lg p-2 text-sm bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">
-              <option value="">All Vehicles</option>
+              <option value="">{{ _('All Vehicles') }}</option>
               {% for item in vehicle_data %}
                 <option value="{{ item.vehicle.id }}">{{ item.vehicle.name }}</option>
               {% endfor %}
             </select>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Service Type</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ _('Service Type') }}</label>
             <select id="history-type-filter" class="w-full border rounded-lg p-2 text-sm bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">
-              <option value="">All Types</option>
+              <option value="">{{ _('All Types') }}</option>
               {% for st in service_types %}
                 <option value="{{ st.id }}">{{ st.name }}</option>
               {% endfor %}
             </select>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">From Date</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ _('From Date') }}</label>
             <input type="date" id="history-date-from" class="w-full border rounded-lg p-2 text-sm bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">To Date</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ _('To Date') }}</label>
             <input type="date" id="history-date-to" class="w-full border rounded-lg p-2 text-sm bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">
           </div>
         </div>
@@ -270,19 +270,19 @@
         <table class="w-full text-sm">
           <thead class="border-b border-gray-200 dark:border-gray-700">
             <tr>
-              <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">Date</th>
-              <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">Vehicle</th>
-              <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">Service Type</th>
-              <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">Mileage</th>
-              <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">Cost</th>
-              <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">Provider</th>
+              <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">{{ _('Date') }}</th>
+              <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">{{ _('Vehicle') }}</th>
+              <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">{{ _('Service Type') }}</th>
+              <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">{{ _('Mileage') }}</th>
+              <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">{{ _('Cost') }}</th>
+              <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">{{ _('Provider') }}</th>
             </tr>
           </thead>
           <tbody id="history-table-body">
             <tr>
               <td colspan="6" class="py-8 text-center text-gray-500 dark:text-gray-400">
                 <i class="fas fa-history text-3xl mb-2 block text-gray-300 dark:text-gray-600"></i>
-                No maintenance records found.
+                {{ _('No maintenance records found.') }}
               </td>
             </tr>
           </tbody>
@@ -295,29 +295,29 @@
 <!-- Add/Edit Vehicle Modal -->
 <div id="vehicle-modal" class="modal fixed inset-0 z-50 bg-black/40 backdrop-blur-sm items-center justify-center p-4 hidden">
   <div class="modal-content card w-full max-w-md p-6">
-    <h2 class="text-2xl font-bold mb-4" id="vehicle-modal-title">Add Vehicle</h2>
+    <h2 class="text-2xl font-bold mb-4" id="vehicle-modal-title">{{ _('Add Vehicle') }}</h2>
     <form id="vehicle-form" method="POST" action="{{ url_for('main.add_vehicle') }}">
       <input type="hidden" name="creator" id="vehicle-creator">
       <div class="space-y-3">
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Vehicle Name</label>
-          <input type="text" id="vehicle-name" name="name" class="w-full border rounded-lg p-2 bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="e.g., Honda Civic" required>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ _('Vehicle Name') }}</label>
+          <input type="text" id="vehicle-name" name="name" class="w-full border rounded-lg p-2 bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="{{ _('e.g., Honda Civic') }}" required>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Type</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ _('Type') }}</label>
           <select id="vehicle-type" name="vehicle_type" class="w-full border rounded-lg p-2 bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" required>
-            <option value="car"><i class="fas fa-car"></i> Car</option>
-            <option value="motorcycle">Motorcycle</option>
+            <option value="car"><i class="fas fa-car"></i> {{ _('Car') }}</option>
+            <option value="motorcycle">{{ _('Motorcycle') }}</option>
           </select>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">License Plate</label>
-          <input type="text" id="vehicle-plate" name="plate" class="w-full border rounded-lg p-2 bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="e.g., ABC-1234">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ _('License Plate') }}</label>
+          <input type="text" id="vehicle-plate" name="plate" class="w-full border rounded-lg p-2 bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="{{ _('e.g., ABC-1234') }}">
         </div>
       </div>
       <div class="mt-5 flex justify-end gap-2">
-        <button type="button" id="cancel-vehicle" class="btn btn-secondary">Cancel</button>
-        <button type="submit" class="btn btn-primary">Save Vehicle</button>
+        <button type="button" id="cancel-vehicle" class="btn btn-secondary">{{ _('Cancel') }}</button>
+        <button type="submit" class="btn btn-primary">{{ _('Save Vehicle') }}</button>
       </div>
     </form>
   </div>
@@ -371,7 +371,7 @@ document.addEventListener('DOMContentLoaded', function(){
   function setupAddVehicle(btn) {
     if (!btn) return;
     btn.addEventListener('click', function(){
-      document.getElementById('vehicle-modal-title').textContent = 'Add Vehicle';
+      document.getElementById('vehicle-modal-title').textContent = '{{ _("Add Vehicle") }}';
       document.getElementById('vehicle-form').action = '{{ url_for("main.add_vehicle") }}';
       document.getElementById('vehicle-name').value = '';
       document.getElementById('vehicle-type').value = 'car';
@@ -391,7 +391,7 @@ document.addEventListener('DOMContentLoaded', function(){
       const plate = this.getAttribute('data-plate');
       const editUrl = this.getAttribute('data-edit-url');
 
-      document.getElementById('vehicle-modal-title').textContent = 'Edit Vehicle';
+      document.getElementById('vehicle-modal-title').textContent = '{{ _("Edit Vehicle") }}';
       document.getElementById('vehicle-form').action = editUrl;
       document.getElementById('vehicle-name').value = name;
       document.getElementById('vehicle-type').value = type;

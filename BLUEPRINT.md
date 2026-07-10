@@ -1,7 +1,7 @@
 # HomeHub Project Blueprint
 
-**Version:** v1.1.0  
-**Last Updated:** 2026-07-06
+**Version:** v1.2.0  
+**Last Updated:** 2026-07-11
 
 Dokumen ini memetakan arsitektur dan modul utama dari proyek HomeHub, membantu *developer* memahami struktur fitur secara keseluruhan.
 
@@ -49,6 +49,13 @@ Akses HTTPS bisa diatur via:
 - **AI Agent Integration (Universal Router)**: `app/blueprints/ai_agent.py` - Menyediakan antarmuka "Tanpa Tatap Muka" bagi AI pihak ketiga via `POST /api/ai/execute` dan dokumentasi skema via `GET /api/ai/schema`. Modul ini memungkinkan agen AI untuk mengatur status rumah dan membaca/mengubah Catatan Bersama (*Notes*), Daftar Tugas (*Chores*), Daftar Belanja (*Shopping List*), Tautan Cepat (*Quick Links*), Pengaturan (`config.yml`), serta modul Keuangan (*Expense Tracker*) dengan dukungan unggahan bukti struk (Base64).
 - **RESTful Config API**: `app/blueprints/config_api.py` - Memungkinkan sistem eksternal untuk mengubah preferensi bawaan aplikasi dan mengelola akun di `config.yml` secara programatis tanpa merusak komentar struktur file.
 - **Keamanan**: Seluruh rute API ekstensi dijaga ketat menggunakan mekanisme `Authorization: Bearer <ai_agent_token>`.
+
+### 4. Internasionalisasi (i18n)
+- **Core Engine**: `app/i18n.py` — Sistem terjemahan ringan berbasis dictionary tanpa Flask-Babel. Mendukung EN (Inggris) dan ID (Indonesia) dengan deteksi locale otomatis via session, cookie, atau Accept-Language browser.
+- **Fungsi `_()`**: Tersedia di seluruh Jinja2 template (`{{ _('text') }}`) dan Python blueprint (`from ..i18n import _`).
+- **Language Switcher**: Tombol EN/ID di header aplikasi, route `/lang/<code>` untuk mengganti bahasa secara persisten.
+- **Weather i18n**: Data terjemahan cuaca (weather codes WMO, label, relative time) di-inject ke JavaScript via `<script id="weatherI18n">` JSON.
+- **Navbar Order Sync**: Urutan navbar disimpan di database (`app_setting`) dan direstore lintas device via `GET /settings/navbar-order/<user>`.
 
 ## Struktur Direktori
 ```text

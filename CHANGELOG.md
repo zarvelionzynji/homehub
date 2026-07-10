@@ -3,6 +3,20 @@
 Semua perubahan yang signifikan pada proyek HomeHub ini akan dicatat di file ini.
 Format penulisan berdasarkan [Keep a Changelog](https://keepachangelog.com/id/1.0.0/).
 
+## [v1.2.0] - 2026-07-11
+
+### Added
+- **i18n Internasionalisasi (EN/ID)**: Sistem terjemahan ringan berbasis dictionary untuk Inggris dan Indonesia. Tidak memerlukan Flask-Babel atau file .po/.mo. Mencakup:
+  - **Core engine** (`app/i18n.py`) — kelas `I18n`, fungsi `_()`, deteksi locale via session/cookie/browser Accept-Language.
+  - **300+ terjemahan** — seluruh UI template (17 file), flash messages di 9 blueprint, data cuaca, dan kode weather codes (WMO).
+  - **Language switcher** — tombol EN/ID di header, selalu terlihat sebelum dan sesudah login.
+  - **Weather widget i18n** — terjemahan weather codes, label, dan relative time di JS via JSON injection.
+- **Navbar order cross-device sync**: Urutan navbar kini disimpan ke server (`app_setting` table) dan direstore otomatis di device manapun. Client fetch via `GET /settings/navbar-order/<user>` dengan fallback ke localStorage.
+
+### Fixed
+- **Nested quote syntax error** di `quick_links.html` — Jinja2 `_("...")` di dalam `onsubmit` diperbaiki dengan `{% set %}`
+- **Nested quote syntax error** di `index.html` — `_("Today's Forecast")` diperbaiki dengan `{% set %}`
+
 ## [v1.1.0] - 2026-07-06
 
 ### Added

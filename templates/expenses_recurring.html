@@ -70,19 +70,19 @@
   <div class="flex items-center justify-between mb-6">
     <div class="flex items-center gap-4">
       <a href="/expenses" class="text-blue-600 hover:underline flex items-center gap-2">
-        <i class="fas fa-arrow-left"></i> Back to Calendar
+        <i class="fas fa-arrow-left"></i> {{ _('Back to Calendar') }}
       </a>
-      <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">Recurring Expense Rules</h1>
+      <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">{{ _('Recurring Expense Rules') }}</h1>
     </div>
   </div>
 
   <!-- Tabs -->
   <div class="recurring-page-tabs flex border-b border-gray-200">
     <button class="tab-button {% if active_tab == 'recurring-rules' %}active{% endif %}" data-tab="recurring-rules">
-      <i class="fas fa-repeat mr-2"></i>Recurring Rules
+      <i class="fas fa-repeat mr-2"></i>{{ _('Recurring Rules') }}
     </button>
     <button class="tab-button {% if active_tab == 'general-settings' %}active{% endif %}" data-tab="general-settings">
-      <i class="fas fa-cog mr-2"></i>General Settings
+      <i class="fas fa-cog mr-2"></i>{{ _('General Settings') }}
     </button>
   </div>
 
@@ -91,7 +91,7 @@
     <!-- Recurring Rules Tab -->
     <div id="recurring-rules" class="tab-content {% if active_tab == 'recurring-rules' %}active{% endif %}">
       <div class="space-y-4">
-        <h2 class="text-xl font-semibold">Active Rules</h2>
+        <h2 class="text-xl font-semibold">{{ _('Active Rules') }}</h2>
         
         {% if rules %}
         <div class="rules-container">
@@ -110,7 +110,7 @@
                   </div>
                   <div class="flex items-center gap-2 shrink-0">
                     <button type="button" class="btn btn-secondary edit-btn" data-creator="{{ r.creator }}" onclick="this.closest('details').open=true">
-                      <i class="fas fa-edit mr-1"></i>Edit
+                      <i class="fas fa-edit mr-1"></i>{{ _('Edit') }}
                     </button>
                   </div>
                 </div>
@@ -120,27 +120,27 @@
               <form method="POST" action="/expenses/recurring/edit/{{ r.id }}" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4 pt-4 border-t recurring-edit-form" data-creator="{{ r.creator }}">
                 <input type="hidden" name="user" value="">
                 <div class="md:col-span-3 p-3 rounded border border-gray-200 dark:border-gray-700 bg-amber-50 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200 text-xs">
-                  Editing a recurring rule can affect generated entries. Choose a strategy to avoid accidental history loss.
+                  {{ _('Editing a recurring rule can affect generated entries. Choose a strategy to avoid accidental history loss.') }}
                 </div>
                 <div>
-                  <label class="text-sm text-gray-600 dark:text-gray-300">Title</label>
+                  <label class="text-sm text-gray-600 dark:text-gray-300">{{ _('Title') }}</label>
                   <input type="text" name="title" class="w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded p-2 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" value="{{ r.title }}">
                 </div>
                 <div>
-                  <label class="text-sm text-gray-600 dark:text-gray-300">Category</label>
+                  <label class="text-sm text-gray-600 dark:text-gray-300">{{ _('Category') }}</label>
                   <input type="text" name="category" class="w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded p-2 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" value="{{ r.category or '' }}">
                   <div class="edit-category-chips mt-2 flex flex-wrap gap-2"></div>
                 </div>
                 <div>
-                  <label class="text-sm text-gray-600 dark:text-gray-300">Unit Price</label>
+                  <label class="text-sm text-gray-600 dark:text-gray-300">{{ _('Unit Price') }}</label>
                   <input type="number" step="0.01" name="unit_price" class="w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded p-2 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" value="{{ ('%.' ~ expense_precision ~ 'f')|format(r.unit_price or 0) }}">
                 </div>
                 <div>
-                  <label class="text-sm text-gray-600 dark:text-gray-300">Default Qty</label>
+                  <label class="text-sm text-gray-600 dark:text-gray-300">{{ _('Default Qty') }}</label>
                   <input type="number" step="0.01" name="default_quantity" class="w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded p-2 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" value="{{ r.default_quantity }}">
                 </div>
                 <div>
-                  <label class="text-sm text-gray-600 dark:text-gray-300">Frequency</label>
+                  <label class="text-sm text-gray-600 dark:text-gray-300">{{ _('Frequency') }}</label>
                   <select name="frequency" class="w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded p-2 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">
                     <option value="daily" {% if r.frequency=='daily' %}selected{% endif %}>Daily</option>
                     <option value="weekly" {% if r.frequency=='weekly' %}selected{% endif %}>Weekly</option>
@@ -148,22 +148,22 @@
                   </select>
                 </div>
                 <div>
-                  <label class="text-sm text-gray-600 dark:text-gray-300">Monthly Mode</label>
+                  <label class="text-sm text-gray-600 dark:text-gray-300">{{ _('Monthly Mode') }}</label>
                   <select name="monthly_mode" class="w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded p-2 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">
                     <option value="day_of_month" {% if (r.monthly_mode or 'day_of_month')=='day_of_month' %}selected{% endif %}>Same day-of-month</option>
                     <option value="calendar" {% if (r.monthly_mode or 'day_of_month')=='calendar' %}selected{% endif %}>Calendar month</option>
                   </select>
                 </div>
                 <div>
-                  <label class="text-sm text-gray-600 dark:text-gray-300">Start Date</label>
+                  <label class="text-sm text-gray-600 dark:text-gray-300">{{ _('Start Date') }}</label>
                   <input type="date" name="start_date" class="w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded p-2 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" value="{{ r.start_date }}">
                 </div>
                 <div>
-                  <label class="text-sm text-gray-600 dark:text-gray-300">End Date</label>
+                  <label class="text-sm text-gray-600 dark:text-gray-300">{{ _('End Date') }}</label>
                   <input type="date" name="end_date" class="w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded p-2 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" value="{{ r.end_date or '' }}">
                 </div>
                 <div>
-                  <label class="text-sm text-gray-600 dark:text-gray-300">Edit Strategy</label>
+                  <label class="text-sm text-gray-600 dark:text-gray-300">{{ _('Edit Strategy') }}</label>
                   <select name="edit_strategy" class="w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded p-2 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">
                     <option value="apply_from" selected>Keep history, apply changes from effective date</option>
                     <option value="split_rule">Create new rule from effective date (split)</option>
@@ -171,17 +171,17 @@
                   </select>
                 </div>
                 <div>
-                  <label class="text-sm text-gray-600 dark:text-gray-300">Update Attachment (opt)</label>
+                  <label class="text-sm text-gray-600 dark:text-gray-300">{{ _('Update Attachment (opt)') }}</label>
                   <input type="file" name="attachment" accept="image/*" class="w-full text-sm text-gray-500 dark:text-gray-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-50 dark:bg-slate-800 dark:border-slate-700 file:text-blue-700 hover:file:bg-blue-100 focus-visible:outline-none">
                 </div>
                 <div class="effective-from-group">
-                  <label class="text-sm text-gray-600 dark:text-gray-300">Effective From</label>
+                  <label class="text-sm text-gray-600 dark:text-gray-300">{{ _('Effective From') }}</label>
                   <input type="date" name="effective_from" class="w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded p-2 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" value="{{ (r.start_date or '') }}">
                   <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Used by apply/split strategies.</p>
                 </div>
                 <div class="md:col-span-3 flex justify-end gap-2">
-                  <button type="button" class="btn btn-secondary cancel-edit" onclick="this.closest('details').open=false">Cancel</button>
-                  <button type="submit" class="btn btn-primary">Save</button>
+                  <button type="button" class="btn btn-secondary cancel-edit" onclick="this.closest('details').open=false">{{ _('Cancel') }}</button>
+                  <button type="submit" class="btn btn-primary">{{ _('Save') }}</button>
                 </div>
               </form>
 
@@ -189,10 +189,10 @@
               <form method="POST" action="/expenses/recurring/delete/{{ r.id }}" class="mt-3 pt-3 border-t flex items-center gap-3 delete-form" data-creator="{{ r.creator }}" onsubmit="return confirm('Yakin ingin menghapus recurring rule &quot;{{ r.title }}&quot;? Lampiran (kontrak) juga akan dihapus.')"
                 <input type="hidden" name="user">
                 <label class="text-sm text-gray-600 dark:text-gray-300 inline-flex items-center gap-2">
-                  <input type="checkbox" name="delete_entries" value="1" class="rounded"> Delete generated entries (unchecked = keep history)
+                  <input type="checkbox" name="delete_entries" value="1" class="rounded"> {{ _('Delete generated entries (unchecked = keep history)') }}
                 </label>
-                <span class="text-xs text-red-600">This permanently removes linked generated entries.</span>
-                <button type="submit" class="btn btn-danger">Delete Rule</button>
+                <span class="text-xs text-red-600">{{ _('This permanently removes linked generated entries.') }}</span>
+                <button type="submit" class="btn btn-danger">{{ _('Delete Rule') }}</button>
               </form>
             </details>
           </div>
@@ -200,22 +200,22 @@
         </div>
         {% else %}
         <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded border">
-          <p class="text-gray-500 dark:text-gray-400">No recurring rules yet. Add one below.</p>
+          <p class="text-gray-500 dark:text-gray-400">{{ _('No recurring rules yet. Add one below.') }}</p>
         </div>
         {% endif %}
 
         <!-- Add New Rule Form -->
         <div class="border border-gray-200 dark:border-gray-700 rounded p-6 bg-blue-50 dark:bg-slate-800 dark:border-slate-700 mt-6">
-          <h3 class="text-lg font-semibold mb-4">Add New Rule</h3>
+          <h3 class="text-lg font-semibold mb-4">{{ _('Add New Rule') }}</h3>
           <form id="recurring-form" method="POST" action="/expenses" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
             <input type="hidden" name="form_type" value="recurring">
-            <input type="text" name="title" class="md:col-span-4 p-2 border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="Title (e.g., Milk)" required>
+            <input type="text" name="title" class="md:col-span-4 p-2 border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="{{ _('Title (e.g., Milk)') }}" required>
             <div class="md:col-span-4">
               <div id="recurring-category-chips" class="mb-2 flex flex-wrap gap-2"></div>
-              <input type="text" name="category" class="w-full p-2 border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="Category (opt)">
+              <input type="text" name="category" class="w-full p-2 border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="{{ _('Category (opt)') }}">
             </div>
-            <input type="number" step="0.01" name="unit_price" class="md:col-span-4 p-2 border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="Unit price" required>
-            <input type="number" step="0.01" name="default_quantity" class="md:col-span-4 p-2 border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="Default qty" required>
+            <input type="number" step="0.01" name="unit_price" class="md:col-span-4 p-2 border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="{{ _('Unit price') }}" required>
+            <input type="number" step="0.01" name="default_quantity" class="md:col-span-4 p-2 border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="{{ _('Default qty') }}" required>
             <select name="frequency" class="md:col-span-4 p-2 border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">
               <option value="daily">Daily</option>
               <option value="weekly">Weekly</option>
@@ -225,14 +225,14 @@
               <option value="day_of_month">Monthly mode: Same day-of-month</option>
               <option value="calendar">Monthly mode: Calendar boundary</option>
             </select>
-            <input type="date" name="start_date" class="md:col-span-4 p-2 border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="Start">
-            <input type="date" name="end_date" class="md:col-span-4 p-2 border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="End (optional)">
+            <input type="date" name="start_date" class="md:col-span-4 p-2 border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="{{ _('Start') }}">
+            <input type="date" name="end_date" class="md:col-span-4 p-2 border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="{{ _('End (optional)') }}">
             <div class="md:col-span-4">
               <input type="file" name="attachment" accept="image/*" class="w-full text-sm text-gray-500 dark:text-gray-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-50 dark:bg-slate-800 dark:border-slate-700 file:text-blue-700 hover:file:bg-blue-100 focus-visible:outline-none" title="Proof of subscription/contract">
             </div>
             <input type="hidden" name="creator" id="recCreator">
             <div class="md:col-span-12 flex justify-end">
-              <button type="submit" class="btn btn-primary">Add Recurring Rule</button>
+              <button type="submit" class="btn btn-primary">{{ _('Add Recurring Rule') }}</button>
             </div>
           </form>
         </div>
@@ -242,30 +242,30 @@
     <!-- General Settings Tab -->
     <div id="general-settings" class="tab-content {% if active_tab == 'general-settings' %}active{% endif %}">
       <div class="space-y-6">
-        <h2 class="text-xl font-semibold">Expense Settings</h2>
+        <h2 class="text-xl font-semibold">{{ _('Expense Settings') }}</h2>
         
         <form method="POST" action="/expenses/settings" class="space-y-4 max-w-md">
           <input type="hidden" name="user" id="settings-user">
           
           <div>
-            <label class="text-sm text-gray-600 dark:text-gray-300 font-semibold">Currency symbol</label>
+            <label class="text-sm text-gray-600 dark:text-gray-300 font-semibold">{{ _('Currency symbol') }}</label>
             <input type="text" name="currency" id="currency-input" class="w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded p-2 mt-1 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="Rp">
           </div>
           
           <div>
-            <label class="text-sm text-gray-600 dark:text-gray-300 font-semibold">Fraction factor</label>
+            <label class="text-sm text-gray-600 dark:text-gray-300 font-semibold">{{ _('Fraction factor') }}</label>
             <input type="number" min="1" step="1" name="fraction_factor" id="fraction-factor-input" class="w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded p-2 mt-1 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" value="{{ expense_settings.fraction_factor if expense_settings is defined and expense_settings.fraction_factor is defined else 1 }}" placeholder="1">
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">How many lower currency units make one main unit, like $1 contains 100 cents. Common values: 1 (IDR, JPY), 100 (USD, EUR).</p>
           </div>
           
           <div>
-            <label class="text-sm text-gray-600 dark:text-gray-300 font-semibold">Categories (comma separated)</label>
-            <input type="text" name="categories" id="categories-input" class="w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded p-2 mt-1 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="Groceries, Utilities, Housing">
+            <label class="text-sm text-gray-600 dark:text-gray-300 font-semibold">{{ _('Categories (comma separated)') }}</label>
+            <input type="text" name="categories" id="categories-input" class="w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded p-2 mt-1 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="{{ _('Groceries, Utilities, Housing') }}">
             <div id="category-chips" class="mt-3 flex flex-wrap gap-2"></div>
           </div>
           
           <div class="flex justify-end pt-4">
-            <button type="submit" class="btn btn-primary">Save Settings</button>
+            <button type="submit" class="btn btn-primary">{{ _('Save Settings') }}</button>
           </div>
         </form>
       </div>
