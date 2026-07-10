@@ -72,7 +72,7 @@
       <a href="/expenses" class="text-blue-600 hover:underline flex items-center gap-2">
         <i class="fas fa-arrow-left"></i> {{ _('Back to Calendar') }}
       </a>
-      <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">{{ _('Recurring Expense Rules') }}</h1>
+      <h1 class="text-xl md:text-3xl font-bold text-gray-800 dark:text-gray-100">{{ _('Recurring Expense Rules') }}</h1>
     </div>
   </div>
 
@@ -91,7 +91,7 @@
     <!-- Recurring Rules Tab -->
     <div id="recurring-rules" class="tab-content {% if active_tab == 'recurring-rules' %}active{% endif %}">
       <div class="space-y-4">
-        <h2 class="text-xl font-semibold">{{ _('Active Rules') }}</h2>
+        <h2 class="text-base md:text-xl font-semibold">{{ _('Active Rules') }}</h2>
         
         {% if rules %}
         <div class="rules-container">
@@ -242,7 +242,7 @@
     <!-- General Settings Tab -->
     <div id="general-settings" class="tab-content {% if active_tab == 'general-settings' %}active{% endif %}">
       <div class="space-y-6">
-        <h2 class="text-xl font-semibold">{{ _('Expense Settings') }}</h2>
+        <h2 class="text-base md:text-xl font-semibold">{{ _('Expense Settings') }}</h2>
         
         <form method="POST" action="/expenses/settings" class="space-y-4 max-w-md">
           <input type="hidden" name="user" id="settings-user">

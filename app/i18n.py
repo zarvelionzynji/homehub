@@ -285,7 +285,6 @@ TRANSLATIONS = {
         'Delete generated entries (unchecked = keep history)': 'Hapus entri yang dibuat (tidak dicentang = simpan riwayat)',
         'This permanently removes linked generated entries.': 'Ini menghapus permanen entri terkait.',
         'No recurring rules yet. Add one below.': 'Belum ada aturan berulang. Tambah di bawah.',
-        "Recurring rules &amp; config": 'Aturan berulang &amp; konfig',
         'e.g., Groceries': 'mis., Sembako',
         '%(count)d expense(s) deleted.': '%(count)d pengeluaran dihapus.',
 
