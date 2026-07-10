@@ -3,6 +3,7 @@ from datetime import datetime, date, timedelta
 import calendar as _calendar
 import json
 import os
+from ..i18n import _
 from ..models import db, RecurringExpense, ExpenseEntry, MaintenanceRecord
 from ..security import sanitize_text
 from ..blueprints import main_bp
@@ -217,7 +218,7 @@ def expenses():
             
             db.session.add(RecurringExpense(title=title, unit_price=unit_price, default_quantity=default_quantity, frequency=frequency, monthly_mode=monthly_mode, category=category, start_date=sd, end_date=ed, creator=creator, effective_from=sd, attachment_path=attachment_path))
             db.session.commit()
-            flash('Recurring expense added.', 'success')
+            flash(_('Recurring expense added.'), 'success')
             y = request.args.get('y') or today.year
             m = request.args.get('m') or today.month
             sel = request.args.get('sel')
@@ -241,7 +242,7 @@ def expenses():
             is_paid = request.form.get('is_paid') == 'on'
             db.session.add(ExpenseEntry(date=d, title=title, category=category, unit_price=up, quantity=q, amount=amount, payer=payer, attachment_path=attachment_path, is_paid=is_paid))
             db.session.commit()
-            flash('Expense added.', 'success')
+            flash(_('Expense added.'), 'success')
             y = request.args.get('y') or d.year
             m = request.args.get('m') or d.month
             sel = request.args.get('sel') or d.strftime('%Y-%m-%d')
@@ -260,7 +261,7 @@ def edit_recurring_expense(rid):
     admin_name = current_app.config['HOMEHUB_CONFIG'].get('admin_name', 'Administrator')
     admin_aliases = {admin_name, 'Administrator', 'admin'}
     if not (user in admin_aliases or user == (r.creator or '')):
-        flash('Not allowed to edit rule.', 'error')
+        flash(_('Not allowed to edit rule.'), 'error')
         return redirect(url_for('main.expenses'))
     def _parse_date(value, fallback):
         if value in (None, ''):
@@ -347,7 +348,7 @@ def edit_recurring_expense(rid):
             e.amount = (r.unit_price or 0.0) * qty
             updated += 1
         db.session.commit()
-        flash(f'Recurring rule fully rewritten. Updated {updated} entry(ies), removed {deleted} outside rule range.', 'warning')
+        flash(_('Recurring rule fully rewritten. Updated %(updated)d entry(ies), removed %(deleted)d outside rule range.') % {'updated': updated, 'deleted': deleted}, 'warning')
     elif strategy == 'split_rule':
         split_start = effective_from
         if r.start_date and split_start < r.start_date:
@@ -375,7 +376,7 @@ def edit_recurring_expense(rid):
             db.session.commit()
             _generate_recurring_entries_until(today)
             flash(
-                f'Split at {split_start} would create an empty old rule window. Applied changes from {effective_from} on the same rule instead.',
+                _('Split at %(split_start)s would create an empty old rule window. Applied changes from %(effective_from)s on the same rule instead.') % {'split_start': split_start, 'effective_from': effective_from},
                 'info'
             )
             return redirect(url_for('main.recurring_expenses_page', tab='recurring-rules'))
@@ -405,7 +406,7 @@ def edit_recurring_expense(rid):
         db.session.add(new_rule)
         db.session.commit()
         _generate_recurring_entries_until(today)
-        flash(f'Rule split from {split_start}. Old rule preserved; removed {removed_from_old} future old-rule entry(ies).', 'success')
+        flash(_('Rule split from %(split_start)s. Old rule preserved; removed %(removed)d future old-rule entry(ies).') % {'split_start': split_start, 'removed': removed_from_old}, 'success')
     else:
         if new_start_date and effective_from < new_start_date:
             effective_from = new_start_date
@@ -444,7 +445,7 @@ def edit_recurring_expense(rid):
             ExpenseEntry.date >= effective_from
         ).count()
         flash(
-            f'Rule updated from {effective_from}. Kept {historical_kept} historical entry(ies), rebuilt {regenerated} from that date.',
+            _('Rule updated from %(effective_from)s. Kept %(historical)d historical entry(ies), rebuilt %(regenerated)d from that date.') % {'effective_from': effective_from, 'historical': historical_kept, 'regenerated': regenerated},
             'success'
         )
 
@@ -458,7 +459,7 @@ def delete_recurring_expense(rid):
     admin_name = current_app.config['HOMEHUB_CONFIG'].get('admin_name', 'Administrator')
     admin_aliases = {admin_name, 'Administrator', 'admin'}
     if not (user in admin_aliases or user == (r.creator or '')):
-        flash('Not allowed to delete rule.', 'error')
+        flash(_('Not allowed to delete rule.'), 'error')
         return redirect(url_for('main.expenses'))
     delete_entries = request.form.get('delete_entries') in ('1', 'true', 'on', 'yes')
     if delete_entries:
@@ -469,9 +470,9 @@ def delete_recurring_expense(rid):
     db.session.delete(r)
     db.session.commit()
     if delete_entries:
-        flash('Recurring rule deleted. Linked generated entries deleted.', 'success')
+        flash(_('Recurring rule deleted. Linked generated entries deleted.'), 'success')
     else:
-        flash('Recurring rule deleted. Linked generated entries kept as history.', 'success')
+        flash(_('Recurring rule deleted. Linked generated entries kept as history.'), 'success')
     return redirect(url_for('main.recurring_expenses_page', tab='recurring-rules'))
 
 
@@ -481,7 +482,7 @@ def expenses_settings():
     user = sanitize_text(request.form.get('user', ''))
     admin_name = current_app.config['HOMEHUB_CONFIG'].get('admin_name', 'Administrator')
     if user != admin_name:
-        flash('Only admin can update settings.', 'error')
+        flash(_('Only admin can update settings.'), 'error')
         return redirect(url_for('main.expenses'))
     currency = sanitize_text(request.form.get('currency', ''))
     categories = sanitize_text(request.form.get('categories', ''))
@@ -495,9 +496,9 @@ def expenses_settings():
         db.session.execute(db.text("INSERT INTO app_setting(key,value) VALUES('categories', :v) ON CONFLICT(key) DO UPDATE SET value=excluded.value"), {"v": categories})
         db.session.execute(db.text("INSERT INTO app_setting(key,value) VALUES('fraction_factor', :v) ON CONFLICT(key) DO UPDATE SET value=excluded.value"), {"v": str(fraction_factor)})
         db.session.commit()
-        flash('Settings saved.', 'success')
+        flash(_('Settings saved.'), 'success')
     except Exception:
-        flash('Failed to save settings.', 'error')
+        flash(_('Failed to save settings.'), 'error')
     today = date.today()
     tab = request.args.get('tab', 'general-settings')
     return redirect(url_for('main.recurring_expenses_page', tab=tab))
@@ -513,11 +514,11 @@ def delete_expense_entry(entry_id):
     family = current_app.config['HOMEHUB_CONFIG'].get('family_members', [])
     valid_users = admin_aliases | set(family)
     if user not in valid_users:
-        flash('Not allowed to delete entry.', 'error')
+        flash(_('Not allowed to delete entry.'), 'error')
         return redirect(url_for('main.expenses'))
     db.session.delete(entry)
     db.session.commit()
-    flash('Expense deleted.', 'success')
+    flash(_('Expense deleted.'), 'success')
     # Preserve view
     today = date.today()
     y = request.args.get('y') or today.year
@@ -535,7 +536,7 @@ def edit_expense_entry(entry_id):
     family = current_app.config['HOMEHUB_CONFIG'].get('family_members', [])
     valid_users = admin_aliases | set(family)
     if user not in valid_users:
-        flash('Not allowed to edit entry.', 'error')
+        flash(_('Not allowed to edit entry.'), 'error')
         return redirect(url_for('main.expenses'))
     # Update fields
     entry.title = bleach.clean(request.form.get('title', entry.title))
@@ -572,7 +573,7 @@ def edit_expense_entry(entry_id):
             maintenance.attachment_path = entry.attachment_path
 
     db.session.commit()
-    flash('Expense updated.', 'success')
+    flash(_('Expense updated.'), 'success')
     # Preserve view
     today = date.today()
     y = request.args.get('y') or entry.date.year
@@ -590,7 +591,7 @@ def bulk_delete_expenses():
     valid_users = admin_aliases | set(family)
     ids = request.form.getlist('ids')
     if not ids:
-        flash('No entries selected.', 'warning')
+        flash(_('No entries selected.'), 'warning')
         return redirect(url_for('main.expenses'))
     deleted = 0
     for entry_id in ids:
@@ -602,7 +603,7 @@ def bulk_delete_expenses():
         except Exception:
             continue
     db.session.commit()
-    flash(f'{deleted} expense(s) deleted.', 'success')
+    flash(_('%(count)d expense(s) deleted.') % {'count': deleted}, 'success')
     # Preserve view
     today = date.today()
     y = request.args.get('y') or today.year

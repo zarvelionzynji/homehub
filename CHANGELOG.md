@@ -1,127 +1,136 @@
 # Changelog
 
-Semua perubahan yang signifikan pada proyek HomeHub ini akan dicatat di file ini.
-Format penulisan berdasarkan [Keep a Changelog](https://keepachangelog.com/id/1.0.0/).
+All significant changes to the HomeHub project are recorded in this file.
+
+## [v1.2.0] - 2026-07-11
+
+### Added
+- **i18n Internationalization (EN/ID)**: Lightweight dictionary-based translation system for English and Indonesian. No Flask-Babel or .po/.mo files required. Includes:
+  - **Core engine** (`app/i18n.py`) — `I18n` class, `_()` helper, locale detection via session/cookie/browser Accept-Language.
+  - **300+ translations** — all 17 UI templates, flash messages in 9 blueprints, weather data, and WMO weather codes.
+  - **Language switcher** — EN/ID toggle in the header, always visible before and after login.
+  - **Weather widget i18n** — translated weather codes, labels, and relative time in JS via JSON injection.
+- **Navbar order cross-device sync**: Navbar order is now saved to the server (`app_setting` table) and automatically restored across devices. Client fetches via `GET /settings/navbar-order/<user>` with localStorage fallback.
+
+### Fixed
+- **Nested quote syntax error** in `quick_links.html` — Jinja2 `_("...")` inside `onsubmit` fixed with `{% set %}`
+- **Nested quote syntax error** in `index.html` — `_("Today's Forecast")` fixed with `{% set %}`
+- **Mobile header compact** — single-row header on mobile: Menu, EN/ID, welcome, user dropdown with proportional sizing
+- **Welcome message comma spacing** — fixed `Welcome,User!` to `Welcome, User!`
+- **Recurring page heading mobile** — headings reduced on mobile (`text-xl md:text-3xl`)
 
 ## [v1.1.0] - 2026-07-06
 
 ### Added
-- **Re-download Media**: Tombol "Redownload" pada setiap item media yang sudah selesai di-download. Menggunakan URL, format (MP4/MP3), dan kualitas yang tersimpan dari download sebelumnya. File lama otomatis dihapus setelah download baru berhasil.
-- **Format preservation**: Kolom `download_format` dan `download_quality` pada model Media untuk menyimpan opsi download agar re-download menggunakan pengaturan yang sama.
-- **Mobile-optimized media card**: Layout card yang lebih rapi dengan format badge (MP4/MP3), tombol icon-only di mobile, dan tombol delete berupa icon sampah yang lebih subtle.
+- **Re-download Media**: "Redownload" button on completed media items. Uses saved URL, format (MP4/MP3), and quality from the original download. Old files are automatically deleted after a successful re-download.
+- **Format preservation**: `download_format` and `download_quality` columns on the Media model to persist download options for re-downloads.
+- **Mobile-optimized media card**: Cleaner card layout with format badge (MP4/MP3), icon-only buttons on mobile, and a subtle trash icon for delete.
 
 ### Fixed
-- **NameError on re-download**: Nested `worker()` function tidak bisa diakses dari route `redownload_media()`. Diekstrak ke module level sebagai `_download_worker()`.
-- **Redownload stuck on retry**: Setelah error, status chip lama tidak dihapus sehingga klik Redownload ulang tidak mengirim fetch request.
+- **NameError on re-download**: Nested `worker()` function was inaccessible from `redownload_media()` route. Extracted to module level as `_download_worker()`.
+- **Redownload stuck on retry**: Old status chip was not cleared after error, preventing re-download fetch requests from being sent.
 
 ## [v1.0.8] - 2026-07-01
 
 ### Security
-- **AI Agent generic auth error**: Mengembalikan pesan error generik "Unauthorized" untuk semua kegagalan autentikasi AI agent (tidak lagi mengungkap apakah token dikonfigurasi atau invalid).
-- **File path traversal validation**: Menambahkan validasi `_safe_basename()` pada semua rute serve media dan PDF untuk mencegah path traversal.
+- **AI Agent generic auth error**: Returns generic "Unauthorized" error for all AI agent authentication failures (no longer reveals whether the token is configured or invalid).
+- **File path traversal validation**: Added `_safe_basename()` validation on all media and PDF serve routes to prevent path traversal.
 
 ### Changed
-- **SQLite WAL mode + connection pooling**: Mengaktifkan Write-Ahead Logging (WAL) untuk performa konkurensi lebih baik. Konfigurasi pool: timeout 15s, pool_size 5, max_overflow 10, pool_pre_ping untuk deteksi koneksi stale.
-- **python-dateutil untuk date arithmetic**: Recurring chores sekarang menggunakan `python-dateutil` (relativedelta) untuk perhitungan tanggal yang akurat, dengan fallback ke logika manual jika library tidak tersedia.
+- **SQLite WAL mode + connection pooling**: Enabled Write-Ahead Logging (WAL) for better concurrent performance. Pool config: timeout 15s, pool_size 5, max_overflow 10, pool_pre_ping for stale connection detection.
+- **python-dateutil for date arithmetic**: Recurring chores now use `python-dateutil` (relativedelta) for accurate date calculations, with fallback to manual logic if the library is unavailable.
 
 ### Fixed
-- **Infinite loop protection (recurring expense)**: Menambahkan safety check pada `_generate_recurring_entries_until` untuk mencegah infinite loop jika `next_date()` tidak memajukan tanggal. Error dicatat di log.
-- **Expense month/year validation**: Menambahkan validasi parameter y/m pada route expenses untuk mencegah crash dengan nilai ekstrem (y harus 1900-2100, m harus 1-12).
-- **Expense settings logging**: Logging ditambahkan pada kegagalan muat pengaturan expense (sebelumnya silent fail).
+- **Infinite loop protection (recurring expense)**: Added safety check in `_generate_recurring_entries_until` to prevent infinite loops if `next_date()` does not advance the date. Error logged.
+- **Expense month/year validation**: Added parameter validation on expense routes to prevent crashes with extreme values (y must be 1900-2100, m must be 1-12).
+- **Expense settings logging**: Added logging on expense settings load failure (previously silent).
 
 ## [v1.0.7] - 2026-07-01
 
 ### Fixed
-- **Media/PDF preview not found saat file hilang**: Media downloader dan PDF viewer sekarang mengecek keberadaan file di disk sebelum menyajikan tautan Preview/Download. Jika file sudah dihapus atau folder media dipindah, backend mengembalikan 404 dengan rapi, API status mengembalikan flag `file_exists`, dan antarmuka menampilkan "Not available (deleted)" alih-alih tautan rusak. Tombol Delete tetap tersedia agar pengguna bisa membersihkan entri *database*.
-- **Preview link tetap buka new tab 404 meski sudah ditandai "Not available"**: Memperbaiki *async race condition* di click handler frontend — `preventDefault()` kini dipanggil secara sinkron sebelum `await fetch(HEAD)`, sehingga navigasi ke 404 benar-benar dicegah. Jika file valid, `window.open()` dipanggil manual di kode.
-- **Raw HTML "Not available" muncul sebagai teks**: Memperbaiki penggunaan `replaceWith()` yang membuat TextNode — kini menggunakan `outerHTML()` agar elemen HTML dirender dengan benar.
-- **Add Redownload button untuk media hilang**: Menambahkan tombol "Redownload" yang muncul ketika media tidak ditemukan di disk. Klik tombol mengisi form URL download dengan URL asli video dan scroll ke form untuk memudahkan re-download.
-- **Initial page load validation**: Media yang sudah selesai di-download (filepath di DB ada) tetapi file di disk hilang kini otomatis terdeteksi saat halaman dimuat, bukan hanya setelah polling.
-
-### Fixed
-- **Media/PDF preview not found saat file hilang**: Media downloader dan PDF viewer sekarang mengecek keberadaan file di disk sebelum menyajikan tautan Preview/Download. Jika file sudah dihapus atau folder media dipindah, backend mengembalikan 404 dengan rapi, API status mengembalikan flag `file_exists`, dan antarmuka menampilkan "Not available (deleted)" alih-alih tautan rusak. Tombol Delete tetap tersedia agar pengguna bisa membersihkan entri *database*.
-- **Preview link tetap buka new tab 404 meski sudah ditandai "Not available"**: Memperbaiki *async race condition* di click handler frontend — `preventDefault()` kini dipanggil secara sinkron sebelum `await fetch(HEAD)`, sehingga navigasi ke 404 benar-benar dicegah. Jika file valid, `window.open()` dipanggil manual di kode.
-- **Raw HTML "Not available" muncul sebagai teks**: Memperbaiki penggunaan `replaceWith()` yang membuat TextNode — kini menggunakan `outerHTML()` agar elemen HTML dirender dengan benar.
-- **Add Redownload button untuk media hilang**: Menambahkan tombol "Redownload" yang muncul ketika media tidak ditemukan di disk. Klik tombol mengisi form URL download dengan URL asli video dan scroll ke form untuk memudahkan re-download.
-- **Initial page load validation**: Media yang sudah selesai di-download (filepath di DB ada) tetapi file di disk hilang kini otomatis terdeteksi saat halaman dimuat, bukan hanya setelah polling.
+- **Media/PDF preview not found when file is missing**: Media downloader and PDF viewer now check file existence on disk before presenting Preview/Download links. If the file was deleted or the media folder moved, the backend returns 404 cleanly, the API returns a `file_exists` flag, and the UI shows "Not available (deleted)" instead of broken links. Delete button remains available so users can clean up database entries.
+- **Preview link still opens new tab 404 even when marked "Not available"**: Fixed async race condition in the frontend click handler — `preventDefault()` is now called synchronously before `await fetch(HEAD)`, preventing navigation to 404. If the file is valid, `window.open()` is called manually.
+- **Raw HTML "Not available" rendered as text**: Fixed `replaceWith()` creating a TextNode — now uses `outerHTML()` so HTML elements render correctly.
+- **Add Redownload button for missing media**: Added "Redownload" button that appears when media is not found on disk. Clicking fills the download form with the original video URL and scrolls to the form for easy re-download.
+- **Initial page load validation**: Media marked as downloaded (filepath in DB) but missing on disk is now automatically detected on page load, not just after polling.
 
 ## [v1.0.6] - 2026-06-26
 
 ### Fixed
-- **PWA Web Share Target tidak muncul di Android share sheet**: Memperbaiki tiga masalah kritis yang mencegah PWA terdaftar sebagai target share:
-    1. **Ikon maskable** — Menambahkan `purpose: "any maskable"` pada ikon PNG dan menghapus ikon SVG (tidak didukung andal di Android Chrome).
-    2. **`display_override`** — Menambahkan `["standalone", "minimal-ui", "browser"]` agar browser konsisten display mode di semua versi Android.
-    3. **Cache-Control** — Menambahkan `no-cache` pada respons manifest agar browser selalu mengambil konfigurasi terbaru.
-- **`short_name` tanpa unicode** — Mengganti `'…'` (U+2026) dengan truncate ASCII biasa untuk menghindari masalah di Android launcher.
-- **Template `shared_url` bug** — Memperbaiki `templates/media.html` yang membaca `request.args.get('shared_url')` alih-alih variabel template `shared_url` yang sudah diproses backend (URL tidak terisi otomatis dari share target).
-- **Service Worker pre-cache & share target** — Menambahkan ikon PWA ke daftar precache dan bypass cache khusus untuk rute `/media/share` agar share navigation selalu fresh.
-- **405 Method Not Allowed on Download** — Form di `/media/share` tidak punya `action`, POST ke URL saat ini yang cuma terima GET. Tambah `action="/media"` pada form.
+- **PWA Web Share Target not appearing in Android share sheet**: Fixed three critical issues preventing PWA from registering as a share target:
+    1. **Maskable icons** — Added `purpose: "any maskable"` on PNG icons and removed SVG icons (unreliable on Android Chrome).
+    2. **`display_override`** — Added `["standalone", "minimal-ui", "browser"]` for consistent display mode across all Android versions.
+    3. **Cache-Control** — Added `no-cache` on manifest response so the browser always fetches the latest config.
+- **`short_name` without unicode** — Replaced `'…'` (U+2026) with plain ASCII truncation to avoid Android launcher issues.
+- **Template `shared_url` bug** — Fixed `templates/media.html` reading `request.args.get('shared_url')` instead of the already-processed `shared_url` template variable (URL not auto-filled from share target).
+- **Service Worker pre-cache & share target** — Added PWA icons to precache list and bypassed cache for `/media/share` route so share navigation is always fresh.
+- **405 Method Not Allowed on Download** — Form in `/media/share` had no `action`, POSTing to current URL which only accepts GET. Added `action="/media"` to the form.
 
 ### Required Infra
-- **HTTPS** — Web Share Target API hanya bekerja di secure context. PWA harus diakses via HTTPS (Caddy/Nginx reverse proxy atau Tailscale Funnel). Lihat BLUEPRINT.md untuk panduan.
+- **HTTPS** — Web Share Target API only works in secure context. PWA must be served over HTTPS (Caddy/Nginx reverse proxy or Tailscale Funnel). See BLUEPRINT.md for guidance.
 
 ## [v1.0.5] - 2026-06-26
 
 ### Added
-- **PWA Web Share Target API**: Mengintegrasikan API Web Share Target ke dalam PWA HomeHub. Pengguna Android (dan desktop yang kompatibel) kini dapat menggunakan fitur "Share" bawaan OS (misalnya dari YouTube atau TikTok) untuk membagikan tautan video secara langsung ke aplikasi HomeHub. 
-- **Media Pre-fill**: Tautan yang dibagikan melalui *Share sheet* kini akan langsung membuka halaman Media Downloader dan otomatis mengisi (*pre-fill*) kolom input URL. Pengguna bisa me-*review* URL, memilih format (MP4/MP3) atau kualitas yang diinginkan sebelum mengklik Download.
+- **PWA Web Share Target API**: Integrated Web Share Target API into the HomeHub PWA. Android users (and compatible desktops) can now use the OS "Share" feature (e.g., from YouTube or TikTok) to share video links directly to the HomeHub app.
+- **Media Pre-fill**: Shared links now open the Media Downloader page and auto-fill the URL input field. Users can review the URL, select format (MP4/MP3), and quality before clicking Download.
 
 ## [v1.0.4] - 2026-06-23
 
 ### Added
-- **AI Attachment Support (Base64)**: Endpoint AI agent (`POST /api/ai/execute`) kini mendukung unggahan lampiran struk/bukti bayar berbasis Base64 untuk modul pengeluaran. Menambahkan parameter fungsi `attachment_base64` dan `attachment_filename` yang otomatis diproses, dikompresi dengan Pillow, dan disimpan secara persisten.
+- **AI Attachment Support (Base64)**: AI agent endpoint (`POST /api/ai/execute`) now supports Base64 receipt/payment proof uploads for expense entries. Added `attachment_base64` and `attachment_filename` function parameters that are automatically processed, compressed with Pillow, and persisted.
 
 ### Changed
-- **AI Metadata Lampiran**: Response endpoint pembacaan data (`get_expenses` dan `get_recurring_expenses`) kini menyertakan field `has_attachment` (boolean) dan `attachment_path` (string) sebagai indikator keberadaan lampiran.
+- **AI Attachment Metadata**: Read-data responses (`get_expenses` and `get_recurring_expenses`) now include `has_attachment` (boolean) and `attachment_path` (string) fields.
 
 ### Fixed
-- **AI Attachment Validation**: Menambahkan validasi ketat untuk lampiran expense: (1) Invalid base64 ditolak dengan error "Invalid base64 string", (2) attachment_base64 dan attachment_filename wajib berpasangan, ditolak dengan error "Both attachment_base64 and attachment_filename are required if one is provided".
-- **Attachment Semantics**: Mendokumentasikan perbedaan semantik lampiran di schema: expense individual = bukti pembayaran per-transaksi, recurring expense = bukti kontrak/langganan (template, tidak di-copy ke generated entries).
-- **Expense Delete Confirm**: Memperbaiki bug UX di mana konfirmasi penghapusan pengeluaran satuan dan penghapusan massal (*bulk delete*) tidak muncul karena konflik cakupan fungsi lokal (*scope ReferenceError*) pada *inline handler*. Dialog konfirmasi kini muncul dengan benar sebelum mengeksekusi penghapusan.
+- **AI Attachment Validation**: Added strict validation for expense attachments: (1) Invalid base64 rejected with "Invalid base64 string" error, (2) `attachment_base64` and `attachment_filename` must be paired, rejected with "Both attachment_base64 and attachment_filename are required if one is provided".
+- **Attachment Semantics**: Documented semantic differences in schema: individual expense = per-transaction payment proof, recurring expense = contract/subscription proof (template, not copied to generated entries).
+- **Expense Delete Confirm**: Fixed UX bug where single and bulk delete confirmation dialogs did not appear due to local function scope conflict (ReferenceError) in inline handlers. Confirm dialog now appears correctly before deletion.
 
 ## [v1.0.3] - 2026-06-22
 
 ### Fixed
-- **Quick Links Edit Modal Centering**: Memperbaiki bug pada Edit Quick Link Modal (`quick_links.html`) yang tampil di pojok kiri atas pada desktop dan di paling atas pada mobile. Dengan menghapus kelas `flex` bawaan dari deklarasi HTML awal (dan menyisakan kelas `hidden`), perubahan kelas dinamis JavaScript (`classList.add('flex')` dan `classList.remove('hidden')`) kini memposisikan modal di tengah-tengah layar secara presisi baik secara vertikal maupun horizontal di semua ukuran viewport.
+- **Quick Links Edit Modal Centering**: Fixed Edit Quick Link Modal appearing in the top-left corner on desktop and top on mobile. By removing the default `flex` class from the HTML declaration (leaving only `hidden`), dynamic JavaScript class changes (`classList.add('flex')` and `classList.remove('hidden')`) now center the modal precisely both vertically and horizontally across all viewport sizes.
 - **Expense Editing & Navigation Flow**:
-  - Membuka pembatasan akses edit/delete pengeluaran individu di backend (`expenses.py`) dan frontend (`expenses.html`) agar semua anggota keluarga yang sah (bukan hanya pembuat/admin) dapat mengedit atau menghapusnya. Ini sangat krusial bagi entri pengeluaran rutin (*recurring*) yang dibuat oleh admin tetapi perlu ditandai sebagai 'Lunas' atau dilampirkan bukti bayar oleh anggota keluarga lain.
-  - Menjadikan daftar baris pengeluaran bulanan di sidebar "Entries This Month" dapat diklik (*clickable*). Mengeklik baris pengeluaran kini akan secara otomatis menggeser fokus tanggal kalender dan membuka panel detail di sebelah kiri, mempermudah akses pengeditan/penghapusan langsung dari ringkasan bulanan.
+  - Removed edit/delete access restrictions for individual expenses in both backend (`expenses.py`) and frontend (`expenses.html`), allowing all authorized family members (not just the creator/admin) to edit or delete. This is critical for recurring expense entries created by an admin that need to be marked 'Paid' or have payment proof attached by other family members.
+  - Made "Entries This Month" sidebar rows clickable. Clicking an expense row now auto-focuses the calendar date and opens the detail panel on the left, simplifying edit/delete access from the monthly summary.
 
 ## [v1.0.2] - 2026-06-22
 
 ### Changed
-- **Premium UI/UX Refactoring**: Menyelesaikan seluruh 4 fase refaktor UI/UX berstandar tinggi (ui-ux-expert + ui-ux-pro-max) mencakup perbaikan aksesibilitas, konsistensi visual, kegunaan perangkat seluler (mobile), transisi halus, dan kelengkapan tema gelap (dark mode).
-- **A11y (Accessibility) Improvements**: Menambahkan tag `<label>` terikat untuk semua input form yang hilang (seperti User Switcher, status form, input catatan, modal pemilihan user). Menambahkan ikon pendamping visual untuk pill status "Who is Home" agar tidak bergantung pada warna saja. Menambahkan `:focus-visible` ring bergaya premium pada elemen interaktif yang bisa dinavigasi dengan keyboard.
-- **Mobile & Touch Optimization**: Memperbesar touch target (ukuran tap minimum 44x44px) untuk semua tombol filter rentang waktu (scope), filter kategori pengingat, navigasi bulan kalender, dan sel hari kalender. Menambahkan *backdrop overlay* interaktif pada menu sidebar seluler agar bisa ditutup dengan menyentuh area luar.
-- **Async Interaction State**: Menghindari double-submit pada aksi AJAX (Who is Home update/clear dan Personal Status save) dengan menambahkan status `disabled` dan ikon pemutar (*spinner animation*) pada tombol selama request berlangsung.
-- **Dark Mode Completion**: Mengisi celah contrast dan warna hardcoded pada modal pemilihan user awal, tab menu pengeluaran, dan latar belakang manajemen tautan cepat (*Quick Links*) agar menyatu sempurna dalam data-theme gelap.
-- **Micro-Animations & Motion**: Mengganti transition generik `all` dengan properti transisi spesifik (gpu-friendly) untuk card dan sidebar-link. Menerapkan hover efek mengangkat (`translateY(-2px)`) yang lebih premium pada kartu dasbor. Menghargai preferensi sistem reduced motion via `@media (prefers-reduced-motion: reduce)`.
-- **Icon Standardization**: Menghapus penggunaan emoji unicode `🧾 ◀ ▶ ✕ ✎` di seluruh layout dan menggantinya dengan ikon Font Awesome (chevron, trash-can, pen, receipt) yang konsisten.
-- **Heading Hierarchy Fixes**: Menata ulang struktur heading (`h2` ke `h1`) pada sub-halaman Shopping List, Chores, Recipe Book, dan Quick Links untuk mematuhi SEO best practices.
-- **Script & Layout Consolidation**: Merapikan peletakan tag `<script>` ke dalam batas tag `<body>` sebelum penutup dan menyatukan penulisan `.btn` ke dalam `static/input.css` (membersihkan style inline yang duplikat).
+- **Premium UI/UX Refactoring**: Completed 4 phases of high-standard UI/UX refactoring (ui-ux-expert + ui-ux-pro-max) covering accessibility, visual consistency, mobile optimization, smooth transitions, and dark mode completeness.
+- **A11y (Accessibility) Improvements**: Added bound `<label>` tags for all missing form inputs (User Switcher, status forms, notes input, user selection modal). Added visual companion icons for "Who is Home" status pills so they don't rely on color alone. Added premium `:focus-visible` ring styling on keyboard-navigable interactive elements.
+- **Mobile & Touch Optimization**: Increased touch targets (minimum 44x44px tap size) for all scope filter buttons, reminder category filters, calendar month navigation, and calendar day cells. Added interactive backdrop overlay on mobile sidebar so it can be closed by tapping outside.
+- **Async Interaction State**: Prevented double-submit on AJAX actions (Who is Home update/clear and Personal Status save) by adding `disabled` state and spinner animation on buttons during requests.
+- **Dark Mode Completion**: Fixed contrast gaps and hardcoded colors on the initial user selection modal, expense tab menu, and Quick Links management background to blend perfectly in dark data-theme mode.
+- **Micro-Animations & Motion**: Replaced generic `all` transitions with GPU-friendly specific properties for cards and sidebar links. Applied premium hover lift effect (`translateY(-2px)`) on dashboard cards. Respects system reduced-motion preference via `@media (prefers-reduced-motion: reduce)`.
+- **Icon Standardization**: Removed unicode emoji `🧾 ◀ ▶ ✕ ✎` across all layouts and replaced with consistent Font Awesome icons (chevron, trash-can, pen, receipt).
+- **Heading Hierarchy Fixes**: Restructured heading hierarchy (`h2` to `h1`) on Shopping List, Chores, Recipe Book, and Quick Links sub-pages to comply with SEO best practices.
+- **Script & Layout Consolidation**: Cleaned up `<script>` tag placement within `<body>` boundaries and consolidated `.btn` styles into `static/input.css` (removed duplicate inline styles).
 
 ## [v1.0.1] - 2026-06-21
 
 ### Added
-- **Dedicated Recurring Expenses Page**: Pengaturan tagihan berulang dan pengaturan global pengeluaran dipindahkan dari *pop-up modal* ke halaman khusus (`/expenses/recurring`) dengan navigasi *tabs* (Recurring Rules & General Settings) yang lebih luas dan rapi.
-- **Edit Strategy for Recurring Rules**: Tiga opsi strategi aman saat mengedit aturan berulang (*Apply from effective date*, *Split rule*, *Rewrite all*) untuk mencegah terhapusnya riwayat tagihan lama yang sudah dicetak.
-- **Grouped Expense Sidebar**: Pengelompokan tampilan daftar pengeluaran di sidebar kalender `/expenses` berdasarkan tipe (*recurring* dengan badge biru, manual dengan badge abu-abu) dengan *checkbox bulk-delete* pintar per kelompok.
-- **Drag & Drop Quick Links**: Menambahkan fitur pengurutan (Sortable.js) pada menu *Manage Quick Links*. Tautan dan kategori sekarang bisa digeser (drag and drop) dan urutannya akan tersimpan secara persisten ke database (penambahan tabel `quick_link_category` dan kolom `order_index`).
-- **Quick Links (Dashboard Bookmark)**: Fitur baru untuk menyimpan tautan akses cepat (seperti Heimdall/Homarr mini). Mendukung manajemen ikon cerdas (SVG CDN atau Favicon) dengan pengelompokan kategori bergaya kotak (*Grid*) vertikal/horizontal langsung di *dashboard* utama. Dilengkapi sistem *Feature Toggle* (dapat dinonaktifkan di `config.yml`) dan kemampuan CRUD penuh oleh asisten AI lewat aksi `edit_quick_link`, dsb.
-- **Delete Actions untuk AI Router**: AI sekarang bisa menghapus catatan, tugas, dan barang belanjaan lewat aksi `delete_note`, `delete_chore`, dan `delete_shopping_item`.
-- **AI Universal Router Expansion**: Penambahan fungsi asisten AI untuk membaca/memanipulasi `config.yml` (Config API) serta memanipulasi Catatan (*Notes*), Tugas Rumah (*Chores*), dan Daftar Belanja (*Shopping List*) via `POST /api/ai/execute`.
-- **AI Agent Universal Router**: API Endpoint (`/api/ai/execute`) tunggal untuk memungkinkan asisten AI pihak ketiga berinteraksi dengan seluruh *database* dan sistem *HomeHub* secara tersentralisasi.
-- **Auto-Schema AI**: Endpoint (`/api/ai/schema`) yang mengembalikan format JSON OpenAI-compatible agar pengaturan *tool* AI lebih mudah.
-- **Status Lunas/Belum Bayar (Expenses)**: Kolom `is_paid` pada pengeluaran dan penandaan visual (Lunas/Belum Bayar) di *Expense Tracker* dan kalender.
-- **Pengaturan Horizon Tagihan Bulanan**: Tagihan berulang sekarang dicetak secara proaktif sampai akhir bulan saat ini untuk memudahkan perencanaan keuangan.
+- **Dedicated Recurring Expenses Page**: Recurring bill management and global expense settings moved from pop-up modal to a dedicated page (`/expenses/recurring`) with tab navigation (Recurring Rules & General Settings) for a roomier, cleaner layout.
+- **Edit Strategy for Recurring Rules**: Three safe edit strategies when modifying recurring rules (*Apply from effective date*, *Split rule*, *Rewrite all*) to prevent loss of historical bill records.
+- **Grouped Expense Sidebar**: Expense list in the calendar sidebar grouped by type (recurring with blue badge, manual with gray badge) with smart bulk-delete checkboxes per group.
+- **Drag & Drop Quick Links**: Added Sortable.js ordering on the Manage Quick Links page. Links and categories can now be drag-and-drop reordered with persistent storage in the database (added `quick_link_category` table and `order_index` column).
+- **Quick Links (Dashboard Bookmark)**: New feature for storing quick-access bookmarks (like a mini Heimdall/Homarr). Supports intelligent icon management (SVG CDN or Favicon) with vertical/horizontal grid category grouping on the main dashboard. Includes Feature Toggle (can be disabled in `config.yml`) and full CRUD by AI assistant via `edit_quick_link` action, etc.
+- **Delete Actions for AI Router**: AI can now delete notes, chores, and shopping items via `delete_note`, `delete_chore`, and `delete_shopping_item` actions.
+- **AI Universal Router Expansion**: Added AI assistant functions to read/manipulate `config.yml` (Config API) and manipulate Notes, Chores, and Shopping List via `POST /api/ai/execute`.
+- **AI Agent Universal Router**: Single API Endpoint (`/api/ai/execute`) allowing third-party AI assistants to interact with the entire HomeHub database and system centrally.
+- **Auto-Schema AI**: Endpoint (`/api/ai/schema`) returning OpenAI-compatible JSON schema format for easier AI tool configuration.
+- **Paid/Unpaid Status (Expenses)**: `is_paid` column on expenses with visual Paid/Unpaid indicators in Expense Tracker and calendar.
+- **Monthly Bill Horizon**: Recurring bills are now proactively generated through the end of the current month for easier financial planning.
 
 ### Changed
-- **UI/UX Dark Mode Enhancements**: Meningkatkan dukungan tema gelap (*Dark Mode*) untuk halaman *Recurring Expenses* dengan mengubah CSS statis menjadi kelas *utility Tailwind* (seperti `dark:bg-gray-800`).
-- **Bug Fix (Early Payment Tracking)**: Memperbaiki deteksi pelunasan tagihan berulang bulanan di *dashboard* agar tetap mendeteksi pembayaran yang dilakukan sangat awal di bulan yang sama (sebelumnya gagal mendeteksi jika selisih pembayaran lebih dari 20 hari).
-- **API (AI Agent Validations)**: Memperbaiki sejumlah celah validasi pada rute API asisten AI, termasuk memblokir nominal negatif, membatasi input tahun (2000-2100), memastikan tanggal mulai tidak melebihi tanggal akhir pada tagihan berulang, mewajibkan pengisian nama pembayar (*payer*), serta memperbaiki logika konsistensi *hard-delete* untuk aturan berulang.
-- **Bug Fix (Overlap Layout)**: Memperbaiki elemen yang saling tumpang tindih (*overlap*) antara judul pengeluaran yang panjang dan label *badge* pada sidebar dengan menerapkan *flex constraints* (`shrink-0` dan `min-w-0`).
-- **Bug Fix (UnboundLocalError)**: Memperbaiki *Internal Server Error 500* pada dasbor (khususnya *widget* *Reminder*) yang diakibatkan oleh *shadowing variable* `timedelta` lokal pada Python.
-- **Bug Fix (Dashboard Clock)**: Memperbaiki masalah di mana jam berjalan di halaman muka tidak mengindahkan pengaturan format 24 jam (`reminders.time_format`) pada `config.yml`. Jam utama dan kartu sambutan sekarang mendetek format waktu dengan benar serta detiknya terus berdetak tanpa memuat ulang halaman.
-- **Bug Fix (AI Tags Array)**: Memperbaiki masalah di mana pengiriman `tags` berupa *JSON Array* oleh agen AI menyebabkan gagal simpan di SQLite. Input *array* kini dinormalisasi secara otomatis menjadi *comma-separated string* sebelum dimasukkan ke database.
-- Konfigurasi `config.yml` kini mendukung `ai_agent_token` untuk autentikasi API eksternal.
-- Total pengeluaran bulanan di dasbor dan *Expense Tracker* sekarang hanya menghitung pengeluaran yang statusnya sudah "Lunas".
+- **UI/UX Dark Mode Enhancements**: Improved dark mode support for the Recurring Expenses page by converting static CSS to Tailwind utility classes (e.g., `dark:bg-gray-800`).
+- **Bug Fix (Early Payment Tracking)**: Fixed recurring bill payment detection on the dashboard to properly detect early payments within the same month (previously failed if payment was made more than 20 days early).
+- **API (AI Agent Validations)**: Fixed several validation gaps in AI assistant API routes, including blocking negative amounts, limiting year input (2000-2100), ensuring start date does not exceed end date on recurring bills, requiring payer name, and fixing hard-delete consistency logic for recurring rules.
+- **Bug Fix (Overlap Layout)**: Fixed overlapping elements between long expense titles and badge labels in the sidebar by applying flex constraints (`shrink-0` and `min-w-0`).
+- **Bug Fix (UnboundLocalError)**: Fixed Internal Server Error 500 on the dashboard (specifically the Reminder widget) caused by Python `timedelta` local variable shadowing.
+- **Bug Fix (Dashboard Clock)**: Fixed the live clock on the home page not respecting the 24-hour format setting (`reminders.time_format`) in `config.yml`. The main clock and welcome card now detect the time format correctly and tick every second without page reload.
+- **Bug Fix (AI Tags Array)**: Fixed an issue where sending `tags` as a JSON Array from the AI agent caused save failure in SQLite. Array input is now automatically normalized to a comma-separated string before database insertion.
+- `config.yml` now supports `ai_agent_token` for external API authentication.
+- Monthly expense totals on the dashboard and Expense Tracker now only count expenses with "Paid" status.

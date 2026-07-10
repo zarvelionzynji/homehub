@@ -32,7 +32,7 @@
   <!-- Header -->
   <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
     <div class="flex items-center gap-3">
-      <a href="{{ url_for('main.vehicles') }}" class="btn btn-secondary !p-2 !rounded-full" title="Back to Vehicles">
+      <a href="{{ url_for('main.vehicles') }}" class="btn btn-secondary !p-2 !rounded-full" title="{{ _('Back to Vehicles') }}">
         <i class="fas fa-arrow-left"></i>
       </a>
       <div class="flex items-center gap-3">
@@ -54,11 +54,11 @@
     </div>
     <div class="flex gap-2 flex-wrap">
       <button id="edit-vehicle-btn" class="btn btn-secondary">
-        <i class="fas fa-edit mr-1"></i>Edit
+        <i class="fas fa-edit mr-1"></i>{{ _('Edit') }}
       </button>
       <form method="POST" action="{{ url_for('main.delete_vehicle', vid=vehicle.id) }}" class="inline delete-form" data-creator="{{ vehicle.creator }}">
-        <button type="submit" class="btn btn-danger" onclick="return confirm('Delete {{ vehicle.name }}?')">
-          <i class="fas fa-trash mr-1"></i>Delete
+        <button type="submit" class="btn btn-danger" onclick="return confirm('{{ _('Delete %(name)s?', name=vehicle.name) }}')">
+          <i class="fas fa-trash mr-1"></i>{{ _('Delete') }}
         </button>
       </form>
     </div>
@@ -68,10 +68,10 @@
   <div class="card p-4">
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">
-        <i class="fas fa-history mr-2 text-blue-500"></i>Service History
+        <i class="fas fa-history mr-2 text-blue-500"></i>{{ _('Service History') }}
       </h2>
       <button id="add-service-btn" class="btn btn-primary">
-        <i class="fas fa-plus mr-1"></i>Add Service
+        <i class="fas fa-plus mr-1"></i>{{ _('Add Service') }}
       </button>
     </div>
 
@@ -80,13 +80,13 @@
       <table class="w-full text-sm">
         <thead>
           <tr class="border-b border-gray-200 dark:border-gray-700">
-            <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">Date</th>
-            <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">Service</th>
-            <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">Mileage</th>
-            <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">Cost</th>
-            <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">Provider</th>
-            <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">Notes</th>
-            <th class="text-right py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">Actions</th>
+            <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">{{ _('Date') }}</th>
+            <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">{{ _('Service') }}</th>
+            <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">{{ _('Mileage') }}</th>
+            <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">{{ _('Cost') }}</th>
+            <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">{{ _('Provider') }}</th>
+            <th class="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">{{ _('Notes') }}</th>
+            <th class="text-right py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">{{ _('Actions') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -105,7 +105,7 @@
                   <span class="text-gray-400">—</span>
                 {% endif %}
                 {% if rec.attachment_path %}
-                  <a href="{{ url_for('main.vehicle_attachment', filename=rec.attachment_path.replace('uploads/', '')) }}" target="_blank" class="flex-shrink-0 text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300" title="View attachment">
+                  <a href="{{ url_for('main.vehicle_attachment', filename=rec.attachment_path.replace('uploads/', '')) }}" target="_blank" class="flex-shrink-0 text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300" title="{{ _('View attachment') }}">
                     <i class="fas fa-paperclip"></i>
                   </a>
                 {% endif %}
@@ -113,11 +113,11 @@
             </td>
             <td class="py-2.5 px-3">
               <div class="flex items-center justify-end gap-1">
-                <button class="edit-service-btn row-action-btn text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/30" data-id="{{ rec.id }}" data-service-type="{{ rec.service_type_id }}" data-date="{{ rec.date.strftime('%Y-%m-%d') }}" data-mileage="{{ rec.mileage }}" data-cost="{{ rec.cost }}" data-provider="{{ rec.provider or '' }}" data-notes="{{ rec.notes or '' }}" title="Edit">
+                <button class="edit-service-btn row-action-btn text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/30" data-id="{{ rec.id }}" data-service-type="{{ rec.service_type_id }}" data-date="{{ rec.date.strftime('%Y-%m-%d') }}" data-mileage="{{ rec.mileage }}" data-cost="{{ rec.cost }}" data-provider="{{ rec.provider or '' }}" data-notes="{{ rec.notes or '' }}" title="{{ _('Edit') }}">
                   <i class="fas fa-edit"></i>
                 </button>
                 <form method="POST" action="{{ url_for('main.delete_maintenance_record', rid=rec.id) }}" class="inline delete-form" data-creator="{{ rec.creator }}">
-                  <button type="submit" class="row-action-btn text-red-500 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/30" onclick="return confirm('Delete this service record?')" title="Delete">
+                  <button type="submit" class="row-action-btn text-red-500 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/30" onclick="return confirm('{{ _('Delete this service record?') }}')" title="{{ _('Delete') }}">
                     <i class="fas fa-trash"></i>
                   </button>
                 </form>
@@ -131,8 +131,8 @@
     {% else %}
     <div class="text-center py-12 text-gray-400 dark:text-gray-500">
       <i class="fas fa-tools text-4xl mb-3 block"></i>
-      <p class="text-lg font-medium text-gray-600 dark:text-gray-400">No service records yet</p>
-      <p class="text-sm mt-1">Click "Add Service" to log the first maintenance record.</p>
+      <p class="text-lg font-medium text-gray-600 dark:text-gray-400">{{ _('No service records yet') }}</p>
+      <p class="text-sm mt-1">{{ _('Click "Add Service" to log the first maintenance record.') }}</p>
     </div>
     {% endif %}
   </div>
@@ -141,28 +141,28 @@
 <!-- Edit Vehicle Modal -->
 <div id="vehicle-modal" class="modal fixed inset-0 z-50 bg-black/40 backdrop-blur-sm items-center justify-center p-4 hidden">
   <div class="modal-content card w-full max-w-md p-6">
-    <h2 class="text-2xl font-bold mb-4">Edit Vehicle</h2>
+    <h2 class="text-2xl font-bold mb-4">{{ _('Edit Vehicle') }}</h2>
     <form id="vehicle-form" method="POST" action="{{ url_for('main.edit_vehicle', vid=vehicle.id) }}">
       <div class="space-y-3">
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Vehicle Name</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ _('Vehicle Name') }}</label>
           <input type="text" id="vehicle-name" name="name" class="w-full border rounded-lg p-2 bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" value="{{ vehicle.name }}" required>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Type</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ _('Type') }}</label>
           <select id="vehicle-type" name="vehicle_type" class="w-full border rounded-lg p-2 bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" required>
-            <option value="car" {% if vehicle.vehicle_type == 'car' %}selected{% endif %}>Car</option>
-            <option value="motorcycle" {% if vehicle.vehicle_type == 'motorcycle' %}selected{% endif %}>Motorcycle</option>
+            <option value="car" {% if vehicle.vehicle_type == 'car' %}selected{% endif %}>{{ _('Car') }}</option>
+            <option value="motorcycle" {% if vehicle.vehicle_type == 'motorcycle' %}selected{% endif %}>{{ _('Motorcycle') }}</option>
           </select>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">License Plate</label>
-          <input type="text" id="vehicle-plate" name="plate" class="w-full border rounded-lg p-2 bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" value="{{ vehicle.plate or '' }}" placeholder="e.g., ABC-1234">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ _('License Plate') }}</label>
+          <input type="text" id="vehicle-plate" name="plate" class="w-full border rounded-lg p-2 bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" value="{{ vehicle.plate or '' }}" placeholder="{{ _('e.g., ABC-1234') }}">
         </div>
       </div>
       <div class="mt-5 flex justify-end gap-2">
-        <button type="button" id="cancel-vehicle" class="btn btn-secondary">Cancel</button>
-        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <button type="button" id="cancel-vehicle" class="btn btn-secondary">{{ _('Cancel') }}</button>
+        <button type="submit" class="btn btn-primary">{{ _('Save Changes') }}</button>
       </div>
     </form>
   </div>
@@ -171,49 +171,49 @@
 <!-- Add/Edit Service Record Modal -->
 <div id="service-modal" class="modal fixed inset-0 z-50 bg-black/40 backdrop-blur-sm items-center justify-center p-4 hidden">
   <div class="modal-content card w-full max-w-md p-6">
-    <h2 class="text-2xl font-bold mb-4" id="service-modal-title">Add Service Record</h2>
+    <h2 class="text-2xl font-bold mb-4" id="service-modal-title">{{ _('Add Service Record') }}</h2>
     <form id="service-form" method="POST" action="{{ url_for('main.add_maintenance_record', vid=vehicle.id) }}" enctype="multipart/form-data">
       <input type="hidden" name="creator" id="service-creator">
       <div class="space-y-3">
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Service Type</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ _('Service Type') }}</label>
           <select id="service-type" name="service_type_id" class="w-full border rounded-lg p-2 bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" required>
-            <option value="">— Select Service Type —</option>
+            <option value="">— {{ _('Select Service Type') }} —</option>
             {% for st in service_types %}
               <option value="{{ st.id }}">{{ st.name }}</option>
             {% endfor %}
           </select>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ _('Date') }}</label>
           <input type="date" id="service-date" name="date" class="w-full border rounded-lg p-2 bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" required>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Mileage (km)</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ _('Mileage (km)') }}</label>
           <input type="number" id="service-mileage" name="mileage" class="w-full border rounded-lg p-2 bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" step="0.1" placeholder="45000" required>
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cost ({{ config.currency_symbol or 'Rp' }})</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ _('Cost (%(currency)s)', currency=config.currency_symbol or 'Rp') }}</label>
             <input type="number" id="service-cost" name="cost" class="w-full border rounded-lg p-2 bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" step="0.01" placeholder="0" min="0">
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Provider</label>
-            <input type="text" id="service-provider" name="provider" class="w-full border rounded-lg p-2 bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="Auto Shop">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ _('Provider') }}</label>
+            <input type="text" id="service-provider" name="provider" class="w-full border rounded-lg p-2 bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="{{ _('Auto Shop') }}">
           </div>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label>
-          <textarea id="service-notes" name="notes" class="w-full border rounded-lg p-2 bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" rows="2" placeholder="e.g., Replaced air filter, rotated tires"></textarea>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ _('Notes') }}</label>
+          <textarea id="service-notes" name="notes" class="w-full border rounded-lg p-2 bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" rows="2" placeholder="{{ _('e.g., Replaced air filter, rotated tires') }}"></textarea>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Attachment (Receipt/Proof)</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ _('Attachment (Receipt/Proof)') }}</label>
           <input type="file" id="service-attachment" name="attachment" accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:text-gray-400 dark:file:bg-blue-900/50 dark:file:text-blue-200">
         </div>
       </div>
       <div class="mt-5 flex justify-end gap-2">
-        <button type="button" id="cancel-service" class="btn btn-secondary">Cancel</button>
-        <button type="submit" class="btn btn-primary">Save Record</button>
+        <button type="button" id="cancel-service" class="btn btn-secondary">{{ _('Cancel') }}</button>
+        <button type="submit" class="btn btn-primary">{{ _('Save Record') }}</button>
       </div>
     </form>
   </div>
@@ -250,7 +250,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
   // Add service button
   document.getElementById('add-service-btn').addEventListener('click', function(){
-    document.getElementById('service-modal-title').textContent = 'Add Service Record';
+    document.getElementById('service-modal-title').textContent = '{{ _("Add Service Record") }}';
     document.getElementById('service-form').action = '{{ url_for("main.add_maintenance_record", vid=vehicle.id) }}';
     document.getElementById('service-form').method = 'POST';
     document.getElementById('service-type').value = '';
@@ -275,7 +275,7 @@ document.addEventListener('DOMContentLoaded', function(){
       const provider = this.getAttribute('data-provider');
       const notes = this.getAttribute('data-notes');
 
-      document.getElementById('service-modal-title').textContent = 'Edit Service Record';
+      document.getElementById('service-modal-title').textContent = '{{ _("Edit Service Record") }}';
       document.getElementById('service-form').action = '{{ url_for("main.edit_maintenance_record", rid=999) }}'.replace('999', id);
       document.getElementById('service-form').method = 'POST';
       document.getElementById('service-type').value = serviceTypeId;

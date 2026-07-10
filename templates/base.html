@@ -101,35 +101,35 @@
             <div class="p-6 text-2xl font-bold border-b border-white/20 flex items-center justify-between" style="color: var(--sidebar-text-color);">
                 <span class="brand-name">{{ config.instance_name }}</span>
                 <div class="flex items-center gap-2">
-                    <button id="toggleCollapse" class="hidden md:inline-flex text-white/90 hover:text-white focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none rounded" title="Collapse sidebar" aria-label="Collapse">
+                    <button id="toggleCollapse" class="hidden md:inline-flex text-white/90 hover:text-white focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none rounded" title="{{ _('Collapse sidebar') }}" aria-label="Collapse">
                         <i id="collapseIcon" class="fa-solid fa-angles-left"></i>
                     </button>
-                    <button id="closeSidebar" class="md:hidden text-white/90 hover:text-white focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none rounded p-1" aria-label="Close Sidebar"><i class="fa-solid fa-xmark text-xl"></i></button>
+                    <button id="closeSidebar" class="md:hidden text-white/90 hover:text-white focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none rounded p-1" aria-label="{{ _('Close Sidebar') }}"><i class="fa-solid fa-xmark text-xl"></i></button>
                 </div>
             </div>
             <nav class="flex-1 p-4 space-y-1 overflow-y-auto" id="sidebarNav">
-                <button id="customizeNavBtn" class="flex items-center gap-3 py-2 px-4 rounded text-white/70 hover:text-white hover:bg-white/10 w-full text-sm mb-1 transition-colors" title="Customize navbar order">
-                    <i class="fa-solid fa-grip w-5 text-center"></i><span class="nav-label">Reorder</span>
+                <button id="customizeNavBtn" class="flex items-center gap-3 py-2 px-4 rounded text-white/70 hover:text-white hover:bg-white/10 w-full text-sm mb-1 transition-colors" title="{{ _('Reorder') }}">
+                    <i class="fa-solid fa-grip w-5 text-center"></i><span class="nav-label">{{ _('Reorder') }}</span>
                 </button>
-                <button id="saveNavOrderBtn" class="flex items-center gap-3 py-2 px-4 rounded text-green-300 hover:text-green-200 hover:bg-white/10 w-full text-sm mb-1 hidden transition-colors" title="Save order">
-                    <i class="fa-solid fa-check w-5 text-center"></i><span class="nav-label">Done</span>
+                <button id="saveNavOrderBtn" class="flex items-center gap-3 py-2 px-4 rounded text-green-300 hover:text-green-200 hover:bg-white/10 w-full text-sm mb-1 hidden transition-colors" title="{{ _('Done') }}">
+                    <i class="fa-solid fa-check w-5 text-center"></i><span class="nav-label">{{ _('Done') }}</span>
                 </button>
                 <hr class="border-white/10 mb-1" id="navSep">
                 {% set navbar_items = [
-                    {'id': 'welcome', 'url': '/', 'icon': 'fa-house', 'label': 'Welcome', 'toggle': None, 'icon_color': ''},
-                    {'id': 'quick_links', 'url': '/quick-links', 'icon': 'fa-link', 'label': 'Quick Links', 'toggle': 'quick_links', 'icon_color': 'text-blue-400', 'default': True},
-                    {'id': 'notes', 'url': '/notes', 'icon': 'fa-note-sticky', 'label': 'Shared Notes', 'toggle': 'notes', 'icon_color': ''},
-                    {'id': 'shared_cloud', 'url': '/upload', 'icon': 'fa-cloud', 'label': 'Shared Cloud', 'toggle': 'shared_cloud', 'icon_color': ''},
-                    {'id': 'shopping_list', 'url': '/shopping', 'icon': 'fa-cart-shopping', 'label': 'Shopping List', 'toggle': 'shopping_list', 'icon_color': ''},
-                    {'id': 'chores', 'url': '/chores', 'icon': 'fa-list-check', 'label': 'To-Do/Chores', 'toggle': 'chores', 'icon_color': ''},
-                    {'id': 'recipes', 'url': '/recipes', 'icon': 'fa-utensils', 'label': 'Recipe Book', 'toggle': 'recipes', 'icon_color': ''},
-                    {'id': 'expiry_tracker', 'url': '/expiry', 'icon': 'fa-hourglass-half', 'label': 'Expiry Tracker', 'toggle': 'expiry_tracker', 'icon_color': ''},
-                    {'id': 'url_shortener', 'url': '/shorten', 'icon': 'fa-link', 'label': 'URL Shortener', 'toggle': 'url_shortener', 'icon_color': ''},
-                    {'id': 'media_downloader', 'url': '/media', 'icon': 'fa-download', 'label': 'Media Downloader', 'toggle': 'media_downloader', 'icon_color': ''},
-                    {'id': 'pdf_compressor', 'url': '/pdfs', 'icon': 'fa-file-pdf', 'label': 'PDF Compressor', 'toggle': 'pdf_compressor', 'icon_color': ''},
-                    {'id': 'qr_generator', 'url': '/qr', 'icon': 'fa-qrcode', 'label': 'QR Generator', 'toggle': 'qr_generator', 'icon_color': ''},
-                    {'id': 'expense_tracker', 'url': '/expenses', 'icon': 'fa-wallet', 'label': 'Expense Tracker', 'toggle': 'expense_tracker', 'icon_color': '', 'default': True},
-                    {'id': 'vehicles', 'url': '/vehicles', 'icon': 'fa-car', 'label': 'Vehicles', 'toggle': 'vehicles', 'icon_color': ''},
+                    {'id': 'welcome', 'url': '/', 'icon': 'fa-house', 'label': _('Welcome'), 'toggle': None, 'icon_color': ''},
+                    {'id': 'quick_links', 'url': '/quick-links', 'icon': 'fa-link', 'label': _('Quick Links'), 'toggle': 'quick_links', 'icon_color': 'text-blue-400', 'default': True},
+                    {'id': 'notes', 'url': '/notes', 'icon': 'fa-note-sticky', 'label': _('Shared Notes'), 'toggle': 'notes', 'icon_color': ''},
+                    {'id': 'shared_cloud', 'url': '/upload', 'icon': 'fa-cloud', 'label': _('Shared Cloud'), 'toggle': 'shared_cloud', 'icon_color': ''},
+                    {'id': 'shopping_list', 'url': '/shopping', 'icon': 'fa-cart-shopping', 'label': _('Shopping List'), 'toggle': 'shopping_list', 'icon_color': ''},
+                    {'id': 'chores', 'url': '/chores', 'icon': 'fa-list-check', 'label': _('To-Do/Chores'), 'toggle': 'chores', 'icon_color': ''},
+                    {'id': 'recipes', 'url': '/recipes', 'icon': 'fa-utensils', 'label': _('Recipe Book'), 'toggle': 'recipes', 'icon_color': ''},
+                    {'id': 'expiry_tracker', 'url': '/expiry', 'icon': 'fa-hourglass-half', 'label': _('Expiry Tracker'), 'toggle': 'expiry_tracker', 'icon_color': ''},
+                    {'id': 'url_shortener', 'url': '/shorten', 'icon': 'fa-link', 'label': _('URL Shortener'), 'toggle': 'url_shortener', 'icon_color': ''},
+                    {'id': 'media_downloader', 'url': '/media', 'icon': 'fa-download', 'label': _('Media Downloader'), 'toggle': 'media_downloader', 'icon_color': ''},
+                    {'id': 'pdf_compressor', 'url': '/pdfs', 'icon': 'fa-file-pdf', 'label': _('PDF Compressor'), 'toggle': 'pdf_compressor', 'icon_color': ''},
+                    {'id': 'qr_generator', 'url': '/qr', 'icon': 'fa-qrcode', 'label': _('QR Generator'), 'toggle': 'qr_generator', 'icon_color': ''},
+                    {'id': 'expense_tracker', 'url': '/expenses', 'icon': 'fa-wallet', 'label': _('Expense Tracker'), 'toggle': 'expense_tracker', 'icon_color': '', 'default': True},
+                    {'id': 'vehicles', 'url': '/vehicles', 'icon': 'fa-car', 'label': _('Vehicles'), 'toggle': 'vehicles', 'icon_color': ''},
                 ] %}
                 {% for item in navbar_items %}
                     {% set show = false %}
@@ -171,47 +171,59 @@
                 const saveBtn = document.getElementById('saveNavOrderBtn');
                 let sortable = null;
 
-                // Apply saved order from localStorage
+                // Apply saved order: server > localStorage
+                function doReorder(saved) {
+                    const links = nav.querySelectorAll('.sidebar-link[data-nav-id]');
+                    const linkMap = {};
+                    const allIds = [];
+                    links.forEach(el => {
+                        const id = el.getAttribute('data-nav-id');
+                        linkMap[id] = el;
+                        allIds.push(id);
+                    });
+                    if (!saved.length || saved.every(id => !linkMap[id])) {
+                        allIds.forEach(id => {
+                            const el = linkMap[id];
+                            if (el && el.parentNode === nav) nav.appendChild(el);
+                        });
+                        return;
+                    }
+                    const moved = new Set();
+                    saved.forEach(id => {
+                        const el = linkMap[id];
+                        if (el && el.parentNode === nav) {
+                            nav.appendChild(el);
+                            moved.add(id);
+                        }
+                    });
+                    allIds.forEach(id => {
+                        if (!moved.has(id)) {
+                            const el = linkMap[id];
+                            if (el && el.parentNode === nav) nav.appendChild(el);
+                        }
+                    });
+                }
                 function applySavedOrder() {
                     const user = localStorage.getItem('username') || '';
                     if (!user) return;
                     const key = 'navbar_order_' + user;
-                    try {
-                        const saved = JSON.parse(localStorage.getItem(key) || '[]');
-                        // Get all reorderable nav items
-                        const links = nav.querySelectorAll('.sidebar-link[data-nav-id]');
-                        const linkMap = {};
-                        const allIds = [];
-                        links.forEach(el => {
-                            const id = el.getAttribute('data-nav-id');
-                            linkMap[id] = el;
-                            allIds.push(id);
-                        });
-                        if (!saved.length || saved.every(id => !linkMap[id])) {
-                            // No saved order - restore default (append everything to reset)
-                            allIds.forEach(id => {
-                                const el = linkMap[id];
-                                if (el && el.parentNode === nav) nav.appendChild(el);
-                            });
-                            return;
-                        }
-                        // Order: saved items first, then unknown items appended
-                        const moved = new Set();
-                        saved.forEach(id => {
-                            const el = linkMap[id];
-                            if (el && el.parentNode === nav) {
-                                nav.appendChild(el);
-                                moved.add(id);
-                            }
-                        });
-                        // Append any items not in saved order
-                        allIds.forEach(id => {
-                            if (!moved.has(id)) {
-                                const el = linkMap[id];
-                                if (el && el.parentNode === nav) nav.appendChild(el);
-                            }
-                        });
-                    } catch(e) {}
+                    // Try localStorage first (fast)
+                    var saved = [];
+                    try { saved = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) {}
+                    // Fallback: fetch from server if nothing in localStorage
+                    if (!saved.length) {
+                        fetch('/settings/navbar-order/' + encodeURIComponent(user))
+                            .then(r => r.json())
+                            .then(data => {
+                                if (data.ok && data.order && data.order.length) {
+                                    localStorage.setItem(key, JSON.stringify(data.order));
+                                    doReorder(data.order);
+                                }
+                            })
+                            .catch(() => {});
+                        return;
+                    }
+                    doReorder(saved);
                 }
                 applySavedOrder();
                 document.addEventListener('user-switched', applySavedOrder);
@@ -265,20 +277,24 @@
             </script>
         </aside>
         <!-- Main Content -->
-        <main class="main-content flex-1 p-4 md:p-8 overflow-y-auto md:ml-0 ml-0">
+        <main class="main-content flex-1 p-2 md:p-8 overflow-y-auto md:ml-0 ml-0">
             <div class="max-w-screen-2xl mx-auto w-full">
-                <div class="sticky top-0 z-20 mb-4 bg-[var(--background-color)] py-3 border-b border-gray-200/10 dark:border-gray-800/10 backdrop-blur-md bg-opacity-95">
-                    <div class="flex items-center flex-wrap gap-2">
-                        <button id="openSidebar" class="md:hidden bg-blue-600 text-white px-3 py-2 rounded flex items-center gap-2 hover:bg-blue-700 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"><i class="fa-solid fa-bars"></i> Menu</button>
+                <div class="sticky top-0 z-20 mb-2 md:mb-4 bg-[var(--background-color)] py-2 md:py-3 border-b border-gray-200/10 dark:border-gray-800/10 backdrop-blur-md bg-opacity-95">
+                    <div class="flex items-center flex-wrap gap-1 md:gap-2">
+                        <button id="openSidebar" class="md:hidden bg-blue-600 text-white px-2 py-1.5 rounded flex items-center gap-1 text-sm hover:bg-blue-700 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"><i class="fa-solid fa-bars"></i> {{ _('Menu') }}</button>
                         {% if not (hide_user_ui | default(false)) %}
-                        <div class="ml-auto flex items-center gap-3 flex-wrap justify-end">
-                            <div id="welcome" class="text-sm text-gray-600 dark:text-slate-300 truncate max-w-[50vw]"></div>
-                            <div class="flex items-center">
-                                <label for="userSwitcher" class="text-sm text-gray-600 dark:text-slate-300 mr-2">User:</label>
-                                <select id="userSwitcher" class="border rounded p-1 text-sm bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"></select>
+                        <div class="ml-auto flex items-center gap-0.5 md:gap-3 flex-nowrap min-w-0">
+                            <div class="flex items-center gap-0.5 md:gap-1 shrink-0">
+                                {% for code, name in languages.items() %}
+                                <a href="/lang/{{ code }}" class="px-1.5 md:px-2 py-1 rounded text-[10px] md:text-xs font-medium {% if current_lang == code %}bg-blue-600 text-white{% else %}bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700{% endif %} transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">{{ code|upper }}</a>
+                                {% endfor %}
+                            </div>
+                            <div id="welcome" class="text-[10px] md:text-sm text-gray-600 dark:text-slate-300 truncate min-w-0 mx-1"></div>
+                            <div class="flex items-center shrink-0">
+                                <select id="userSwitcher" class="border rounded p-0.5 text-[10px] md:text-sm bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none max-w-[64px] md:max-w-none"></select>
                             </div>
                             {% if is_authed %}
-                            <a href="/logout" class="px-2 py-1 rounded bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+                            <a href="/logout" class="px-1.5 md:px-2 py-1 rounded bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors flex items-center gap-1 text-xs md:text-sm shrink-0 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"><i class="fa-solid fa-right-from-bracket"></i><span class="hidden md:inline"> {{ _('Logout') }}</span></a>
                             {% endif %}
                         </div>
                         {% endif %}
@@ -437,7 +453,7 @@
                 year: 'numeric', month: 'numeric', day: 'numeric', 
                 hour: '2-digit', minute: '2-digit', second: '2-digit' 
             });
-            document.getElementById('welcome').textContent = name ? `Welcome, ${name}! — ${ds}` : ds;
+            document.getElementById('welcome').textContent = name ? '{{ _('Welcome') }}, ' + name + '! — ' + ds : ds;
         }
         function applyUserContext(){
             const current = localStorage.getItem('username') || '';
@@ -470,14 +486,14 @@
     <!-- First-visit user selection modal -->
     <div id="userSelectModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 backdrop-blur-sm">
         <div class="bg-[var(--card-background-color)] border border-gray-200/20 w-full max-w-sm p-6 rounded-lg shadow-xl text-[var(--text-color)]">
-            <h3 class="text-lg font-bold mb-2">Select your user</h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Pick your name to personalize your HomeHub experience.</p>
+            <h3 class="text-lg font-bold mb-2">{{ _('Select your user') }}</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">{{ _('Pick your name to personalize your HomeHub experience.') }}</p>
             <div class="mb-4">
-                <label class="block text-sm font-medium mb-1" for="userSelectInput">User</label>
+                <label class="block text-sm font-medium mb-1" for="userSelectInput">{{ _('User') }}</label>
                 <select id="userSelectInput" class="w-full border rounded-lg p-2 bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"></select>
             </div>
             <div class="flex justify-end">
-                <button id="userSelectConfirm" class="btn btn-primary px-4 py-2 rounded-lg text-sm font-semibold">Continue</button>
+                <button id="userSelectConfirm" class="btn btn-primary px-4 py-2 rounded-lg text-sm font-semibold">{{ _('Continue') }}</button>
             </div>
         </div>
     </div>

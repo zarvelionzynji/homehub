@@ -2,6 +2,7 @@ import os, re, shutil, subprocess
 from threading import Thread
 from flask import render_template, request, redirect, url_for, send_from_directory, jsonify, current_app, flash, abort
 from datetime import datetime
+from ..i18n import _
 from ..models import db, Media, PDF
 from ..blueprints import main_bp
 from ..security import sanitize_text, is_url_safe_for_fetch
@@ -109,13 +110,13 @@ def media():
                         shared_url = extracted
                     break
         if not shared_url and (url_param or text_param):
-            flash('No valid URL found in share intent.', 'error')
+            flash(_('No valid URL found in share intent.'), 'error')
 
     if request.method == 'POST':
         url = sanitize_text(request.form['url'])
         creator = sanitize_text(request.form['creator'])
         if not is_url_safe_for_fetch(url):
-            flash('Invalid or disallowed URL. Only external http(s) URLs are allowed.', 'error')
+            flash(_('Invalid or disallowed URL. Only external http(s) URLs are allowed.'), 'error')
             return redirect(url_for('main.media'))
         fmt = sanitize_text(request.form.get('format', 'mp4'))
         quality = sanitize_text(request.form.get('quality', 'best'))
@@ -124,7 +125,7 @@ def media():
         media_obj = Media(title=url, url=url, creator=creator, filepath='', status='pending', download_format=fmt, download_quality=quality)
         db.session.add(media_obj)
         db.session.commit()
-        flash('Download queued. You can switch tabs; refresh to check status.', 'info')
+        flash(_('Download queued. You can switch tabs; refresh to check status.'), 'info')
         cmd = _build_ytdlp_cmd(url, fmt, quality, output_tmpl)
 
         app_obj = current_app._get_current_object()
@@ -224,12 +225,12 @@ def pdfs():
             return redirect(url_for('main.pdfs'))
         # Only allow .pdf uploads
         if not filename.lower().endswith('.pdf'):
-            flash('Only PDF files are allowed.', 'error')
+            flash(_('Only PDF files are allowed.'), 'error')
             return redirect(url_for('main.pdfs'))
         # Normalize and secure the user-provided filename to avoid traversal or odd chars
         safe_name = secure_filename(os.path.basename(filename))
         if not safe_name:
-            flash('Invalid filename.', 'error')
+            flash(_('Invalid filename.'), 'error')
             return redirect(url_for('main.pdfs'))
         input_path = os.path.join(PDF_FOLDER, safe_name)
         pdf_file.save(input_path)

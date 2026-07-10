@@ -1,49 +1,49 @@
 {% extends "base.html" %}
 
-{% block title %}Quick Links - HomeHub{% endblock %}
+{% block title %}{{ _('Quick Links') }} - HomeHub{% endblock %}
 
 {% block content %}
 <div class="max-w-screen-2xl mx-auto space-y-6">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
-            <i class="fa-solid fa-link text-blue-500"></i> Quick Links
+            <i class="fa-solid fa-link text-blue-500"></i> {{ _('Quick Links') }}
         </h1>
     </div>
 
     <!-- Add Link Form -->
     <div class="card p-4 sm:p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
-        <h3 class="text-lg font-semibold mb-4 text-gray-700 dark:text-gray-300">Add New Link</h3>
+        <h3 class="text-lg font-semibold mb-4 text-gray-700 dark:text-gray-300">{{ _('Add New Link') }}</h3>
         <form action="{{ url_for('quick_links.manage_links') }}" method="POST" class="space-y-4">
             <input type="hidden" name="action" value="add">
             
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label for="inputTitle" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Title *</label>
-                    <input id="inputTitle" type="text" name="title" required placeholder="e.g. Proxmox" class="w-full px-3 py-2 rounded-lg bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none border">
+                    <label for="inputTitle" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ _('Title') }} *</label>
+                    <input id="inputTitle" type="text" name="title" required placeholder="{{ _('e.g. Proxmox') }}" class="w-full px-3 py-2 rounded-lg bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none border">
                 </div>
                 <div>
-                    <label for="inputUrl" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">URL *</label>
+                    <label for="inputUrl" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ _('URL') }} *</label>
                     <input id="inputUrl" type="text" name="url" required placeholder="192.168.1.100:8006" class="w-full px-3 py-2 rounded-lg bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none border">
                 </div>
                 <div>
-                    <label for="inputCategory" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category / Group</label>
-                    <input id="inputCategory" type="text" name="category" value="General" placeholder="e.g. Media, Homelab" class="w-full px-3 py-2 rounded-lg bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none border">
+                    <label for="inputCategory" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ _('Category / Group') }}</label>
+                    <input id="inputCategory" type="text" name="category" value="General" placeholder="{{ _('e.g. Media, Homelab') }}" class="w-full px-3 py-2 rounded-lg bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none border">
                 </div>
                 <div>
-                    <label for="inputIcon" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Icon Keyword (Optional)</label>
-                    <input id="inputIcon" type="text" name="icon_keyword" placeholder="e.g. netflix, github" class="w-full px-3 py-2 rounded-lg bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none border">
-                    <p class="text-[10px] text-gray-500 mt-1">Slug from <a href="https://simpleicons.org/" target="_blank" class="text-blue-500 hover:underline">simpleicons.org</a>. Leave blank to auto-fetch favicon.</p>
+                    <label for="inputIcon" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ _('Icon Keyword (Optional)') }}</label>
+                    <input id="inputIcon" type="text" name="icon_keyword" placeholder="{{ _('e.g. netflix, github') }}" class="w-full px-3 py-2 rounded-lg bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none border">
+                    <p class="text-[10px] text-gray-500 mt-1">{{ _('Slug from') }} <a href="https://simpleicons.org/" target="_blank" class="text-blue-500 hover:underline">simpleicons.org</a>. {{ _('Leave blank to auto-fetch favicon.') }}</p>
                 </div>
             </div>
 
             <div class="flex items-center gap-2 mt-2">
                 <input type="checkbox" name="show_on_dashboard" id="showDashboard" checked class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                <label for="showDashboard" class="text-sm text-gray-700 dark:text-gray-300 cursor-pointer">Show on Dashboard</label>
+                <label for="showDashboard" class="text-sm text-gray-700 dark:text-gray-300 cursor-pointer">{{ _('Show on Dashboard') }}</label>
             </div>
 
             <div class="pt-2">
                 <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition-colors shadow-sm text-sm">
-                    <i class="fa-solid fa-plus mr-1"></i> Add Link
+                    <i class="fa-solid fa-plus mr-1"></i> {{ _('Add Link') }}
                 </button>
             </div>
         </form>
@@ -51,7 +51,7 @@
 
     <!-- List Links -->
     <div class="card p-4 sm:p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
-        <h3 class="text-lg font-semibold mb-4 text-gray-700 dark:text-gray-300">Manage Links</h3>
+        <h3 class="text-lg font-semibold mb-4 text-gray-700 dark:text-gray-300">{{ _('Manage Links') }}</h3>
         {% if grouped_links %}
         <div id="categoriesContainer" class="space-y-4">
             {% for category, items in grouped_links.items() %}
@@ -61,7 +61,7 @@
                         <i class="fa-solid fa-grip-vertical text-gray-400"></i>
                         {{ category }}
                     </h4>
-                    <span class="text-xs bg-white dark:bg-gray-600 px-2 py-1 rounded text-gray-500 dark:text-gray-300 border border-gray-200 dark:border-gray-500">{{ items|length }} links</span>
+                    <span class="text-xs bg-white dark:bg-gray-600 px-2 py-1 rounded text-gray-500 dark:text-gray-300 border border-gray-200 dark:border-gray-500">{{ items|length }} {{ _('links') }}</span>
                 </div>
                 <div class="links-container p-2 space-y-2 min-h-[50px]">
                     {% for link in items %}
@@ -84,7 +84,7 @@
                             <form action="{{ url_for('quick_links.manage_links') }}" method="POST" class="inline">
                                 <input type="hidden" name="action" value="toggle_dashboard">
                                 <input type="hidden" name="link_id" value="{{ link.id }}">
-                                <button type="submit" class="cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-400 rounded p-1" aria-label="Toggle dashboard visibility for {{ link.title }}" title="Toggle Dashboard Visibility">
+                                <button type="submit" class="cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-400 rounded p-1" aria-label="{{ _('Toggle dashboard visibility for %(title)s', title=link.title) }}" title="{{ _('Toggle Dashboard Visibility') }}">
                                     {% if link.show_on_dashboard %}
                                     <i class="fa-solid fa-eye text-green-500 hover:text-green-600 text-lg" aria-hidden="true"></i>
                                     {% else %}
@@ -92,13 +92,14 @@
                                     {% endif %}
                                 </button>
                             </form>
-                            <button onclick="openEditModal('{{ link.id }}', '{{ link.title|escape }}', '{{ link.url|escape }}', '{{ link.category|escape }}', '{{ link.icon_keyword|escape }}')" class="cursor-pointer text-blue-500 hover:text-blue-700 p-2 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-400 rounded" aria-label="Edit {{ link.title }}" title="Edit">
+                            <button onclick="openEditModal('{{ link.id }}', '{{ link.title|escape }}', '{{ link.url|escape }}', '{{ link.category|escape }}', '{{ link.icon_keyword|escape }}')" class="cursor-pointer text-blue-500 hover:text-blue-700 p-2 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-400 rounded" aria-label="{{ _('Edit %(title)s', title=link.title) }}" title="{{ _('Edit') }}">
                                 <i class="fa-solid fa-pen" aria-hidden="true"></i>
                             </button>
-                            <form action="{{ url_for('quick_links.manage_links') }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this link?');">
+                            {% set del_confirm = _('Are you sure you want to delete this link?') %}
+                            <form action="{{ url_for('quick_links.manage_links') }}" method="POST" class="inline" onsubmit="return confirm('{{ del_confirm|e }}');">
                                 <input type="hidden" name="action" value="delete">
                                 <input type="hidden" name="link_id" value="{{ link.id }}">
-                                <button type="submit" class="cursor-pointer text-red-500 hover:text-red-700 p-2 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-red-400 rounded" aria-label="Delete {{ link.title }}" title="Delete">
+                                <button type="submit" class="cursor-pointer text-red-500 hover:text-red-700 p-2 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-red-400 rounded" aria-label="{{ _('Delete %(title)s', title=link.title) }}" title="{{ _('Delete') }}">
                                     <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
                                 </button>
                             </form>
@@ -112,7 +113,7 @@
         {% else %}
         <div class="text-center py-8 text-gray-500">
             <i class="fa-solid fa-link text-4xl mb-3 text-gray-300"></i>
-            <p>No quick links added yet. Start by adding one above!</p>
+            <p>{{ _('No quick links added yet. Start by adding one above!') }}</p>
         </div>
         {% endif %}
     </div>
@@ -122,8 +123,8 @@
 <div id="editLinkModal" class="fixed inset-0 z-50 bg-black/50 items-center justify-center p-4 backdrop-blur-sm hidden">
     <div class="bg-[var(--card-background-color)] text-[var(--text-color)] border border-gray-200/20 rounded-lg shadow-xl w-full max-w-md overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200/10 flex justify-between items-center bg-[var(--secondary-bg)]">
-            <h3 class="text-lg font-semibold">Edit Quick Link</h3>
-            <button onclick="closeEditModal()" class="cursor-pointer text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400 rounded" aria-label="Close edit modal">
+            <h3 class="text-lg font-semibold">{{ _('Edit Quick Link') }}</h3>
+            <button onclick="closeEditModal()" class="cursor-pointer text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400 rounded" aria-label="{{ _('Close edit modal') }}">
                 <i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
             </button>
         </div>
@@ -132,24 +133,24 @@
             <input type="hidden" name="link_id" id="editLinkId">
             
             <div>
-                <label for="editLinkTitle" class="block text-sm font-medium mb-1">Title *</label>
+                <label for="editLinkTitle" class="block text-sm font-medium mb-1">{{ _('Title') }} *</label>
                 <input type="text" name="title" id="editLinkTitle" required class="w-full px-3 py-2 border rounded bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
             <div>
-                <label for="editLinkUrl" class="block text-sm font-medium mb-1">URL *</label>
+                <label for="editLinkUrl" class="block text-sm font-medium mb-1">{{ _('URL') }} *</label>
                 <input type="text" name="url" id="editLinkUrl" required class="w-full px-3 py-2 border rounded bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
             <div>
-                <label for="editLinkCategory" class="block text-sm font-medium mb-1">Category / Group</label>
+                <label for="editLinkCategory" class="block text-sm font-medium mb-1">{{ _('Category / Group') }}</label>
                 <input type="text" name="category" id="editLinkCategory" class="w-full px-3 py-2 border rounded bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
             <div>
-                <label for="editLinkIcon" class="block text-sm font-medium mb-1">Icon Keyword</label>
+                <label for="editLinkIcon" class="block text-sm font-medium mb-1">{{ _('Icon Keyword') }}</label>
                 <input type="text" name="icon_keyword" id="editLinkIcon" class="w-full px-3 py-2 border rounded bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
             <div class="pt-4 flex justify-end gap-2">
-                <button type="button" onclick="closeEditModal()" class="btn btn-secondary px-4 py-2">Cancel</button>
-                <button type="submit" class="btn btn-primary px-4 py-2">Save Changes</button>
+                <button type="button" onclick="closeEditModal()" class="btn btn-secondary px-4 py-2">{{ _('Cancel') }}</button>
+                <button type="submit" class="btn btn-primary px-4 py-2">{{ _('Save Changes') }}</button>
             </div>
         </form>
     </div>
@@ -199,7 +200,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({categories: categories})
                 }).then(r => r.json()).then(data => {
-                    if(data.success) showToast('Category order saved!');
+                    if(data.success) showToast('{{ _("Category order saved!") }}');
                 });
             }
         });
@@ -224,7 +225,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     body: JSON.stringify({link_ids: linkIds, category: newCategory})
                 }).then(r => r.json()).then(data => {
                     if(data.success) {
-                        showToast('Link order saved!');
+                        showToast('{{ _("Link order saved!") }}');
                         // If cross-category, we might need to reload or just update UI visually
                         // We also need to update the source container's order if it moved out, but saving the target container is usually enough since it updates the order of the new items. Wait, the remaining items in source container will still retain their relative order indices, which is fine!
                     }

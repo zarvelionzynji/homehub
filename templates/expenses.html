@@ -47,33 +47,33 @@
 <script id="expensesData" type="application/json">{{ expenses_json | safe }}</script>
 
 <div class="max-w-screen-2xl mx-auto space-y-6">
-  <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">Expense Tracker</h1>
+  <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">{{ _('Expense Tracker') }}</h1>
 
   <!-- Summary Cards -->
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="summary-cards">
     <div class="card p-4 flex items-center">
       <div class="bg-blue-100 text-blue-600 p-3 rounded-full"><i class="fas fa-wallet"></i></div>
       <div class="ml-4">
-        <p class="text-gray-500 text-sm">Total This Month</p>
+        <p class="text-gray-500 text-sm">{{ _('Total This Month') }}</p>
         <p class="text-2xl font-bold text-gray-800" id="total-this-month">₹0.00</p>
       </div>
     </div>
     <div class="card p-4 flex items-center">
       <div class="bg-green-100 text-green-600 p-3 rounded-full"><i class="fas fa-user-circle"></i></div>
       <div class="ml-4">
-        <p class="text-gray-500 text-sm">My Spending</p>
+        <p class="text-gray-500 text-sm">{{ _('My Spending') }}</p>
         <p class="text-2xl font-bold text-gray-800" id="my-spending">₹0.00</p>
       </div>
     </div>
     <div class="card p-4 flex items-center">
       <div class="bg-purple-100 text-purple-600 p-3 rounded-full"><i class="fas fa-chart-pie"></i></div>
       <div class="ml-4">
-        <p class="text-gray-500 text-sm">Top Category</p>
+        <p class="text-gray-500 text-sm">{{ _('Top Category') }}</p>
         <p class="text-2xl font-bold text-gray-800" id="top-category">-</p>
       </div>
     </div>
     <div class="card p-4 flex items-center justify-center">
-      <a href="/expenses/recurring" class="w-full h-full btn flex items-center justify-center"><i class="fas fa-cog mr-2"></i>Recurring rules & config</a>
+      <a href="/expenses/recurring" class="w-full h-full btn flex items-center justify-center"><i class="fas fa-cog mr-2"></i>{{ _('Recurring Rules') }} &amp; {{ _('Settings') }}</a>
     </div>
   </div>
 
@@ -82,12 +82,12 @@
     <!-- Calendar -->
   <div class="lg:col-span-5 card p-4 relative z-0">
       <div class="flex items-center justify-between mb-3">
-        <button id="prev-month" class="p-2.5 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 text-[var(--text-color)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" title="Prev"><i class="fas fa-chevron-left"></i></button>
+        <button id="prev-month" class="p-2.5 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 text-[var(--text-color)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" title="{{ _('Prev') }}"><i class="fas fa-chevron-left"></i></button>
         <h2 class="text-xl font-bold" id="calendar-header"></h2>
-        <button id="next-month" class="p-2.5 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 text-[var(--text-color)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" title="Next"><i class="fas fa-chevron-right"></i></button>
+        <button id="next-month" class="p-2.5 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 text-[var(--text-color)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" title="{{ _('Next') }}"><i class="fas fa-chevron-right"></i></button>
       </div>
     <div class="grid grid-cols-7 gap-1 text-center text-xs text-gray-500 mb-1">
-        <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+        <div>{{ _('Sun') }}</div><div>{{ _('Mon') }}</div><div>{{ _('Tue') }}</div><div>{{ _('Wed') }}</div><div>{{ _('Thu') }}</div><div>{{ _('Fri') }}</div><div>{{ _('Sat') }}</div>
       </div>
       <div id="calendar-grid" class="grid grid-cols-7 gap-1 pb-4"></div>
     </div>
@@ -100,8 +100,8 @@
     <!-- Monthly Summary Sidebar -->
     <div class="lg:col-span-4 card p-4 monthly-summary-container relative z-0">
       <div class="flex-shrink-0 flex items-center justify-between mb-3">
-        <h3 class="text-lg font-bold">Entries This Month</h3>
-        <label id="select-all-label" class="text-sm flex items-center gap-2" style="display: none;"><input type="checkbox" id="select-all-month" class="rounded"> Select all</label>
+        <h3 class="text-lg font-bold">{{ _('Entries This Month') }}</h3>
+        <label id="select-all-label" class="text-sm flex items-center gap-2" style="display: none;"><input type="checkbox" id="select-all-month" class="rounded">{{ _(' Select all') }}</label>
       </div>
       <form id="bulk-delete-form" method="POST" action="/expenses/bulk-delete" class="flex-grow overflow-y-auto pr-2 no-scrollbar" style="max-height:480px">
         <input type="hidden" name="user" id="bulk-user">
@@ -109,10 +109,10 @@
       </form>
       <div id="monthly-total-footer" class="flex-shrink-0 border-t pt-3 mt-3 flex justify-between items-center">
         <div class="flex items-center gap-3">
-          <button id="bulk-delete-btn" class="btn btn-danger" style="display: none;">Delete Selected</button>
+          <button id="bulk-delete-btn" class="btn btn-danger" style="display: none;">{{ _('Delete Selected') }}</button>
         </div>
         <div class="flex items-center gap-2">
-          <span class="font-semibold">Month Total:</span>
+          <span class="font-semibold">{{ _('Month Total:') }}</span>
           <span id="monthly-total-amount" class="text-lg font-bold">₹0.00</span>
         </div>
       </div>
@@ -125,56 +125,56 @@
 <!-- Add/Edit Expense Modal -->
 <div id="expense-modal" class="modal fixed inset-0 z-50 bg-black/40 backdrop-blur-sm items-center justify-center p-4 hidden">
   <div class="modal-content card w-full max-w-md p-6">
-    <h2 class="text-2xl font-bold mb-4" id="modal-title">Add Expense</h2>
+    <h2 class="text-2xl font-bold mb-4" id="modal-title">{{ _('Add Expense') }}</h2>
     <form id="expense-form" method="POST" action="/expenses" enctype="multipart/form-data">
       <input type="hidden" name="form_type" value="single">
       <input type="hidden" name="user" id="expense-user">
       <div class="space-y-3">
         <div>
-          <label class="text-sm text-gray-600 dark:text-gray-300">Date</label>
+          <label class="text-sm text-gray-600 dark:text-gray-300">{{ _('Date') }}</label>
           <input type="date" id="expense-date" name="date" class="mt-1 block w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded p-2 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" required>
         </div>
         <div>
-          <label class="text-sm text-gray-600 dark:text-gray-300">Title</label>
+          <label class="text-sm text-gray-600 dark:text-gray-300">{{ _('Title') }}</label>
           <input type="text" id="expense-title" name="title" class="mt-1 block w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded p-2 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" required>
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="text-sm text-gray-600 dark:text-gray-300">Category</label>
-            <input type="text" id="expense-category" name="category" class="mt-1 block w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded p-2 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="e.g., Groceries">
+            <label class="text-sm text-gray-600 dark:text-gray-300">{{ _('Category') }}</label>
+            <input type="text" id="expense-category" name="category" class="mt-1 block w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded p-2 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="{{ _('e.g., Groceries') }}">
             <div id="modal-category-chips" class="mt-2 flex flex-wrap gap-2"></div>
           </div>
           <div>
-            <label class="text-sm text-gray-600 dark:text-gray-300">Quantity</label>
+            <label class="text-sm text-gray-600 dark:text-gray-300">{{ _('Quantity') }}</label>
             <input type="number" step="0.01" id="expense-quantity" name="quantity" class="mt-1 block w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded p-2 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="optional">
           </div>
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="text-sm text-gray-600 dark:text-gray-300">Unit Price</label>
+            <label class="text-sm text-gray-600 dark:text-gray-300">{{ _('Unit Price') }}</label>
             <input type="number" step="0.01" id="expense-unit-price" name="unit_price" class="mt-1 block w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded p-2 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" placeholder="optional">
           </div>
           <div>
-            <label class="text-sm text-gray-600 dark:text-gray-300">Total Amount</label>
+            <label class="text-sm text-gray-600 dark:text-gray-300">{{ _('Total Amount') }}</label>
             <input type="number" step="0.01" id="expense-amount" name="amount" class="mt-1 block w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded p-2 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" required>
           </div>
         </div>
         <div>
-          <label class="text-sm text-gray-600 dark:text-gray-300">Payer</label>
+          <label class="text-sm text-gray-600 dark:text-gray-300">{{ _('Payer') }}</label>
           <input type="text" id="expense-payer" name="payer" class="mt-1 block w-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--input-text)] rounded p-2 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" required>
         </div>
         <div class="flex items-center gap-2 mt-2">
           <input type="checkbox" id="expense-is-paid" name="is_paid" class="w-4 h-4 text-blue-600 rounded focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">
-          <label for="expense-is-paid" class="text-sm font-medium text-gray-700 dark:text-gray-300">Lunas / Sudah Dibayar</label>
+          <label for="expense-is-paid" class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ _('Lunas / Sudah Dibayar') }}</label>
         </div>
         <div>
-          <label class="text-sm text-gray-600 dark:text-gray-300">Attachment (Receipt/Proof)</label>
+          <label class="text-sm text-gray-600 dark:text-gray-300">{{ _('Attachment (Receipt/Proof)') }}</label>
           <input type="file" id="expense-attachment" name="attachment" accept="image/*" class="mt-1 block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 focus-visible:outline-none">
         </div>
       </div>
       <div class="mt-5 flex justify-end gap-2">
-        <button type="button" id="cancel-expense" class="btn btn-secondary">Cancel</button>
-        <button type="submit" class="btn btn-primary">Save Expense</button>
+        <button type="button" id="cancel-expense" class="btn btn-secondary">{{ _('Cancel') }}</button>
+        <button type="submit" class="btn btn-primary">{{ _('Save Expense') }}</button>
       </div>
     </form>
   </div>
@@ -187,8 +187,8 @@
   <button
     type="button"
     id="close-attachment"
-    aria-label="Close"
-    title="Close"
+    aria-label="{{ _('Close') }}"
+    title="{{ _('Close') }}"
     style="position:fixed; top:16px; right:16px; z-index:1000; width:44px; height:44px; border-radius:50%; background:rgba(255,255,255,0.2); border:2px solid rgba(255,255,255,0.7); color:#fff; font-size:24px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);">
     &times;
   </button>
@@ -292,7 +292,7 @@ document.addEventListener('DOMContentLoaded', function(){
         <button class="${cls}" data-date="${ds}">
           <div class="font-semibold">${day}</div>
           ${data && data.total ? `<div class="text-xs mt-1 ${isSelected? 'text-white' : 'text-gray-600'}">${fmt(data.total)}</div>` : ''}
-          ${unpaid ? `<div class="text-[10px] mt-0.5 ${isSelected? 'text-red-200' : 'text-red-500'} flex items-center" title="Belum Dibayar"><i class="fa-solid fa-clock mr-1"></i>${fmt(unpaid)}</div>` : ''}
+          ${unpaid ? `<div class="text-[10px] mt-0.5 ${isSelected? 'text-red-200' : 'text-red-500'} flex items-center" title="{{ _('Belum Dibayar') }}"><i class="fa-solid fa-clock mr-1"></i>${fmt(unpaid)}</div>` : ''}
         </button>
       `);
     }
@@ -306,7 +306,7 @@ document.addEventListener('DOMContentLoaded', function(){
       (byDate[ds]?.entries||[]).filter(e=>e&&e.id).forEach(e=>allEntries.push({...e, date:ds}));
     });
     if(allEntries.length===0){
-      monthlyList.innerHTML = '<div class="text-gray-500 p-2 text-sm">No entries this month.</div>';
+      monthlyList.innerHTML = '<div class="text-gray-500 p-2 text-sm">{{ _('No entries this month.') }}</div>';
       bulkBtn.style.display = 'none';
       if (selectAllLabel) selectAllLabel.style.display = 'none';
       return;
@@ -369,13 +369,13 @@ document.addEventListener('DOMContentLoaded', function(){
         // Extract attachment/is_paid info
         const firstEntry = run.entries[0];
         const statusHtml = typeof firstEntry.is_paid !== 'undefined' 
-            ? (firstEntry.is_paid ? '<span class="ml-1 text-green-600 shrink-0" title="Paid"><i class="fa-solid fa-check-circle"></i></span>' : '<span class="ml-1 text-red-500 shrink-0" title="Unpaid"><i class="fa-solid fa-clock"></i></span>')
+            ? (firstEntry.is_paid ? '<span class="ml-1 text-green-600 shrink-0" title="{{ _('Paid') }}"><i class="fa-solid fa-check-circle"></i></span>' : '<span class="ml-1 text-red-500 shrink-0" title="{{ _('Unpaid') }}"><i class="fa-solid fa-clock"></i></span>')
             : '';
         const attachmentHtml = firstEntry.attachment_path ? `<button type="button" class="ml-1 text-blue-600 hover:text-blue-800 focus:outline-none shrink-0" onclick="event.stopPropagation(); showAttachment('/${firstEntry.attachment_path}')"><i class="fa-solid fa-paperclip"></i></button>` : '';
 
         return `
-          <div class="run-row flex items-center gap-2 px-3 py-2.5 border-b last:border-b-0 hover:bg-gray-100 dark:hover:bg-slate-700 cursor-pointer" data-date="${run.startDate}" title="Click to view on calendar">
-            <input type="checkbox" class="run-check rounded shrink-0 cursor-pointer" title="Select all entries in this period">
+          <div class="run-row flex items-center gap-2 px-3 py-2.5 border-b last:border-b-0 hover:bg-gray-100 dark:hover:bg-slate-700 cursor-pointer" data-date="${run.startDate}" title="{{ _('Click to view on calendar') }}">
+            <input type="checkbox" class="run-check rounded shrink-0 cursor-pointer" title="{{ _('Select all entries in this period') }}">
             <div class="flex-1 min-w-0">
               <span class="text-sm font-medium flex items-center">${dateRange} ${statusHtml} ${attachmentHtml}</span>
               <span class="text-xs text-gray-500 dark:text-gray-400 ml-1.5 truncate block">${escapeHtml(runDesc)}</span>
@@ -425,7 +425,7 @@ document.addEventListener('DOMContentLoaded', function(){
       panelContent.innerHTML = `<div class="text-center text-gray-500 p-8 h-full flex items-center justify-center">
         <div>
           <div class="text-5xl mb-2 text-gray-400 dark:text-gray-600"><i class="fa-solid fa-receipt"></i></div>
-          <div class="font-medium">Pick a day on the calendar to view or add expenses.</div>
+          <div class="font-medium">{{ _('Pick a day on the calendar to view or add expenses.') }}</div>
         </div>
       </div>`; return;
     }
@@ -438,7 +438,7 @@ document.addEventListener('DOMContentLoaded', function(){
         <div>
           <div class="font-medium">
             ${escapeHtml(e.title)}${e.quantity? ` (${e.quantity})` : ''}
-            ${e.is_paid ? '<span class="ml-2 text-green-700 text-xs font-semibold border border-green-200 bg-green-50 px-1 py-0.5 rounded" title="Paid"><i class="fa-solid fa-check-circle"></i> Lunas</span>' : '<span class="ml-2 text-red-600 text-xs font-semibold border border-red-200 bg-red-50 px-1 py-0.5 rounded" title="Unpaid"><i class="fa-solid fa-clock"></i> Belum Bayar</span>'}
+            ${e.is_paid ? '<span class="ml-2 text-green-700 text-xs font-semibold border border-green-200 bg-green-50 px-1 py-0.5 rounded" title="{{ _('Paid') }}"><i class="fa-solid fa-check-circle"></i> Lunas</span>' : '<span class="ml-2 text-red-600 text-xs font-semibold border border-red-200 bg-red-50 px-1 py-0.5 rounded" title="{{ _('Unpaid') }}"><i class="fa-solid fa-clock"></i> Belum Bayar</span>'}
             ${e.attachment_path ? `<button type="button" class="ml-2 text-blue-600 hover:text-blue-800 focus:outline-none" onclick="event.stopPropagation(); showAttachment('/${e.attachment_path}')"><i class="fa-solid fa-paperclip"></i> View Receipt</button>` : ''}
           </div>
           <div class="text-xs text-gray-500 dark:text-gray-400">${escapeHtml(e.category || '')} ${e.payer? `• by ${escapeHtml(e.payer)}`:''}</div>
@@ -446,10 +446,10 @@ document.addEventListener('DOMContentLoaded', function(){
         <div class="text-right">
           <div class="font-semibold">${fmt(e.amount)}</div>
           <div class="text-xs mt-1 space-x-2 ${allowed? '' : 'hidden'}">
-            <button class="text-blue-600 hover:underline edit-expense" data-id="${e.id}" data-date="${ds}">Edit</button>
+            <button class="text-blue-600 hover:underline edit-expense" data-id="${e.id}" data-date="${ds}">{{ _('Edit') }}</button>
             <form method="POST" action="/expenses/delete/${e.id}" class="inline expense-delete-form" data-title="${escapeHtml(e.title)}" data-amount="${fmt(e.amount)}">
               <input type="hidden" name="user" value="${escapeHtml(currentUser())}">
-              <button type="submit" class="text-red-600 hover:underline">Delete</button>
+              <button type="submit" class="text-red-600 hover:underline">{{ _('Delete') }}</button>
             </form>
           </div>
         </div>
@@ -458,13 +458,13 @@ document.addEventListener('DOMContentLoaded', function(){
     panelContent.innerHTML = `
       <div class="flex items-center justify-between mb-2">
         <div>
-          <div class="text-sm text-gray-500 dark:text-gray-400">Expenses for</div>
+          <div class="text-sm text-gray-500 dark:text-gray-400">{{ _('Expenses for') }}</div>
           <div class="text-lg font-semibold">${selectedDate.toLocaleDateString()}</div>
         </div>
         <div class="text-lg font-semibold">${fmt(dayData.total||0)}</div>
       </div>
-      <div>${entriesHtml || '<div class=\'text-gray-500 dark:text-gray-400\'>No expenses yet.</div>'}</div>
-      <button id="add-expense-btn" class="mt-3 w-full btn btn-primary"><i class="fa-solid fa-plus mr-1"></i> Add Expense</button>
+      <div>${entriesHtml || '<div class=\'text-gray-500 dark:text-gray-400\'>{{ _('No expenses yet.') }}</div>'}</div>
+      <button id="add-expense-btn" class="mt-3 w-full btn btn-primary"><i class="fa-solid fa-plus mr-1"></i> {{ _('Add Expense') }}</button>
     `;
   }
 

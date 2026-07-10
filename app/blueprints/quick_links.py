@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, abort, jsonify
+from ..i18n import _
 from ..models import db, QuickLink, QuickLinkCategory
 from urllib.parse import urlparse
 from collections import OrderedDict
@@ -70,9 +71,9 @@ def manage_links():
                     cat = QuickLinkCategory(name=category)
                     db.session.add(cat)
                 db.session.commit()
-                flash('Quick Link added successfully!', 'success')
+                flash(_('Quick Link added successfully!'), 'success')
             else:
-                flash('Title and URL are required!', 'error')
+                flash(_('Title and URL are required!'), 'error')
                 
         elif action == 'delete':
             link_id = request.form.get('link_id')
@@ -80,7 +81,7 @@ def manage_links():
             if link:
                 db.session.delete(link)
                 db.session.commit()
-                flash('Quick Link deleted!', 'success')
+                flash(_('Quick Link deleted!'), 'success')
                 
         elif action == 'toggle_dashboard':
             link_id = request.form.get('link_id')
@@ -107,9 +108,9 @@ def manage_links():
                         cat = QuickLinkCategory(name=link.category)
                         db.session.add(cat)
                     db.session.commit()
-                    flash('Quick Link updated successfully!', 'success')
+                    flash(_('Quick Link updated successfully!'), 'success')
                 else:
-                    flash('Title and URL are required!', 'error')
+                    flash(_('Title and URL are required!'), 'error')
                 
         return redirect(url_for('quick_links.manage_links'))
         

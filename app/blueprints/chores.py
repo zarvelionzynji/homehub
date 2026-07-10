@@ -1,5 +1,6 @@
 from flask import render_template, request, redirect, url_for, current_app, jsonify, flash, session
 from datetime import datetime, date, timedelta
+from ..i18n import _
 from ..models import db, Chore, RecurringChore
 from ..blueprints import main_bp
 from ..security import sanitize_text
@@ -223,7 +224,7 @@ def chores():
             start_date = _parse_date(request.form.get('rec_start_date')) or date.today()
             end_date = _parse_date(request.form.get('rec_end_date'))
             if end_date and end_date < start_date:
-                flash('Recurring chore end date cannot be before the start date.', 'error')
+                flash(_('Recurring chore end date cannot be before the start date.'), 'error')
                 return _render_chores_page(
                     form_description=description,
                     form_tags=json.dumps(tags_list),
@@ -236,7 +237,7 @@ def chores():
                     form_recurring_rule_id=recurring_rule_id or '',
                 )
             if end_date and end_date < date.today():
-                flash('Recurring chore ends in the past. Choose a future end date to create an active chore.', 'error')
+                flash(_('Recurring chore ends in the past. Choose a future end date to create an active chore.'), 'error')
                 return _render_chores_page(
                     form_description=description,
                     form_tags=json.dumps(tags_list),
@@ -251,7 +252,7 @@ def chores():
             if recurring_rule_id:
                 rule = RecurringChore.query.get_or_404(int(recurring_rule_id))
                 if not (user in admin_aliases or user == (rule.creator or '')):
-                    flash('Not allowed to update recurring rule.', 'error')
+                    flash(_('Not allowed to update recurring rule.'), 'error')
                     return redirect(url_for('main.chores'))
                 rule.description = description
                 rule.tags = json.dumps(tags_list)
@@ -269,7 +270,7 @@ def chores():
                     active.done = False
                 rule.last_generated_date = next_due
                 db.session.commit()
-                flash('Recurring chore updated.', 'success')
+                flash(_('Recurring chore updated.'), 'success')
             else:
                 rule = RecurringChore(
                     description=description,
@@ -294,12 +295,12 @@ def chores():
                     ))
                     rule.last_generated_date = next_due
                     db.session.commit()
-                flash('Recurring chore added.', 'success')
+                flash(_('Recurring chore added.'), 'success')
         else:
             if recurring_rule_id:
                 rule = RecurringChore.query.get_or_404(int(recurring_rule_id))
                 if not (user in admin_aliases or user == (rule.creator or '')):
-                    flash('Not allowed to delete recurring rule.', 'error')
+                    flash(_('Not allowed to delete recurring rule.'), 'error')
                     return redirect(url_for('main.chores'))
                 Chore.query.filter_by(recurring_id=rule.id).delete()
                 db.session.delete(rule)
@@ -307,17 +308,17 @@ def chores():
             if chore_id:
                 chore = Chore.query.get_or_404(int(chore_id))
                 if not (user in admin_aliases or user == (chore.creator or '')):
-                    flash('Not allowed to update chore.', 'error')
+                    flash(_('Not allowed to update chore.'), 'error')
                     return redirect(url_for('main.chores'))
                 chore.description = description
                 chore.tags = json.dumps(tags_list)
                 db.session.commit()
-                flash('Chore updated.', 'success')
+                flash(_('Chore updated.'), 'success')
             else:
                 chore = Chore(description=description, creator=creator, tags=json.dumps(tags_list))
                 db.session.add(chore)
                 db.session.commit()
-                flash('Chore added.', 'success')
+                flash(_('Chore added.'), 'success')
         return redirect(url_for('main.chores'))
     return _render_chores_page()
 
@@ -332,7 +333,7 @@ def edit_chore(chore_id):
     admin_aliases = _admin_aliases()
     creator = (chore.creator or '')
     if not (user in admin_aliases or user == creator):
-        flash('Not allowed to edit chore.', 'error')
+        flash(_('Not allowed to edit chore.'), 'error')
         return redirect(url_for('main.chores'))
     form_state = {
         'form_description': chore.description,
@@ -364,11 +365,11 @@ def edit_chore(chore_id):
 @main_bp.route('/chores/settings', methods=['POST'])
 def chores_settings():
     if current_app.config['HOMEHUB_CONFIG'].get('password_hash') and not session.get('authed'):
-        flash('Only admin can update chore settings.', 'error')
+        flash(_('Only admin can update chore settings.'), 'error')
         return redirect(url_for('main.chores'))
     enabled = request.form.get('show_chores_on_homepage') in ('1', 'on', 'true', 'yes')
     _set_show_chores_on_homepage(enabled)
-    flash('Chore settings updated.', 'success')
+    flash(_('Chore settings updated.'), 'success')
     return redirect(url_for('main.chores'))
 
 
@@ -378,12 +379,12 @@ def delete_recurring_chore(rule_id):
     user = _request_user()
     admin_aliases = _admin_aliases()
     if not (user in admin_aliases or user == (rule.creator or '')):
-        flash('Not allowed to delete recurring rule.', 'error')
+        flash(_('Not allowed to delete recurring rule.'), 'error')
         return redirect(url_for('main.chores'))
     Chore.query.filter_by(recurring_id=rule.id).delete()
     db.session.delete(rule)
     db.session.commit()
-    flash('Recurring chore rule deleted.', 'success')
+    flash(_('Recurring chore rule deleted.'), 'success')
     return redirect(url_for('main.chores'))
 
 
@@ -421,19 +422,19 @@ def delete_chore(chore_id):
             if rule:
                 Chore.query.filter_by(recurring_id=rule.id).delete()
                 db.session.delete(rule)
-                flash('Recurring chore rule deleted.', 'success')
+                flash(_('Recurring chore rule deleted.'), 'success')
             else:
                 db.session.delete(chore)
             db.session.commit()
         else:
-            flash('Not allowed to delete recurring rule.', 'error')
+            flash(_('Not allowed to delete recurring rule.'), 'error')
         return redirect(url_for('main.chores'))
     if user in admin_aliases or user == chore.creator:
         db.session.delete(chore)
         db.session.commit()
-        flash('Chore deleted.', 'success')
+        flash(_('Chore deleted.'), 'success')
     else:
-        flash('Not allowed to delete chore.', 'error')
+        flash(_('Not allowed to delete chore.'), 'error')
     return redirect(url_for('main.chores'))
 
 

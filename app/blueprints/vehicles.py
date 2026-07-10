@@ -2,6 +2,7 @@ from flask import render_template, request, redirect, url_for, flash, current_ap
 from datetime import datetime, date
 import calendar
 import os
+from ..i18n import _
 from ..models import db, Vehicle, ServiceType, MaintenanceRecord, ExpenseEntry
 from ..security import sanitize_text
 from ..blueprints import main_bp
@@ -87,13 +88,13 @@ def add_vehicle():
     creator = bleach.clean(request.form.get('creator', ''))
 
     if not name:
-        flash('Vehicle name required.', 'error')
+        flash(_('Vehicle name required.'), 'error')
         return redirect(url_for('main.vehicles'))
 
     v = Vehicle(name=name, vehicle_type=vehicle_type, plate=plate, creator=creator)
     db.session.add(v)
     db.session.commit()
-    flash(f'Vehicle "{name}" added.', 'success')
+    flash(_('Vehicle "%(name)s" added.') % {'name': name}, 'success')
     return redirect(url_for('main.vehicles'))
 
 
@@ -105,7 +106,7 @@ def edit_vehicle(vid):
     v.vehicle_type = bleach.clean(request.form.get('vehicle_type', v.vehicle_type))
     v.plate = bleach.clean(request.form.get('plate', v.plate))
     db.session.commit()
-    flash('Vehicle updated.', 'success')
+    flash(_('Vehicle updated.'), 'success')
     return redirect(url_for('main.vehicle_detail', vid=vid))
 
 
@@ -116,7 +117,7 @@ def delete_vehicle(vid):
     name = v.name
     db.session.delete(v)
     db.session.commit()
-    flash(f'Vehicle "{name}" deleted.', 'success')
+    flash(_('Vehicle "%(name)s" deleted.') % {'name': name}, 'success')
     return redirect(url_for('main.vehicles'))
 
 
@@ -144,13 +145,13 @@ def add_maintenance_record(vid):
     creator = bleach.clean(request.form.get('creator', ''))
 
     if not service_type_id or not date_s or mileage is None:
-        flash('Service type, date, and mileage required.', 'error')
+        flash(_('Service type, date, and mileage required.'), 'error')
         return redirect(url_for('main.vehicle_detail', vid=vid))
 
     try:
         d = datetime.strptime(date_s, '%Y-%m-%d').date()
     except ValueError:
-        flash('Invalid date format.', 'error')
+        flash(_('Invalid date format.'), 'error')
         return redirect(url_for('main.vehicle_detail', vid=vid))
 
     st = ServiceType.query.get_or_404(service_type_id)
@@ -196,7 +197,7 @@ def add_maintenance_record(vid):
     v.current_mileage = mileage
 
     db.session.commit()
-    flash('Maintenance record logged.', 'success')
+    flash(_('Maintenance record logged.'), 'success')
     return redirect(url_for('main.vehicle_detail', vid=vid))
 
 
@@ -243,7 +244,7 @@ def edit_maintenance_record(rid):
         r.expense.title = f"[{r.vehicle.name}] {r.service_type.name}"
 
     db.session.commit()
-    flash('Maintenance record updated.', 'success')
+    flash(_('Maintenance record updated.'), 'success')
     return redirect(url_for('main.vehicle_detail', vid=r.vehicle_id))
 
 
@@ -257,7 +258,7 @@ def delete_maintenance_record(rid):
         db.session.delete(r.expense)
     db.session.delete(r)
     db.session.commit()
-    flash('Maintenance record deleted.', 'success')
+    flash(_('Maintenance record deleted.'), 'success')
     return redirect(url_for('main.vehicle_detail', vid=vid))
 
 
@@ -269,7 +270,7 @@ def add_service_type():
     interval_months = request.form.get('interval_months', type=int)
 
     if not name:
-        flash('Service type name required.', 'error')
+        flash(_('Service type name required.'), 'error')
         return redirect(url_for('main.vehicles'))
 
     st = ServiceType(
@@ -279,7 +280,7 @@ def add_service_type():
     )
     db.session.add(st)
     db.session.commit()
-    flash(f'Service type "{name}" added.', 'success')
+    flash(_('Service type "%(name)s" added.') % {'name': name}, 'success')
     return redirect(url_for('main.vehicles', _anchor='tab-service-types'))
 
 

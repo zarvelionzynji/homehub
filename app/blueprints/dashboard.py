@@ -1,5 +1,6 @@
-from flask import render_template, request, redirect, url_for, flash, jsonify, current_app
+from flask import render_template, request, redirect, url_for, flash, jsonify, current_app, session
 from datetime import datetime, date, timedelta
+from ..i18n import _
 from ..models import db, HomeStatus, MemberStatus, Notice, Reminder, RecurringReminder, Chore, QuickLink
 from ..blueprints import main_bp
 from ..security import sanitize_html, sanitize_text
@@ -588,17 +589,17 @@ def add_reminder():
     description = sanitize_html(request.form.get('description'))
     creator = sanitize_text(request.form.get('creator'))
     if not (date_s and title):
-        flash('Date and title are required for reminders.', 'error')
+        flash(_('Date and title are required for reminders.'), 'error')
         return redirect(url_for('main.index'))
     try:
         d = datetime.strptime(date_s, '%Y-%m-%d').date()
     except Exception:
-        flash('Invalid date.', 'error')
+        flash(_('Invalid date.'), 'error')
         return redirect(url_for('main.index'))
     r = Reminder(date=d, title=title, description=description, creator=creator)
     db.session.add(r)
     db.session.commit()
-    flash('Reminder added.', 'success')
+    flash(_('Reminder added.'), 'success')
     return redirect(url_for('main.index', date=date_s))
 
 
@@ -611,9 +612,9 @@ def delete_reminder(reminder_id):
     if user in admin_aliases or user == r.creator:
         db.session.delete(r)
         db.session.commit()
-        flash('Reminder deleted.', 'success')
+        flash(_('Reminder deleted.'), 'success')
     else:
-        flash('Not allowed to delete this reminder.', 'error')
+        flash(_('Not allowed to delete this reminder.'), 'error')
     date_s = None
     try:
         if r.date:
@@ -654,9 +655,9 @@ def delete_reminders_bulk():
             deleted += 1
     if deleted:
         db.session.commit()
-        flash(f'Deleted {deleted} reminder(s).', 'success')
+        flash(_('Deleted %(count)d reminder(s).') % {'count': deleted}, 'success')
     else:
-        flash('No reminders deleted (permission?).', 'error')
+        flash(_('No reminders deleted (permission?).'), 'error')
     return redirect(url_for('main.index', date=kept_date) if kept_date else url_for('main.index'))
 
 
@@ -666,7 +667,7 @@ def update_notice():
     user = sanitize_text(request.form.get('user', ''))
     admin_name = current_app.config['HOMEHUB_CONFIG'].get('admin_name', 'Administrator')
     if user != admin_name:
-        flash('Only admin can update the notice.', 'error')
+        flash(_('Only admin can update the notice.'), 'error')
         return redirect(url_for('main.index'))
     n = Notice.query.order_by(Notice.updated_at.desc()).first()
     now = datetime.utcnow()
@@ -677,7 +678,7 @@ def update_notice():
     else:
         db.session.add(Notice(content=content, updated_by=user, updated_at=now))
     db.session.commit()
-    flash('Notice updated.', 'success')
+    flash(_('Notice updated.'), 'success')
     return redirect(url_for('main.index'))
 
 
@@ -689,7 +690,7 @@ def who_is_home_action():
     name = sanitize_text(request.form.get('name', ''))
     if not name or name not in family:
         if request.headers.get('X-Requested-With') != 'fetch':
-            flash('Invalid user for status.', 'error')
+            flash(_('Invalid user for status.'), 'error')
         if request.headers.get('X-Requested-With') == 'fetch':
             return jsonify({'ok': False, 'error': 'Invalid user'}), 400
         return redirect(url_for('main.index'))
@@ -701,11 +702,11 @@ def who_is_home_action():
             db.session.commit()
             result = 'cleared'
             if request.headers.get('X-Requested-With') != 'fetch':
-                flash('Status cleared.', 'success')
+                flash(_('Status cleared.'), 'success')
         else:
             result = 'none'
             if request.headers.get('X-Requested-With') != 'fetch':
-                flash('No status to clear.', 'info')
+                flash(_('No status to clear.'), 'info')
     else:
         status = sanitize_text(request.form.get('status', '')) or 'Away'
         hs = HomeStatus.query.filter_by(name=name).first()
@@ -716,7 +717,7 @@ def who_is_home_action():
         db.session.commit()
         result = 'updated'
         if request.headers.get('X-Requested-With') != 'fetch':
-            flash('Status updated.', 'success')
+            flash(_('Status updated.'), 'success')
     if request.headers.get('X-Requested-With') == 'fetch':
         who_statuses = {s.name: s.status for s in HomeStatus.query.all() if s.name in family}
         member_statuses = {ms.name: ms.text for ms in MemberStatus.query.all() if ms.name in family and (ms.text or '').strip()}
@@ -735,7 +736,7 @@ def member_status_update():
     text = sanitize_text(raw_text)
     if not name or name not in family:
         if request.headers.get('X-Requested-With') != 'fetch':
-            flash('Invalid user for status.', 'error')
+            flash(_('Invalid user for status.'), 'error')
         if request.headers.get('X-Requested-With') == 'fetch':
             return jsonify({'ok': False, 'error': 'Invalid user'}), 400
         return redirect(url_for('main.index'))
@@ -743,7 +744,7 @@ def member_status_update():
         if request.headers.get('X-Requested-With') == 'fetch':
             return jsonify({'ok': False, 'error': 'Empty status'}), 400
         else:
-            flash('Status cannot be empty.', 'error')
+            flash(_('Status cannot be empty.'), 'error')
             return redirect(url_for('main.index'))
     ms = MemberStatus.query.filter_by(name=name).first()
     now = datetime.utcnow()
@@ -754,7 +755,7 @@ def member_status_update():
         db.session.add(MemberStatus(name=name, text=text, updated_at=now))
     db.session.commit()
     if request.headers.get('X-Requested-With') != 'fetch':
-        flash('Status saved.', 'success')
+        flash(_('Status saved.'), 'success')
     if request.headers.get('X-Requested-With') == 'fetch':
         who_statuses = {s.name: s.status for s in HomeStatus.query.all() if s.name in family}
         member_statuses = {ms.name: ms.text for ms in MemberStatus.query.all() if ms.name in family and (ms.text or '').strip()}
@@ -769,7 +770,7 @@ def member_status_delete():
     name = sanitize_text(request.form.get('name', ''))
     if not name or name not in family:
         if request.headers.get('X-Requested-With') != 'fetch':
-            flash('Invalid user for status removal.', 'error')
+            flash(_('Invalid user for status removal.'), 'error')
         if request.headers.get('X-Requested-With') == 'fetch':
             return jsonify({'ok': False, 'error': 'Invalid user'}), 400
         return redirect(url_for('main.index'))
@@ -780,7 +781,7 @@ def member_status_delete():
         db.session.commit()
         removed = True
         if request.headers.get('X-Requested-With') != 'fetch':
-            flash('Status removed.', 'success')
+            flash(_('Status removed.'), 'success')
     if request.headers.get('X-Requested-With') == 'fetch':
         who_statuses = {s.name: s.status for s in HomeStatus.query.all() if s.name in family}
         member_statuses = {ms.name: ms.text for ms in MemberStatus.query.all() if ms.name in family and (ms.text or '').strip()}
@@ -806,3 +807,20 @@ def save_navbar_order():
         return jsonify({'ok': True})
     except Exception:
         return jsonify({'ok': False, 'error': 'Invalid order data'}), 400
+
+
+@main_bp.route('/settings/navbar-order/<user>')
+def get_navbar_order(user):
+    """Get saved navbar order for a user."""
+    import json
+    try:
+        row = db.session.execute(
+            db.text("SELECT value FROM app_setting WHERE key=:k"),
+            {"k": f"navbar_order_{user}"}
+        ).scalar()
+        if row:
+            order = json.loads(row)
+            return jsonify({'ok': True, 'order': order})
+        return jsonify({'ok': True, 'order': []})
+    except Exception:
+        return jsonify({'ok': True, 'order': []})

@@ -1,20 +1,20 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="mx-auto max-w-4xl">
-    <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Media Downloader</h2>
+    <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">{{ _('Media Downloader') }}</h2>
     <form method="POST" action="/media" class="mb-6 grid gap-2 md:grid-cols-12 grid-cols-1 items-end">
-        <input type="url" name="url" class="w-full p-2 rounded-lg bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none border md:col-span-6" placeholder="Paste media URL..." value="{{ shared_url }}" required>
+        <input type="url" name="url" class="w-full p-2 rounded-lg bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none border md:col-span-6" placeholder="{{ _('Paste media URL...') }}" value="{{ shared_url }}" required>
         <select name="format" class="p-2 rounded-lg bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none border md:col-span-2">
-            <option value="mp4">MP4 (video)</option>
-            <option value="mp3">MP3 (audio)</option>
+            <option value="mp4">{{ _('MP4 (video)') }}</option>
+            <option value="mp3">{{ _('MP3 (audio)') }}</option>
         </select>
         <select name="quality" class="p-2 rounded-lg bg-[var(--input-bg)] text-[var(--input-text)] border-[var(--input-border)] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none border md:col-span-2">
-            <option value="best">Best Available</option>
-            <option value="bestvideo[height<=1080]+bestaudio/best[height<=1080]">Up to 1080p</option>
-            <option value="bestvideo[height<=720]+bestaudio/best[height<=720]">Up to 720p</option>
+            <option value="best">{{ _('Best Available') }}</option>
+            <option value="bestvideo[height<=1080]+bestaudio/best[height<=1080]">{{ _('Up to 1080p') }}</option>
+            <option value="bestvideo[height<=720]+bestaudio/best[height<=720]">{{ _('Up to 720p') }}</option>
         </select>
     <input type="hidden" name="creator" id="creator">
-    <button type="submit" class="btn btn-primary md:col-span-2">Download</button>
+    <button type="submit" class="btn btn-primary md:col-span-2">{{ _('Download') }}</button>
     </form>
         <ul class="space-y-3">
         {% for media in media_list %}
@@ -30,33 +30,33 @@
         <!-- Actions row -->
         {% if media.status == 'pending' %}
         <div class="flex flex-wrap items-center gap-2 mb-2">
-            <span class="px-2 py-1 rounded text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300 status-chip">Starting…</span>
-            <span class="text-xs text-gray-500 dark:text-gray-400 progress-line">{{ media.progress or 'Will take a while…' }}</span>
+            <span class="px-2 py-1 rounded text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300 status-chip">{{ _('Starting...') }}</span>
+            <span class="text-xs text-gray-500 dark:text-gray-400 progress-line">{{ media.progress or _('Will take a while...') }}</span>
         </div>
                     {% elif media.filepath %}
         <div class="flex flex-wrap items-center gap-1.5 mb-2">
-            <a href="/media/preview/{{ media.filepath }}" target="_blank" rel="noopener noreferrer" class="btn btn-success media-preview-link !py-1.5 !px-2.5 md:!px-3 text-xs" data-filename="{{ media.filepath }}" aria-label="Preview {{ media.filepath }} in new tab">
-                <i class="fa-solid fa-eye" aria-hidden="true"></i> <span class="hidden sm:inline">Preview</span>
+            <a href="/media/preview/{{ media.filepath }}" target="_blank" rel="noopener noreferrer" class="btn btn-success media-preview-link !py-1.5 !px-2.5 md:!px-3 text-xs" data-filename="{{ media.filepath }}" aria-label="{{ _('Preview %(filename)s in new tab', filename=media.filepath) }}">
+                <i class="fa-solid fa-eye" aria-hidden="true"></i> <span class="hidden sm:inline">{{ _('Preview') }}</span>
             </a>
             <a href="/media/{{ media.filepath }}" class="btn btn-primary media-download-link !py-1.5 !px-2.5 md:!px-3 text-xs" data-filename="{{ media.filepath }}">
-                <i class="fa-solid fa-download" aria-hidden="true"></i> <span class="hidden sm:inline">Download</span>
+                <i class="fa-solid fa-download" aria-hidden="true"></i> <span class="hidden sm:inline">{{ _('Download') }}</span>
             </a>
             <button class="btn btn-warning media-redownload-btn !py-1.5 !px-2.5 md:!px-3 text-xs" data-id="{{ media.id }}">
-                <i class="fa-solid fa-rotate"></i> <span class="hidden sm:inline">Redownload</span>
+                <i class="fa-solid fa-rotate"></i> <span class="hidden sm:inline">{{ _('Redownload') }}</span>
             </button>
         </div>
                     {% else %}
         <div class="flex flex-wrap items-center gap-2 mb-2">
-            <a href="#" class="text-xs px-2 py-1 rounded font-medium bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 media-not-found" data-url="{{ media.title }}">Not available</a>
+            <a href="#" class="text-xs px-2 py-1 rounded font-medium bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 media-not-found" data-url="{{ media.title }}">{{ _('Not available') }}</a>
         </div>
                     {% endif %}
 
         <!-- Meta + Delete row -->
         <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-            <span>By {{ media.creator }} &middot; {{ media.download_time.strftime('%Y-%m-%d %H:%M') }}</span>
+            <span>{{ _('By') }} {{ media.creator }} &middot; {{ media.download_time.strftime('%Y-%m-%d %H:%M') }}</span>
         <form method="POST" action="/media/delete/{{ media.id }}" class="delete-form inline" data-creator="{{ media.creator }}">
             <input type="hidden" name="user">
-            <button type="submit" class="hover:text-red-600 dark:hover:text-red-400 transition-colors action-delete" title="Delete">
+            <button type="submit" class="hover:text-red-600 dark:hover:text-red-400 transition-colors action-delete" title="{{ _('Delete') }}">
                 <i class="fa-solid fa-trash-can"></i>
             </button>
         </form>
