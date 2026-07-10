@@ -1,6 +1,12 @@
 # Database files
 data/app.db
+data/app.db-shm
+data/app.db-wal
 database.db
+
+# Agent worktrees
+.claude/worktrees/
+.claude/session-*
 
 # User-uploaded files
 uploads/
