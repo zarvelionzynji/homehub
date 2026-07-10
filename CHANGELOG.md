@@ -16,6 +16,9 @@ Format penulisan berdasarkan [Keep a Changelog](https://keepachangelog.com/id/1.
 ### Fixed
 - **Nested quote syntax error** di `quick_links.html` — Jinja2 `_("...")` di dalam `onsubmit` diperbaiki dengan `{% set %}`
 - **Nested quote syntax error** di `index.html` — `_("Today's Forecast")` diperbaiki dengan `{% set %}`
+- **Mobile header compact** — header 1 baris di mobile: Menu, EN/ID, welcome, user dropdown dengan ukuran proporsional
+- **Welcome message comma spacing** — perbaiki `Welcome,User!` jadi `Welcome, User!`
+- **Recurring page heading mobile** — heading diperkecil di mobile (`text-xl md:text-3xl`)
 
 ## [v1.1.0] - 2026-07-06
 

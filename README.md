@@ -18,6 +18,8 @@ HomeHub adalah aplikasi web ringan yang berjalan di server lokal (self-hosted) u
 * **👋 Siapa di Rumah?**: Cek dengan cepat siapa anggota keluarga yang sedang berada di rumah.
 * **🎬 Pengunduh Media**: Simpan video atau musik langsung ke server Anda.
 * **🤖 AI Agent API (RESTful)**: Hubungkan HomeHub dengan asisten AI favorit Anda (seperti OpenClaw atau GPT). AI dapat mengontrol status rumah, membaca catatan, menyelesaikan tugas, hingga mengubah `config.yml` secara programatis via API terenkripsi.
+* **🌐 Multi Bahasa (EN/ID)**: Dukung dua bahasa — Inggris dan Indonesia. Language switcher di header untuk ganti bahasa kapan saja.
+* **📱 Responsive Mobile**: Header kompak 1 baris di perangkat seluler, semua fitur tetap mudah diakses.
 * **Privasi Penuh**: Semua data Anda tetap berada di jaringan Anda sendiri. Tidak ada pelacakan dari pihak ketiga.
 
 ## 🚀 Cara Menjalankan dengan Docker
