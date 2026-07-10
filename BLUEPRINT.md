@@ -3,72 +3,72 @@
 **Version:** v1.2.0  
 **Last Updated:** 2026-07-11
 
-Dokumen ini memetakan arsitektur dan modul utama dari proyek HomeHub, membantu *developer* memahami struktur fitur secara keseluruhan.
+This document maps the architecture and main modules of the HomeHub project, helping developers understand the overall feature structure.
 
-## Arsitektur Sistem
-HomeHub dibangun di atas *stack* teknologi berikut:
-- **Backend**: Python (Flask), menggunakan `Flask-SQLAlchemy` untuk interaksi *database*.
-- **Database**: SQLite (tersimpan di `data/app.db`).
-- **Frontend**: Vanilla JavaScript, Tailwind CSS (dibangun menggunakan `npm run build:css`), HTML + Jinja2 Templates. Baru saja diperbarui dengan refaktor UI/UX berstandar tinggi (aksesibilitas/A11y, touch targets 44px, transisi GPU-friendly, reduced-motion, standarisasi ikon Font Awesome).
-- **Penyebaran (Deployment)**: Docker / Docker Compose & Github Actions (GHCR).
+## System Architecture
+HomeHub is built on the following technology stack:
+- **Backend**: Python (Flask), using `Flask-SQLAlchemy` for database interaction.
+- **Database**: SQLite (stored in `data/app.db`).
+- **Frontend**: Vanilla JavaScript, Tailwind CSS (built via `npm run build:css`), HTML + Jinja2 Templates. Recently updated with high-standard UI/UX refactoring (A11y, 44px touch targets, GPU-friendly transitions, reduced-motion, Font Awesome icon standardization).
+- **Deployment**: Docker / Docker Compose & Github Actions (GHCR).
 
 ## Feature Modules
 
-### 1. Inti (Core)
-- **Config Loader**: `app/config.py` - Memuat konfigurasi utama dari `config.yml`. Mengatur fitur-fitur yang dinyalakan/dimatikan serta `family_members`.
-- **Database Models**: `app/models.py` - Menyimpan representasi tabel (*Schema*) seperti Catatan, Chores, Belanja, Pengeluaran, dll.
-- **Main Dashboard**: `app/blueprints/dashboard.py` - Pusat kendali web yang merangkum *Widget* seperti kalender, siapa di rumah, dan status personal.
+### 1. Core
+- **Config Loader**: `app/config.py` — Loads main configuration from `config.yml`. Manages feature toggles and `family_members`.
+- **Database Models**: `app/models.py` — Stores table schemas for Notes, Chores, Shopping, Expenses, etc.
+- **Main Dashboard**: `app/blueprints/dashboard.py` — Web control center that aggregates widgets like calendar, who's home, and personal status.
 
-### 2. Modul Fungsionalitas Keluarga
-- **Shopping List**: Terletak di `app/blueprints/shopping.py`. Mirip dengan *Chores*, tapi khusus melacak daftar belanjaan beserta *tags* kategori dan histori belanja.
-- **Quick Links**: Terletak di `app/blueprints/quick_links.py`. Fitur manajemen *bookmark* interaktif dengan dukungan *drag-and-drop* (menggunakan Sortable.js), ikon SVG CDN, dan Auto-favicon. Tautan dan Kategori dapat diatur urutannya secara fleksibel (*order_index* tersimpan di SQLite), lalu ditampilkan berjejer di *dashboard* utama (sebagai *dashboard* mini ala Heimdall/Homarr).
-- **Expense Tracker**: Terletak di `app/blueprints/expenses.py`. Melacak pengeluaran dengan filter bulanan/tahunan, serta sistem penagihan (Belum Bayar/Lunas) untuk tagihan berulang rutin. Memiliki halaman manajemen dedikasi untuk aturan *recurring* di `/expenses/recurring` dengan *Edit Strategy* pengamanan histori pembayaran.
-- **Shared Notes & Cloud**: Mengelola direktori penyimpanan file bersama dan catatan tempel.
-- **Kalender Reminders**: Mengelola pengingat jadwal satu kali jalan maupun jadwal rutin.
-- **Media Downloader & PDFs**: Terletak di `app/blueprints/media_pdfs.py`. Utilitas pengunduhan video/audio menggunakan `yt-dlp` dan konverter PDF. Terintegrasi erat dengan PWA (Progressive Web App) melalui dukungan **Web Share Target API**, memungkinkan pengguna di perangkat seluler untuk melempar tautan unduhan langsung ke aplikasi HomeHub. Dilengkapi **file existence validation** — backend mengecek keberadaan file sebelum serve, API status mengembalikan `file_exists` flag, dan antarmuka menampilkan status "Not available" jika file hilang (dihapus manual atau folder dipindah), mencegah broken links dan 404 yang membingungkan.
-	   - **Re-download**: Tombol "Redownload" pada setiap item media yang sudah selesai, menggunakan opsi format/quality yang tersimpan di database. File lama otomatis dihapus setelah download baru berhasil. Didukung oleh `_download_worker()` (module-level function) dan `_build_ytdlp_cmd()` untuk menghindari duplikasi kode antar route `media()` dan `redownload_media()`.
-   - **PWA Web Share Target** — Fitur andalan yang memungkinkan pengguna Android membagikan tautan (misalnya dari YouTube) langsung ke Media Downloader via share sheet OS. Didukung oleh manifest `share_target` dan Service Worker fetch handler khusus untuk rute `/media/share`.
+### 2. Family Functionality Modules
+- **Shopping List**: Located at `app/blueprints/shopping.py`. Similar to Chores, but specifically tracks grocery items with category tags and purchase history.
+- **Quick Links**: Located at `app/blueprints/quick_links.py`. Interactive bookmark manager with drag-and-drop (Sortable.js), SVG CDN icons, and auto-favicon. Links and categories are flexibly ordered (`order_index` stored in SQLite) and displayed on the main dashboard as a mini Heimdall/Homarr-style grid.
+- **Expense Tracker**: Located at `app/blueprints/expenses.py`. Tracks expenses with monthly/yearly filters, plus paid/unpaid billing for recurring bills. Has a dedicated management page for recurring rules at `/expenses/recurring` with safe Edit Strategies to protect payment history.
+- **Shared Notes & Cloud**: Manages a shared file storage directory and sticky notes.
+- **Calendar Reminders**: Manages one-time and recurring schedule reminders.
+- **Media Downloader & PDFs**: Located at `app/blueprints/media_pdfs.py`. Video/audio download utility using `yt-dlp` and PDF converter. Tightly integrated with PWA via **Web Share Target API**, allowing mobile users to share download links directly to HomeHub. Includes **file existence validation** — backend checks disk before serving files, API returns `file_exists` flag, UI shows "Not available" status if the file is missing.
+   - **Re-download**: "Redownload" button on completed media items, using saved format/quality options. Old files auto-deleted on successful re-download. Powered by `_download_worker()` (module-level function) and `_build_ytdlp_cmd()` to avoid code duplication between `media()` and `redownload_media()` routes.
+   - **PWA Web Share Target** — Key feature allowing Android users to share links (e.g., from YouTube) directly to Media Downloader via OS share sheet. Powered by manifest `share_target` and a dedicated Service Worker fetch handler for `/media/share`.
 
 ### 2a. PWA Configuration (Progressive Web App)
-PWA HomeHub dikonfigurasi melalui dua endpoint dinamis di `app/blueprints/__init__.py`:
-- **`/manifest.webmanifest`** — Manifest JSON dinamis yang mencakup: `name`, `short_name`, `icons` (192x192 + 512x512 dengan `purpose: "any maskable"`), `display: standalone`, `display_override`, `share_target` untuk Web Share Target API, `categories`, `description`, dan `launch_handler`.
-- **`/sw.js`** — Service Worker dengan strategi offline-first: network-first untuk navigasi, stale-while-revalidate untuk aset statis, bypass cache untuk `/api/*` dan `/media/share`. Ikon PWA di-precache saat install.
+HomeHub PWA is configured through two dynamic endpoints in `app/blueprints/__init__.py`:
+- **`/manifest.webmanifest`** — Dynamic JSON manifest including: `name`, `short_name`, `icons` (192x192 + 512x512 with `purpose: "any maskable"`), `display: standalone`, `display_override`, `share_target` for Web Share Target API, `categories`, `description`, and `launch_handler`.
+- **`/sw.js`** — Service Worker with offline-first strategy: network-first for navigation, stale-while-revalidate for static assets, bypass cache for `/api/*` and `/media/share`. PWA icons pre-cached on install.
 
-### Syarat Infra untuk Share Target
-1. **HTTPS** — Web Share Target API hanya berfungsi di secure context. Server harus diakses via HTTPS.
-2. **Ikon maskable** — Android 12+ memerlukan ikon dengan `purpose: "maskable"` untuk adaptive icon.
-3. **Instalasi penuh** — PWA harus di-install via prompt Chrome (bukan sekedar "Add to Home screen").
+### Share Target Infrastructure Requirements
+1. **HTTPS** — Web Share Target API only works in secure context. Server must be accessed via HTTPS.
+2. **Maskable icons** — Android 12+ requires icons with `purpose: "maskable"` for adaptive icons.
+3. **Full install** — PWA must be installed via the Chrome install prompt (not just "Add to Home screen").
 
-### Panduan HTTPS
-Akses HTTPS bisa diatur via:
-- **Caddy** (auto SSL): Tambah service Caddy ke compose.yml dengan Caddyfile `homehub.domain.com { reverse_proxy homehub:5000 }`.
-- **Nginx + certbot**: Reverse proxy dengan SSL termination.
-- **Tailscale Funnel**: HTTPS cert otomatis via `*.ts.net` — install Tailscale di server + Android, akses via `https://<machine>.ts.net:5000`.
+### HTTPS Setup Guide
+HTTPS access can be configured via:
+- **Caddy** (auto SSL): Add a Caddy service to compose.yml with `homehub.domain.com { reverse_proxy homehub:5000 }`.
+- **Nginx + certbot**: Reverse proxy with SSL termination.
+- **Tailscale Funnel**: Automatic HTTPS cert via `*.ts.net` — install Tailscale on server + Android, access via `https://<machine>.ts.net:5000`.
 
-### 3. Ekstensi API Eksternal
-- **AI Agent Integration (Universal Router)**: `app/blueprints/ai_agent.py` - Menyediakan antarmuka "Tanpa Tatap Muka" bagi AI pihak ketiga via `POST /api/ai/execute` dan dokumentasi skema via `GET /api/ai/schema`. Modul ini memungkinkan agen AI untuk mengatur status rumah dan membaca/mengubah Catatan Bersama (*Notes*), Daftar Tugas (*Chores*), Daftar Belanja (*Shopping List*), Tautan Cepat (*Quick Links*), Pengaturan (`config.yml`), serta modul Keuangan (*Expense Tracker*) dengan dukungan unggahan bukti struk (Base64).
-- **RESTful Config API**: `app/blueprints/config_api.py` - Memungkinkan sistem eksternal untuk mengubah preferensi bawaan aplikasi dan mengelola akun di `config.yml` secara programatis tanpa merusak komentar struktur file.
-- **Keamanan**: Seluruh rute API ekstensi dijaga ketat menggunakan mekanisme `Authorization: Bearer <ai_agent_token>`.
+### 3. External API Extensions
+- **AI Agent Integration (Universal Router)**: `app/blueprints/ai_agent.py` — Provides a "no-UI" interface for third-party AI assistants via `POST /api/ai/execute` and schema documentation via `GET /api/ai/schema`. This module allows AI agents to manage home status, read/modify Shared Notes, Chores, Shopping List, Quick Links, Settings (`config.yml`), and the Expense Tracker module with Base64 receipt upload support.
+- **RESTful Config API**: `app/blueprints/config_api.py` — Allows external systems to modify application preferences and manage accounts in `config.yml` programmatically without breaking the file's comment structure.
+- **Security**: All extension API routes are strictly protected using the `Authorization: Bearer <ai_agent_token>` mechanism.
 
-### 4. Internasionalisasi (i18n)
-- **Core Engine**: `app/i18n.py` — Sistem terjemahan ringan berbasis dictionary tanpa Flask-Babel. Mendukung EN (Inggris) dan ID (Indonesia) dengan deteksi locale otomatis via session, cookie, atau Accept-Language browser.
-- **Fungsi `_()`**: Tersedia di seluruh Jinja2 template (`{{ _('text') }}`) dan Python blueprint (`from ..i18n import _`).
-- **Language Switcher**: Tombol EN/ID di header aplikasi, route `/lang/<code>` untuk mengganti bahasa secara persisten.
-- **Weather i18n**: Data terjemahan cuaca (weather codes WMO, label, relative time) di-inject ke JavaScript via `<script id="weatherI18n">` JSON.
-- **Navbar Order Sync**: Urutan navbar disimpan di database (`app_setting`) dan direstore lintas device via `GET /settings/navbar-order/<user>`.
+### 4. Internationalization (i18n)
+- **Core Engine**: `app/i18n.py` — Lightweight dictionary-based translation system without Flask-Babel. Supports EN (English) and ID (Indonesian) with automatic locale detection via session, cookie, or browser Accept-Language header.
+- **`_()` Function**: Available in all Jinja2 templates (`{{ _('text') }}`) and Python blueprints (`from ..i18n import _`).
+- **Language Switcher**: EN/ID toggle in the application header, route `/lang/<code>` for persistent language changes.
+- **Weather i18n**: Weather data translations (WMO codes, labels, relative time) injected into JavaScript via `<script id="weatherI18n">` JSON.
+- **Navbar Order Sync**: Navbar order stored in the database (`app_setting`) and restored across devices via `GET /settings/navbar-order/<user>`.
 
-## Struktur Direktori
+## Directory Structure
 ```text
 homehub/
 ├── app/
-│   ├── blueprints/       # Folder Controller setiap fitur
-│   ├── __init__.py       # Factory pattern untuk Setup Flask
+│   ├── blueprints/       # Controller folder for each feature
+│   ├── __init__.py       # Factory pattern for Flask setup
 │   ├── config.py         # YAML Parser
 │   └── models.py         # SQLAlchemy Schema
-├── data/                 # Penyimpanan SQLite Database lokal
-├── static/               # Assets frontend (CSS/JS)
-├── templates/            # Tampilan antarmuka HTML
-├── CHANGELOG.md          # Log rekam jejak fitur
-├── BLUEPRINT.md          # Dokumen ini
-└── config.yml            # Pusat pengaturan aplikasi
+├── data/                 # Local SQLite database storage
+├── static/               # Frontend assets (CSS/JS)
+├── templates/            # HTML templates
+├── CHANGELOG.md          # Feature release log
+├── BLUEPRINT.md          # This document
+└── config.yml            # Application settings center
 ```

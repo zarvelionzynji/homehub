@@ -4,47 +4,47 @@
 
 # 🏡 HomeHub (Fork)
 
-> **Info Fork**: Proyek ini adalah versi modifikasi (fork) dari repositori asli [HomeHub buatan surajverma](https://github.com/surajverma/homehub). 
+> **Fork Info**: This project is a modified fork of the original [HomeHub by surajverma](https://github.com/surajverma/homehub).
 
-HomeHub adalah aplikasi web ringan yang berjalan di server lokal (self-hosted) untuk menjadi pusat kegiatan digital harian keluarga Anda.
+HomeHub is a lightweight self-hosted web application designed to be the digital hub for your household's daily activities.
 
-## ✨ Fitur Utama
-* **🔗 Quick Links**: Dasbor visual bergaya kotak (*grid*) untuk mengorganisasi *bookmark* dan tautan favorit keluarga, lengkap dengan logo ikon dan pengelompokan kategori pintar.
-* **📝 Catatan & Cloud Bersama**: Tempat sederhana untuk menulis catatan cepat dan berbagi file di jaringan rumah.
-* **🛒 Daftar Belanja & Tugas (Chores)**: Daftar kolaboratif untuk melacak belanjaan dan tugas rumah tangga.
-* **🗓️ Kalender & Pengingat**: Kalender bersama untuk mengingat tanggal penting.
-* **💰 Pencatat Pengeluaran**: Lacak pengeluaran keluarga dan tagihan bulanan (mendukung status lunas/belum bayar).
-* **🚗 Vehicle Maintenance Log**: Catat riwayat servis kendaraan (mobil & motor) dengan odometer, biaya, dan lampiran. Dilengkapi pengingat servis otomatis dan sinkronisasi biaya dua arah dengan Expense Tracker.
-* **👋 Siapa di Rumah?**: Cek dengan cepat siapa anggota keluarga yang sedang berada di rumah.
-* **🎬 Pengunduh Media**: Simpan video atau musik langsung ke server Anda.
-* **🤖 AI Agent API (RESTful)**: Hubungkan HomeHub dengan asisten AI favorit Anda (seperti OpenClaw atau GPT). AI dapat mengontrol status rumah, membaca catatan, menyelesaikan tugas, hingga mengubah `config.yml` secara programatis via API terenkripsi.
-* **🌐 Multi Bahasa (EN/ID)**: Dukung dua bahasa — Inggris dan Indonesia. Language switcher di header untuk ganti bahasa kapan saja.
-* **📱 Responsive Mobile**: Header kompak 1 baris di perangkat seluler, semua fitur tetap mudah diakses.
-* **Privasi Penuh**: Semua data Anda tetap berada di jaringan Anda sendiri. Tidak ada pelacakan dari pihak ketiga.
+## ✨ Key Features
+* **🔗 Quick Links**: Visual grid-style dashboard for organizing family bookmarks and favorite links, complete with icon logos and smart category grouping.
+* **📝 Shared Notes & Cloud**: A simple space for quick notes and file sharing on your home network.
+* **🛒 Shopping List & Chores**: Collaborative lists for tracking groceries and household tasks.
+* **🗓️ Calendar & Reminders**: A shared calendar for important dates and recurring reminders.
+* **💰 Expense Tracker**: Track family expenses and monthly bills (supports paid/unpaid status).
+* **🚗 Vehicle Maintenance Log**: Log service records for vehicles (cars & motorcycles) with odometer, costs, and attachments. Includes automatic service alerts and bidirectional cost sync with the Expense Tracker.
+* **👋 Who's Home?**: Quickly check which family members are currently home.
+* **🎬 Media Downloader**: Save videos or music directly to your server.
+* **🤖 AI Agent API (RESTful)**: Connect HomeHub with your favorite AI assistants (like OpenClaw or GPT). AI can manage home status, read notes, complete chores, and even modify `config.yml` programmatically via an authenticated API.
+* **🌐 Multi-Language (EN/ID)**: Supports two languages — English and Indonesian. Language switcher in the header to toggle anytime.
+* **📱 Mobile Responsive**: Compact single-row header on mobile devices, all features remain easily accessible.
+* **🔒 Full Privacy**: All your data stays on your own network. No third-party tracking.
 
-## 🚀 Cara Menjalankan dengan Docker
+## 🚀 Quick Start with Docker
 
-1. Clone repositori ini dan buat salinan konfigurasi:
+1. Clone this repository and create a config copy:
 ```bash
 git clone https://github.com/zarvelionzynji/homehub.git
 cd homehub
 cp config-example.yml config.yml
 ```
 
-2. Buka dan edit `config.yml` untuk mengatur nama anggota keluarga dan pengaturan lainnya.
+2. Open and edit `config.yml` to set family member names and other settings.
 
-3. Jalankan dengan Docker Compose:
+3. Run with Docker Compose:
 ```bash
 docker compose up -d
 ```
-HomeHub Anda siap diakses di [http://localhost:5000](http://localhost:5000).
+Your HomeHub is ready at [http://localhost:5000](http://localhost:5000).
 
-## 🛠️ Cara Pengembangan (Development)
+## 🛠️ Development Setup
 
-Jika Anda ingin menjalankannya secara lokal tanpa Docker untuk mengubah kode:
+To run locally without Docker for code changes:
 ```bash
 python -m venv venv
-venv\Scripts\activate  # Di Windows
+venv\Scripts\activate  # On Windows
 pip install -r requirements.txt
 npm install
 npm run build:css
@@ -52,7 +52,7 @@ npm run build:css
 python run.py
 ```
 
-## 📜 Lisensi & Penafian (Disclaimer)
+## 📜 License & Disclaimer
 
-Proyek ini dilisensikan di bawah MIT License. 
-Perangkat lunak ini disediakan "apa adanya" tanpa garansi. Dirancang khusus untuk penggunaan di **jaringan lokal yang terpercaya** dan tidak disarankan untuk diekspos langsung ke internet publik tanpa pengamanan tambahan.
+This project is licensed under the MIT License.
+This software is provided "as is" without warranty. Designed for use on **trusted local networks** and not recommended for direct exposure to the public internet without additional security measures.
